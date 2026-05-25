@@ -43,7 +43,7 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 ### Environment
 
-- Node.js - see `.nvmrc`
+- Node.js - for version see `.nvmrc`, use `nvm use` in terminal before run any node command
 - Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env` for Node, or `.dev.vars` for Cloudflare local dev)
 - Local Supabase: `npx supabase start` (requires Docker)
 - Cloudflare local dev: secrets go in `.dev.vars` (gitignored)
