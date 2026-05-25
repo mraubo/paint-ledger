@@ -26,3 +26,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+#10xdevs
+.agents/**/10x-*
+.cursor/**/10x-*
