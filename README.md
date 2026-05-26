@@ -224,6 +224,29 @@ npx wrangler deploy
 
 Missing Worker secrets at runtime disable auth silently (`createClient()` returns `null`). After deploy, confirm sign-in works and protected routes redirect correctly.
 
+### Cloudflare Workers Builds (auto-deploy)
+
+After connecting the [Cloudflare Workers & Pages GitHub app](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/) and linking this repo to the `paint-ledger` Worker (**Settings → Builds**), use:
+
+| Setting | Value |
+| ------- | ----- |
+| Production branch | `master` |
+| Root directory | `/` |
+| Node version | `22` (matches GitHub Actions CI) |
+| Build command | `npm ci && npx astro sync && npm run build` |
+| Deploy command | `npx wrangler deploy` |
+
+**Environment variables** (two places — both required):
+
+| Where | Variables | Why |
+| ----- | --------- | --- |
+| Builds → **Build variables** | `SUPABASE_URL`, `SUPABASE_KEY` | `astro:env` at **build** time |
+| Worker → **Settings → Variables and Secrets** (encrypted) | `SUPABASE_URL`, `SUPABASE_KEY` | **Runtime** on the Worker (you may already have these from `wrangler secret put`) |
+
+Use the same cloud Supabase **anon** key as GitHub Actions secrets. Do not add a deploy step to GitHub Actions — Builds owns production deploy; CI stays lint + build only.
+
+**Verify:** push to `master` → build succeeds in Cloudflare dashboard → https://paint-ledger.mateusz-raubo.workers.dev still signs in.
+
 ## CI
 
 GitHub Actions runs lint + build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.

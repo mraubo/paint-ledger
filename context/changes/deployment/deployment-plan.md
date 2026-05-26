@@ -1,7 +1,7 @@
 ---
 title: Cloudflare integration and deployment
 created_at: 2026-05-26
-status: pending
+status: active
 source: context/foundation/infrastructure.md
 overview: Harden Astro 6 + @astrojs/cloudflare v13 on Workers, wire Supabase for production, manual first deploy, then Cloudflare Workers Builds on push to master. GitHub Actions stays lint+build only.
 ---
@@ -46,7 +46,7 @@ flowchart LR
 | Secret parity | `phase-2-secrets` | done |
 | Supabase production | `phase-3-supabase` | done |
 | Manual deploy | `phase-4-manual-deploy` | done |
-| Workers Builds | `phase-5-builds` | pending |
+| Workers Builds | `phase-5-builds` | done |
 | Operations | `phase-6-ops` | pending |
 
 ---
@@ -361,7 +361,7 @@ Per [infrastructure.md Getting Started](../../foundation/infrastructure.md):
 
 **Edge-case support steps:**
 
-- [ ] Dashboard vs CLI conflict: if Builds is connected later, prefer **one** publish path. If you see “last published via Dashboard” warnings, avoid alternating dashboard edits and CLI deploys; use Builds or CLI consistently.
+- [x] Dashboard vs CLI conflict: prefer **Builds** for routine deploys; reserve `npx wrangler deploy` for hotfixes only.
 - [ ] Rollback drill: `npx wrangler deployments list` → `npx wrangler rollback` → re-run auth smoke test. Confirm Supabase data unchanged.
 
 ---
@@ -380,11 +380,13 @@ Recommended build settings:
 | Root directory | `/` (repo root) |
 | Node version | `22` (match [`.nvmrc`](../../../.nvmrc) / CI) |
 
-- [ ] Install **Cloudflare Workers & Pages** GitHub app; scope to this repo only.
-- [ ] Add **build environment variables** in Cloudflare Builds (not just Worker secrets): `SUPABASE_URL`, `SUPABASE_KEY` — required for `astro:env` at build time.
-- [ ] Add **Worker secrets** in dashboard (same names) for runtime — Builds `secrets:` in wrangler-action is an alternative only if you drop Builds.
-- [ ] Push to `master` → confirm build + deploy in Cloudflare dashboard and GitHub commit status.
-- [ ] Keep GitHub Actions CI on PRs + `master` (no deploy step) as the quality gate before Cloudflare promotes.
+- [x] Install **Cloudflare Workers & Pages** GitHub app; scope to this repo only.
+- [x] Connect repo: Workers & Pages → `paint-ledger` → **Settings → Builds** → GitHub.
+- [x] Configure build settings (branch, commands, Node 22) — see table below.
+- [x] Add **build environment variables** in Cloudflare Builds (not just Worker secrets): `SUPABASE_URL`, `SUPABASE_KEY` — required for `astro:env` at build time.
+- [x] Add **Worker secrets** in dashboard (same names) for runtime — Builds `secrets:` in wrangler-action is an alternative only if you drop Builds.
+- [x] Push to production branch → confirm build + deploy in Cloudflare dashboard (active: `b9441d3a` from `main`, 2026-05-26). Sign-in verified on https://paint-ledger.mateusz-raubo.workers.dev.
+- [x] Keep GitHub Actions CI on PRs + `master` (no deploy step) as the quality gate before Cloudflare promotes.
 
 **Edge-case support steps:**
 
