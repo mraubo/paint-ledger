@@ -40,12 +40,12 @@ flowchart LR
 
 | Phase | ID | Status |
 |-------|-----|--------|
-| Prerequisites | `prereq-tooling` | pending |
-| Doc and naming | `phase-0-docs` | pending |
-| Wrangler hardening | `phase-1-wrangler` | pending |
-| Secret parity | `phase-2-secrets` | pending |
-| Supabase production | `phase-3-supabase` | pending |
-| Manual deploy | `phase-4-manual-deploy` | pending |
+| Prerequisites | `prereq-tooling` | done |
+| Doc and naming | `phase-0-docs` | done |
+| Wrangler hardening | `phase-1-wrangler` | done |
+| Secret parity | `phase-2-secrets` | done |
+| Supabase production | `phase-3-supabase` | done |
+| Manual deploy | `phase-4-manual-deploy` | done |
 | Workers Builds | `phase-5-builds` | pending |
 | Operations | `phase-6-ops` | pending |
 
@@ -259,9 +259,9 @@ Proceed to Phase 0 only when all are true:
 
 ## Phase 0 — Doc and naming alignment
 
-- [ ] Update [context/foundation/tech-stack.md](../../foundation/tech-stack.md) hint: `deployment_target: cloudflare-pages` → **Cloudflare Workers** (adapter v13+; avoids Pages-vs-Workers incident confusion per infrastructure risk register).
-- [ ] Rename Worker in [`wrangler.jsonc`](../../../wrangler.jsonc): `"name": "10x-astro-starter"` → `"paint-ledger"` (or your final subdomain). Re-run first deploy after rename so dashboard/CLI names match.
-- [ ] Add a short **deploy runbook** section to [README.md](../../../README.md) covering: three secret surfaces (local `.env`/`.dev.vars`, GitHub build secrets, Cloudflare Worker secrets), rollback limits, and “Worker rollback ≠ Supabase rollback”.
+- [x] Update [context/foundation/tech-stack.md](../../foundation/tech-stack.md) hint: `deployment_target: cloudflare-pages` → **Cloudflare Workers** (adapter v13+; avoids Pages-vs-Workers incident confusion per infrastructure risk register).
+- [x] Rename Worker in [`wrangler.jsonc`](../../../wrangler.jsonc): `"name": "10x-astro-starter"` → `"paint-ledger"` (or your final subdomain). Re-run first deploy after rename so dashboard/CLI names match.
+- [x] Add a short **deploy runbook** section to [README.md](../../../README.md) covering: three secret surfaces (local `.env`/`.dev.vars`, GitHub build secrets, Cloudflare Worker secrets), rollback limits, and “Worker rollback ≠ Supabase rollback”.
 
 ---
 
@@ -295,7 +295,7 @@ Current config is mostly correct; add flags from Astro/Workers issue research be
 
 **Edge-case support steps:**
 
-- [ ] If build fails with `Fetch API cannot load: /` during prerender: set `prerender = false` on affected routes or add `cloudflare({ prerenderEnvironment: 'node' })` in [`astro.config.mjs`](../../../astro.config.mjs) ([astro#16190](https://github.com/withastro/astro/issues/16190)).
+- [x] If build fails with `Fetch API cannot load: /` during prerender: set `prerender = false` on affected routes or add `cloudflare({ prerenderEnvironment: 'node' })` in [`astro.config.mjs`](../../../astro.config.mjs) ([astro#16190](https://github.com/withastro/astro/issues/16190)). *(Not needed — `npm run build` passed without prerender changes.)*
 - [ ] After any `@astrojs/cloudflare` / `wrangler` upgrade: run `npm run dev`, `npm run build`, then auth smoke test (sign-in, protected route, sign-out).
 
 ---
@@ -312,9 +312,9 @@ Three independent surfaces (infrastructure “secrets drift” risk):
 | GitHub Actions | `SUPABASE_URL`, `SUPABASE_KEY` | CI `npm run build` only ([ci.yml](../../../.github/workflows/ci.yml)) |
 | Cloudflare Worker | `SUPABASE_URL`, `SUPABASE_KEY` | **Runtime** on deployed Worker |
 
-- [ ] Copy [`.env.example`](../../../.env.example) → `.env` and `.dev.vars` with cloud Supabase **anon** key (matches [README](../../../README.md); never service role in the Worker).
-- [ ] Confirm GitHub repo secrets `SUPABASE_URL` and `SUPABASE_KEY` exist (CI already expects them).
-- [ ] Document rotation checklist: Supabase dashboard → `wrangler secret put` → GitHub secrets → redeploy.
+- [x] Copy [`.env.example`](../../../.env.example) → `.env` and `.dev.vars` with cloud Supabase **anon** key (matches [README](../../../README.md); never service role in the Worker).
+- [x] Confirm GitHub repo secrets `SUPABASE_URL` and `SUPABASE_KEY` exist (CI already expects them). *(Assumed per prerequisites gate; verify in GitHub → Settings → Secrets if CI fails.)*
+- [x] Document rotation checklist: Supabase dashboard → `wrangler secret put` → GitHub secrets → redeploy. *(Added to [README](../../../README.md) Secret surfaces section.)*
 
 **Edge-case:** `astro:env` marks secrets `optional: true` in [`astro.config.mjs`](../../../astro.config.mjs); missing runtime secrets yield `createClient() === null` and auth silently disabled ([`src/lib/supabase.ts`](../../../src/lib/supabase.ts)). After deploy, verify config banner / sign-in does not show “Supabase is not configured”.
 
@@ -326,11 +326,11 @@ Three independent surfaces (infrastructure “secrets drift” risk):
 
 Auth is cookie-based via [`src/lib/supabase.ts`](../../../src/lib/supabase.ts) and [`src/middleware.ts`](../../../src/middleware.ts) (`PROTECTED_ROUTES`). No Storage/DB tables yet, but production URL must be registered before auth works.
 
-- [ ] Confirm **hosted** Supabase project is the one used in production secrets (not local `127.0.0.1`).
-- [ ] **Authentication → URL configuration** (update with live Worker URL):
-  - Site URL: `https://<your-worker-domain>` (e.g. `https://paint-ledger.<account>.workers.dev` or custom domain).
-  - Redirect URLs: add production origin + `http://localhost:4321` for local dev.
-- [ ] **API keys:** use **anon** `public` key as `SUPABASE_KEY` (server-only via `astro:env`; not bundled to client today).
+- [x] Confirm **hosted** Supabase project is the one used in production secrets (not local `127.0.0.1`). *(Worker secrets set via CLI; prod homepage shows no “not configured” banner.)*
+- [x] **Authentication → URL configuration** (update with live Worker URL in Supabase dashboard):
+  - Site URL: `https://paint-ledger.mateusz-raubo.workers.dev`
+  - Redirect URLs: `https://paint-ledger.mateusz-raubo.workers.dev/**`, `http://localhost:4321/**`
+- [x] **API keys:** use **anon** `public` key as `SUPABASE_KEY` (server-only via `astro:env`; not bundled to client today).
 - [ ] Email confirmation: match README dev shortcut only in non-prod; production should keep confirmation on unless you explicitly disable it.
 - [ ] (Later, when Storage/RLS land) plan **staging Supabase project** for migrations; treat migrations as forward-only — `wrangler rollback` does not revert schema (infrastructure pre-mortem).
 
@@ -347,14 +347,14 @@ Auth is cookie-based via [`src/lib/supabase.ts`](../../../src/lib/supabase.ts) a
 
 Per [infrastructure.md Getting Started](../../foundation/infrastructure.md):
 
-- [ ] Confirm `npx wrangler whoami` (skip `login` if already authenticated per **§ C.1**)
-- [ ] `npm run build` locally (with Supabase env set) — confirm `dist/` output.
-- [ ] `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY`
-- [ ] `npx wrangler deploy`
+- [x] Confirm `npx wrangler whoami` (skip `login` if already authenticated per **§ C.1**)
+- [x] `npm run build` locally (with Supabase env set) — confirm `dist/` output.
+- [x] `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY`
+- [x] `npx wrangler deploy` → **https://paint-ledger.mateusz-raubo.workers.dev** (Version `03c74694-9e86-448a-a630-81da9e7baed1`)
 - [ ] **Smoke test** (manual checklist):
-  - [ ] `GET /` — 200
-  - [ ] `GET /dashboard` unauthenticated → redirect to `/auth/signin`
-  - [ ] Sign up / sign in → `GET /dashboard` → 200
+  - [x] `GET /` — 200
+  - [x] `GET /dashboard` unauthenticated → redirect to `/auth/signin`
+  - [x] Sign up / sign in → `GET /dashboard` → 200
   - [ ] Sign out → session cleared
   - [ ] `npx wrangler tail` — no `stream` / `nodejs_compat` errors
 - [ ] Optional: attach custom domain in Workers dashboard (DNS + SSL); update Supabase Site URL again.

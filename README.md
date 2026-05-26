@@ -167,21 +167,62 @@ Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_
 
 ## Deployment
 
-This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/).
+This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) via `@astrojs/cloudflare` (server output + static assets). Production auto-deploy on push to `master` is handled by **Cloudflare Workers Builds** (GitHub app); manual deploy remains available for hotfixes.
 
-1. Build the project:
+### Secret surfaces
+
+Supabase credentials must stay in sync across three independent places. Use the **anon (public) key** only — never the `service_role` key in any of these.
+
+| Surface | Location | Purpose |
+| ------- | -------- | ------- |
+| Local | `.env` and `.dev.vars` | `npm run dev` / local SSR (`astro:env` + Wrangler workerd) |
+| GitHub Actions | Repository secrets `SUPABASE_URL`, `SUPABASE_KEY` | CI `npm run build` only |
+| Cloudflare Worker | `npx wrangler secret put` or dashboard → Variables and Secrets | **Runtime** on the deployed Worker |
+
+**Rotation checklist** (after regenerating keys in Supabase → Settings → API):
+
+1. Update `.env` and `.dev.vars` locally (same `SUPABASE_URL` + anon `SUPABASE_KEY`).
+2. Update GitHub repository secrets (`SUPABASE_URL`, `SUPABASE_KEY`).
+3. Update Cloudflare Worker secrets: `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY`.
+4. Redeploy: `npx wrangler deploy` or push to `master` (if Workers Builds is connected).
+
+### Manual deploy
+
+1. Authenticate: `npx wrangler login` (once per machine).
+2. Build: `npm run build` (requires Supabase env vars locally).
+3. Set runtime secrets (first deploy or after rotation):
 
 ```bash
-npm run build
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_KEY
 ```
 
-2. Deploy with Wrangler:
+4. Deploy:
 
 ```bash
 npx wrangler deploy
 ```
 
-Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or via `npx wrangler secret put`.
+5. Update Supabase **Authentication → URL configuration** (Site URL + Redirect URLs) to match the Worker hostname.
+
+**Current production URL:** `https://paint-ledger.mateusz-raubo.workers.dev`
+
+| Setting | Value |
+| ------- | ----- |
+| Site URL | `https://paint-ledger.mateusz-raubo.workers.dev` |
+| Redirect URLs | `https://paint-ledger.mateusz-raubo.workers.dev/**`, `http://localhost:4321/**` |
+
+### Rollback and operations
+
+| Command | Use |
+| ------- | --- |
+| `npx wrangler tail` | Live Worker logs after deploy |
+| `npx wrangler deployments list` | Version history |
+| `npx wrangler rollback` | Revert to the previous Worker deployment |
+
+**Worker rollback only reverts application code and static assets** on Cloudflare. It does **not** roll back Supabase data, Auth users, or schema changes. Treat database migrations as forward-only; use a staging Supabase project before risky schema work.
+
+Missing Worker secrets at runtime disable auth silently (`createClient()` returns `null`). After deploy, confirm sign-in works and protected routes redirect correctly.
 
 ## CI
 
