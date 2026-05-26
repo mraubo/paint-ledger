@@ -1,8 +1,25 @@
-# 10x Astro Starter
+# Paint Ledger
 
 ![](./public/template.png)
 
-A modern, opinionated starter template for building fast, accessible web applications.
+**Paint Ledger** is a streamlined paint logging application designed for miniature painters and hobbyists who want to track, replicate, and perfect their painting workflows without the clutter.
+
+### The Problem
+
+Every hobbyist knows the frustration of trying to recreate a perfect color scheme months later. Currently, painting workflows are messy and fragmented—scattered across phone notes, loose reference photos, Discord messages, and random local folders. When information is this disorganized, it becomes incredibly difficult to recreate a proven recipe, repeat a cohesive army color scheme, or quickly recall where a specific model was sourced.
+
+### The Solution
+
+**Paint Ledger** solves this by introducing a clean, structured **paint log** that unifies your tutorial, color recipe, and workshop notes into a single, cohesive entry.
+
+The core philosophy behind our MVP is that a true painting recipe is more than just a list of paints or a sequence of steps. It is the holistic combination of:
+
+* **The Model:** What it is and where it came from.
+* **The Palette:** The exact paints, washes, and mediums used.
+* **The Process:** The sequential steps and techniques applied.
+* **The Result:** The final visual outcome, documented in one place.
+
+With Paint Ledger, you can finally close your scattered tabs and focus on what matters: bringing your miniatures to life.
 
 ## Tech Stack
 
