@@ -166,16 +166,16 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID | Suggested issue title | Ready for `/10x-plan` | Notes |
-|---|---|---|---|---|
-| F-01 | paint-log-schema-rls | Paint log Postgres schema and owner RLS | no | Blocks all entry slices |
-| F-02 | photo-storage-buckets | Supabase Storage for step and final photos | no | After F-01 |
-| S-01 | account-auth-shell | Extend auth shell and protected routes for entries | yes | Scaffold present; harden before entry routes |
-| S-02 | entry-draft-and-origin | Create draft entry with model origin note | no | After F-01 |
-| S-03 | entry-paint-palette | Entry-level paint list with color picker | no | After S-02 |
-| S-04 | steps-with-paint-cards | Ordered steps with paint assignment and cards | no | After S-03 |
-| S-05 | entry-step-and-final-photos | Step and final photo upload | no | After F-02 and S-04 |
-| S-06 | entry-list-and-detail | Entry list and full detail recall (US-01) | no | North star; after S-05 |
+| Roadmap ID | Change ID | GitHub | Suggested issue title | Ready for `/10x-plan` | Notes |
+|---|---|---|---|---|---|
+| F-01 | paint-log-schema-rls | [#2](https://github.com/mraubo/paint-ledger/issues/2) | Paint log Postgres schema and owner RLS | no | Blocks all entry slices |
+| F-02 | photo-storage-buckets | [#4](https://github.com/mraubo/paint-ledger/issues/4) | Supabase Storage for step and final photos | no | After F-01 |
+| S-01 | account-auth-shell | [#3](https://github.com/mraubo/paint-ledger/issues/3) | Extend auth shell and protected routes for entries | yes | Scaffold present; harden before entry routes |
+| S-02 | entry-draft-and-origin | [#5](https://github.com/mraubo/paint-ledger/issues/5) | Create draft entry with model origin note | no | After F-01 |
+| S-03 | entry-paint-palette | [#6](https://github.com/mraubo/paint-ledger/issues/6) | Entry-level paint list with color picker | no | After S-02 |
+| S-04 | steps-with-paint-cards | [#7](https://github.com/mraubo/paint-ledger/issues/7) | Ordered steps with paint assignment and cards | no | After S-03 |
+| S-05 | entry-step-and-final-photos | [#8](https://github.com/mraubo/paint-ledger/issues/8) | Step and final photo upload | no | After F-02 and S-04 |
+| S-06 | entry-list-and-detail | [#9](https://github.com/mraubo/paint-ledger/issues/9) | Entry list and full detail recall (US-01) | no | North star; after S-05 |
 
 ## Open Roadmap Questions
 
