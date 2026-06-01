@@ -213,20 +213,20 @@ No data migration. Deploy is code-only.
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes
-- [x] 1.2 `npm run build` passes
+- [x] 1.1 `npm run lint` passes — 2b9fa9c
+- [x] 1.2 `npm run build` passes — 2b9fa9c
 
 #### Manual
 
-- [x] 1.3 Unauthenticated `/entries` redirects; sign-in lands on `/entries`; auth pages redirect when logged in
+- [x] 1.3 Unauthenticated `/entries` redirects; sign-in lands on `/entries`; auth pages redirect when logged in — 2b9fa9c
 
 ### Phase 2: App shell layout and route target
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npm run build` passes
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npm run build` passes
 
 #### Manual
 
-- [ ] 2.3 `/entries` shows AppLayout + Topbar; sign out works; no broken `/dashboard` links
+- [x] 2.3 `/entries` shows AppLayout + Topbar; sign out works; no broken `/dashboard` links
