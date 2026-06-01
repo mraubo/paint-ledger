@@ -224,9 +224,9 @@ No data migration. Deploy is code-only.
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run build` passes
+- [x] 2.1 `npm run lint` passes — 90e0a86
+- [x] 2.2 `npm run build` passes — 90e0a86
 
 #### Manual
 
-- [x] 2.3 `/entries` shows AppLayout + Topbar; sign out works; no broken `/dashboard` links
+- [x] 2.3 `/entries` shows AppLayout + Topbar; sign out works; no broken `/dashboard` links — 90e0a86
