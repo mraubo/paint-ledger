@@ -27,6 +27,15 @@ Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`)
 
 No test suite yet. After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint` and `npm run build`.
 
+### Authenticated `curl` (local)
+
+For API or page requests that need a logged-in session, read the Supabase auth cookie from `.cookies` (gitignored; copy from @.cookies.example). The file stores `SB_COOKIE_KEY` (cookie name, e.g. `sb-127-auth-token` for local Supabase) and `SB_COOKIE_VALUE` (session payload from the browser). Do not commit `.cookies`. Example:
+
+```bash
+source .cookies
+curl -b "${SB_COOKIE_KEY}=${SB_COOKIE_VALUE}" http://localhost:4321/...
+```
+
 ## Coding style
 
 Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `npm run format` / `npm run lint`). React/Astro lint rules: @eslint.config.js (unused vars: `_` prefix). Do not use `set:html` for dynamic or user-supplied HTML; use Astro components. Use `set:html` only for trusted static markup already in the repo. shadcn-style UI: `src/components/ui/` (@components.json).

@@ -30,3 +30,4 @@ pnpm-debug.log*
 #10xdevs
 .agents/**/10x-*
 .cursor/**/10x-*
+.cookies
