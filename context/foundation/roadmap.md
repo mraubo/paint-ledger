@@ -3,7 +3,7 @@ project: "Paint Ledger"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-27
+updated: 2026-06-02
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -33,7 +33,7 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 |---|---|---|---|---|---|
 | F-01 | paint-log-schema-rls | (foundation) paint log schema and owner-only RLS in Postgres | — | FR-002, NFR (privacy) | proposed |
 | F-02 | photo-storage-buckets | (foundation) Supabase Storage buckets and policies for step and final photos | F-01 | FR-009, FR-010, NFR (privacy) | proposed |
-| S-01 | account-auth-shell | sign up, log in, sign out, and reach protected app shell | — | FR-001, FR-002 | ready |
+| S-01 | account-auth-shell | sign up, log in, sign out, and reach protected app shell | — | FR-001, FR-002 | done |
 | S-02 | entry-draft-and-origin | create a draft entry with basics and a custom model origin note | F-01, S-01 | FR-003, FR-004 | proposed |
 | S-03 | entry-paint-palette | define an entry-level paint list with approximate color picker | S-02, F-01 | FR-005 | proposed |
 | S-04 | steps-with-paint-cards | add ordered steps, assign paints from the entry list, and see paint cards on steps | S-03 | FR-006, FR-007, FR-008 | proposed |
@@ -102,7 +102,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Auth scaffold exists but only `/dashboard` is protected — extend `PROTECTED_ROUTES` before entry routes ship to avoid a window where entry pages leak without auth.
-- **Status:** ready
+- **Status:** done
 
 ### S-02: Entry draft and origin
 
@@ -194,3 +194,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Observability baseline (Sentry/OTel)** — Why parked: speed goal; add after US-01 validates unless production errors force earlier.
 
 ## Done
+
+- **S-01: user can sign up, log in, sign out, and access a protected app shell that will host entry workflows.** — Archived 2026-06-02 → `context/archive/2026-06-01-account-auth-shell/`. Lesson: —.
