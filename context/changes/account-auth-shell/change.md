@@ -1,9 +1,9 @@
 ---
 change_id: account-auth-shell
 title: Extend auth shell and protected routes for entries
-status: implemented
+status: impl_reviewed
 created: 2026-06-01
-updated: 2026-06-01
+updated: 2026-06-02
 archived_at: null
 ---
 

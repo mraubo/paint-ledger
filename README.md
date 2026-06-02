@@ -163,7 +163,7 @@ Users can then sign in immediately after sign-up without clicking a confirmation
 | `/auth/confirm-email` | Post-signup "check your inbox" page                                     |
 | `/entries`            | Protected app home (redirects to `/auth/signin` if unauthenticated)     |
 
-Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication.
+Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication. Signed-in users who visit `/auth/signin` or `/auth/signup` are redirected to `/entries`.
 
 ## Deployment
 

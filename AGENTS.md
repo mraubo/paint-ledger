@@ -9,6 +9,7 @@ Paint Ledger logs hobby paint workflows (models, recipes, steps, photos). Astro 
 - Register new authenticated pages by adding their path prefix to `PROTECTED_ROUTES` in @src/middleware.ts.
 - Do not delete or relocate the `context/` tree; it holds foundation docs and change logs for this project.
 - Run `npm run lint` before pushing; CI also runs `npx astro sync` then `npm run build` with Supabase secrets set (@.github/workflows/ci.yml).
+- Do not commit directly to `main`. All work goes on a dedicated feature branch; open a PR into `main` when ready. Before committing, confirm the current branch is not `main` (`git branch --show-current`). If you are on `main`, create and switch to a feature branch first.
 
 ## Project structure
 
@@ -43,5 +44,11 @@ Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `n
 ## Commits and pull requests
 
 Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target branch for CI is `master` (@.github/workflows/ci.yml); confirm your remote default before opening PRs.
+
+**Tracking:** Scope work from @context/foundation/roadmap.md (slice IDs like `S-02`, change IDs like `entry-draft-and-origin`; plans live under `context/changes/<change-id>/`). Optional GitHub Issues on this repo for ad-hoc tasks. This project does not use Jira.
+
+**Branches:** Never commit on `main`. If no feature branch exists yet, create one before the first commit. Name branches from the active roadmap slice or change folder (e.g. `s-02-entry-draft-and-origin`, `f-01-paint-log-schema-rls`). When work maps to a GitHub issue, you may prefix with the issue number (e.g. `42-s-02-entry-draft`). If the slice, change id, or issue is unclear, ask before choosing a branch name.
+
+**Commits:** English; use Conventional Commit prefixes (`feat:`, `fix:`, `chore:`). Reference the roadmap slice in the subject when helpful (e.g. `feat(S-02): add entry draft form`). Link GitHub issues in the body or with `(#42)` in the subject when applicable.
 
 PRs should pass GitHub Actions lint and build. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
