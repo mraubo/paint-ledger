@@ -3,7 +3,7 @@ project: "Paint Ledger"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-06-02
+updated: 2026-06-08
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -31,7 +31,7 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 
 | ID | Change ID | Outcome (user can …) | Prerequisites | PRD refs | Status |
 |---|---|---|---|---|---|
-| F-01 | paint-log-schema-rls | (foundation) paint log schema and owner-only RLS in Postgres | — | FR-002, NFR (privacy) | proposed |
+| F-01 | paint-log-schema-rls | (foundation) paint log schema and owner-only RLS in Postgres | — | FR-002, NFR (privacy) | done |
 | F-02 | photo-storage-buckets | (foundation) Supabase Storage buckets and policies for step and final photos | F-01 | FR-009, FR-010, NFR (privacy) | proposed |
 | S-01 | account-auth-shell | sign up, log in, sign out, and reach protected app shell | — | FR-001, FR-002 | done |
 | S-02 | entry-draft-and-origin | create a draft entry with basics and a custom model origin note | F-01, S-01 | FR-003, FR-004 | proposed |
@@ -75,7 +75,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Without schema and RLS, no vertical slice can persist private entries — blocks the entire must-have path under a 3-week after-hours budget.
-- **Status:** proposed
+- **Status:** done
 
 ### F-02: Photo storage buckets
 
@@ -195,4 +195,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
+- **F-01: (foundation) Postgres tables for entries, entry paints, and ordered steps exist with owner-only row-level security.** — Archived 2026-06-08 → `context/archive/2026-06-08-paint-log-schema-rls/`. Lesson: —.
 - **S-01: user can sign up, log in, sign out, and access a protected app shell that will host entry workflows.** — Archived 2026-06-02 → `context/archive/2026-06-01-account-auth-shell/`. Lesson: —.

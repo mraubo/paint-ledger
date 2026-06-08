@@ -128,7 +128,34 @@ npx supabase stop
 
 The local Studio UI is available at `http://localhost:54323`.
 
-No database tables or migrations are required — this project uses Supabase Auth's built-in `auth.users` table only.
+### Database schema and seed (local)
+
+Paint Ledger stores paint logs in Postgres (`entries`, `entry_paints`, `steps`, `step_paint_assignments`) with owner-only row-level security. Migrations live in `supabase/migrations/`.
+
+After starting the local stack, apply migrations and seed data:
+
+```bash
+npx supabase db reset
+```
+
+This recreates the local database from migrations and runs `supabase/seed.sql`. The seed file is **local development only** — never run its `auth.users` inserts against production.
+
+**Seed user** (for Studio inspection and local sign-in):
+
+| Field    | Value                    |
+| -------- | ------------------------ |
+| Email    | `seed@paint-ledger.local` |
+| Password | `seed-password-123`      |
+
+After schema changes, regenerate TypeScript types:
+
+```bash
+npx supabase gen types typescript --local > src/lib/database.types.ts
+```
+
+**Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
+
+**RLS verification (local):** create a second account via `/auth/signup`, then confirm in Studio (or authenticated SQL) that each user sees only their own `entries` rows and cannot insert/update/delete another user's child rows. Cross-entry step↔paint pairings are also rejected by the `enforce_step_paint_same_entry` trigger.
 
 ### Using a cloud Supabase project instead
 
