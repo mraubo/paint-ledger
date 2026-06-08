@@ -24,6 +24,23 @@ values (
 );
 
 -- ---------------------------------------------------------------------------
+-- Helpers
+-- ---------------------------------------------------------------------------
+
+create or replace function public.try_cast_uuid(t text)
+returns uuid
+language sql
+immutable
+set search_path = ''
+as $$
+  select case
+    when t ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      then t::uuid
+    else null
+  end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- storage.objects RLS: mirror F-01 entry ownership via path segments
 -- Path convention:
 --   Step:  {user_id}/{entry_id}/steps/{step_id}
@@ -40,7 +57,7 @@ using (
   and exists (
     select 1
     from public.entries e
-    where e.id = split_part(name, '/', 2)::uuid
+    where e.id = public.try_cast_uuid(split_part(name, '/', 2))
       and e.user_id = (select auth.uid())
   )
   and (
@@ -50,11 +67,12 @@ using (
     )
     or (
       split_part(name, '/', 3) = 'steps'
+      and split_part(name, '/', 5) = ''
       and exists (
         select 1
         from public.steps s
-        where s.id = split_part(name, '/', 4)::uuid
-          and s.entry_id = split_part(name, '/', 2)::uuid
+        where s.id = public.try_cast_uuid(split_part(name, '/', 4))
+          and s.entry_id = public.try_cast_uuid(split_part(name, '/', 2))
       )
     )
   )
@@ -70,7 +88,7 @@ with check (
   and exists (
     select 1
     from public.entries e
-    where e.id = split_part(name, '/', 2)::uuid
+    where e.id = public.try_cast_uuid(split_part(name, '/', 2))
       and e.user_id = (select auth.uid())
   )
   and (
@@ -80,11 +98,12 @@ with check (
     )
     or (
       split_part(name, '/', 3) = 'steps'
+      and split_part(name, '/', 5) = ''
       and exists (
         select 1
         from public.steps s
-        where s.id = split_part(name, '/', 4)::uuid
-          and s.entry_id = split_part(name, '/', 2)::uuid
+        where s.id = public.try_cast_uuid(split_part(name, '/', 4))
+          and s.entry_id = public.try_cast_uuid(split_part(name, '/', 2))
       )
     )
   )
@@ -100,7 +119,7 @@ using (
   and exists (
     select 1
     from public.entries e
-    where e.id = split_part(name, '/', 2)::uuid
+    where e.id = public.try_cast_uuid(split_part(name, '/', 2))
       and e.user_id = (select auth.uid())
   )
   and (
@@ -110,11 +129,12 @@ using (
     )
     or (
       split_part(name, '/', 3) = 'steps'
+      and split_part(name, '/', 5) = ''
       and exists (
         select 1
         from public.steps s
-        where s.id = split_part(name, '/', 4)::uuid
-          and s.entry_id = split_part(name, '/', 2)::uuid
+        where s.id = public.try_cast_uuid(split_part(name, '/', 4))
+          and s.entry_id = public.try_cast_uuid(split_part(name, '/', 2))
       )
     )
   )
@@ -125,7 +145,7 @@ with check (
   and exists (
     select 1
     from public.entries e
-    where e.id = split_part(name, '/', 2)::uuid
+    where e.id = public.try_cast_uuid(split_part(name, '/', 2))
       and e.user_id = (select auth.uid())
   )
   and (
@@ -135,11 +155,12 @@ with check (
     )
     or (
       split_part(name, '/', 3) = 'steps'
+      and split_part(name, '/', 5) = ''
       and exists (
         select 1
         from public.steps s
-        where s.id = split_part(name, '/', 4)::uuid
-          and s.entry_id = split_part(name, '/', 2)::uuid
+        where s.id = public.try_cast_uuid(split_part(name, '/', 4))
+          and s.entry_id = public.try_cast_uuid(split_part(name, '/', 2))
       )
     )
   )
@@ -155,7 +176,7 @@ using (
   and exists (
     select 1
     from public.entries e
-    where e.id = split_part(name, '/', 2)::uuid
+    where e.id = public.try_cast_uuid(split_part(name, '/', 2))
       and e.user_id = (select auth.uid())
   )
   and (
@@ -165,11 +186,12 @@ using (
     )
     or (
       split_part(name, '/', 3) = 'steps'
+      and split_part(name, '/', 5) = ''
       and exists (
         select 1
         from public.steps s
-        where s.id = split_part(name, '/', 4)::uuid
-          and s.entry_id = split_part(name, '/', 2)::uuid
+        where s.id = public.try_cast_uuid(split_part(name, '/', 4))
+          and s.entry_id = public.try_cast_uuid(split_part(name, '/', 2))
       )
     )
   )
