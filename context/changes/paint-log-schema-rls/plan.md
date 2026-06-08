@@ -330,13 +330,13 @@ Subquery-based RLS on child tables adds a small per-row cost — acceptable for 
 
 #### Automated
 
-- [ ] 2.1 `supabase db reset` applies migration and seed without errors
-- [ ] 2.2 `npm run lint` passes
-- [ ] 2.3 `npm run build` passes
+- [x] 2.1 `supabase db reset` applies migration and seed without errors
+- [x] 2.2 `npm run lint` passes
+- [x] 2.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 2.4 Studio shows seed fixture; seed user can sign in locally
+- [x] 2.4 Studio shows seed fixture; seed user can sign in locally
 
 ### Phase 3: RLS verification and security review
 
