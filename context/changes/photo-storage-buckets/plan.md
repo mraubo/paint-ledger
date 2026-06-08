@@ -325,25 +325,25 @@ Subquery-based Storage RLS adds per-request policy evaluation — acceptable for
 
 #### Automated
 
-- [x] 2.1 `supabase db reset` succeeds with `config.toml` bucket block
-- [x] 2.2 `npm run lint` passes
-- [x] 2.3 `npm run build` passes
+- [x] 2.1 `supabase db reset` succeeds with `config.toml` bucket block — 0d6642b
+- [x] 2.2 `npm run lint` passes — 0d6642b
+- [x] 2.3 `npm run build` passes — 0d6642b
 
 #### Manual
 
-- [x] 2.4 `database.types.ts` includes `final_photo_path` and `storage_path`
-- [x] 2.5 README documents bucket, paths, limits, and verification pointer
+- [x] 2.4 `database.types.ts` includes `final_photo_path` and `storage_path` — 0d6642b
+- [x] 2.5 README documents bucket, paths, limits, and verification pointer — 0d6642b
 
 ### Phase 3: Storage RLS verification and security review
 
 #### Automated
 
-- [ ] 3.1 `npx supabase db advisors --local` — no ERROR-level issues
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.4 Two-user Storage RLS isolation smoke tests pass
-- [ ] 3.5 Upsert overwrite on fixed step path verified
-- [ ] 3.6 `supabase migration list --local` confirms two applied migrations
+- [x] 3.4 Two-user Storage RLS isolation smoke tests pass
+- [x] 3.5 Upsert overwrite on fixed step path verified
+- [x] 3.6 `supabase migration list --local` confirms two applied migrations
