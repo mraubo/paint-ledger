@@ -147,7 +147,7 @@ This recreates the local database from migrations and runs `supabase/seed.sql`. 
 | Email    | `seed@paint-ledger.local` |
 | Password | `seed-password-123`      |
 
-After schema changes, regenerate TypeScript types:
+After schema changes, regenerate TypeScript types (includes photo path columns on `entries` and `steps`):
 
 ```bash
 npx supabase gen types typescript --local > src/lib/database.types.ts
@@ -156,6 +156,64 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 **Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
 
 **RLS verification (local):** create a second account via `/auth/signup`, then confirm in Studio (or authenticated SQL) that each user sees only their own `entries` rows and cannot insert/update/delete another user's child rows. Cross-entry step↔paint pairings are also rejected by the `enforce_step_paint_same_entry` trigger.
+
+### Entry photo storage (local)
+
+Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload UI is deferred to a later slice (S-05); until then, objects can be uploaded manually via Studio for verification. Replacing or deleting entries does not yet remove orphaned Storage objects.
+
+| Kind  | Object key (relative to bucket)              | DB column                 |
+| ----- | -------------------------------------------- | ------------------------- |
+| Step  | `{user_id}/{entry_id}/steps/{step_id}`       | `steps.storage_path`      |
+| Final | `{user_id}/{entry_id}/final`                 | `entries.final_photo_path` |
+
+**Constraints:** JPEG, PNG, and WebP only; **4 MiB** per object. Paths are fixed (no file extension in the key) so S-05 can upsert over the same object.
+
+**Storage RLS verification (local):** repeatable two-user smoke test (no upload UI required). Uses the seed fixture UUIDs from `supabase/seed.sql`:
+
+| Fixture | UUID |
+| ------- | ---- |
+| Seed user | `11111111-1111-4111-8111-111111111111` |
+| Seed entry | `22222222-2222-4222-8222-222222222222` |
+| Seed step 1 | `44444444-4444-4444-8444-444444444441` |
+
+1. Reset and sign in as the seed user (`seed@paint-ledger.local` / `seed-password-123`):
+
+   ```bash
+   npx supabase db reset
+   npm run dev
+   ```
+
+2. **Step photo — seed user (allow):** In Studio → Storage → `entry-photos`, upload a small JPEG/PNG/WebP to:
+
+   `11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/steps/44444444-4444-4444-8444-444444444441`
+
+   Confirm download and list succeed for the seed user.
+
+3. **Upsert overwrite — seed user:** Upload a second image to the **same** step path (Studio replace, or `upsert: true` via the authenticated client). Confirm only one object remains at that key.
+
+4. **Second user setup:** Sign out, create a second account at `/auth/signup`, and create an entry with at least one step (note the new `user_id`, `entry_id`, and `step_id` from Studio or SQL).
+
+5. **Cross-user deny:** While signed in as the second user, attempt to upload to the seed user's step path (step 2). Confirm the upload is rejected. Attempt to download or list the seed user's object — confirm access is denied.
+
+6. **Own path allow — second user:** Upload to `{second_user_id}/{second_entry_id}/steps/{second_step_id}`. Confirm upload, download, and list succeed.
+
+7. **Final photo — repeat for both users:** Seed user uploads to `11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/final` (success). Second user cannot upload to or read that path; second user can upload to `{second_user_id}/{second_entry_id}/final`.
+
+8. **Security advisors:**
+
+   ```bash
+   npx supabase db advisors --local
+   ```
+
+   Resolve any ERROR-level findings on `storage.objects` policies.
+
+9. Confirm migrations are applied:
+
+   ```bash
+   npx supabase migration list --local
+   ```
+
+   Both `paint_log_schema` and `entry_photo_storage` should show as applied locally.
 
 ### Using a cloud Supabase project instead
 
