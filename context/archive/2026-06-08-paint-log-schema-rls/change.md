@@ -1,10 +1,10 @@
 ---
 change_id: paint-log-schema-rls
 title: Paint log Postgres schema and owner-only RLS
-status: impl_reviewed
+status: archived
 created: 2026-06-08
 updated: 2026-06-08
-archived_at: null
+archived_at: 2026-06-08T11:59:33Z
 ---
 
 ## Notes

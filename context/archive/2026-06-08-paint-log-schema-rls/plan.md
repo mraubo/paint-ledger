@@ -342,11 +342,11 @@ Subquery-based RLS on child tables adds a small per-row cost — acceptable for 
 
 #### Automated
 
-- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues on new schema
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues on new schema — c568664
+- [x] 3.2 `npm run lint` passes — c568664
+- [x] 3.3 `npm run build` passes — c568664
 
 #### Manual
 
-- [x] 3.4 Two-user RLS isolation smoke tests pass
-- [x] 3.5 `supabase migration list --local` confirms single applied migration
+- [x] 3.4 Two-user RLS isolation smoke tests pass — a5a8df3
+- [x] 3.5 `supabase migration list --local` confirms single applied migration — a5a8df3
