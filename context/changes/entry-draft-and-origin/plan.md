@@ -363,11 +363,11 @@ Wire Astro pages with SSR reads, navigation, empty state, success banners, and r
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint` — ce17cc1
+- [x] 3.2 Build passes: `npm run build` — ce17cc1
 
 #### Manual
 
-- [x] 3.3 Full create → list banner → edit → saved banner flow works
-- [x] 3.4 List shows title, Draft badge, updated date; empty state shows CTA
-- [x] 3.5 Cross-user entry access blocked; unauthenticated routes redirect
+- [x] 3.3 Full create → list banner → edit → saved banner flow works — ce17cc1
+- [x] 3.4 List shows title, Draft badge, updated date; empty state shows CTA — ce17cc1
+- [x] 3.5 Cross-user entry access blocked; unauthenticated routes redirect — ce17cc1
