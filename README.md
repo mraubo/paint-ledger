@@ -155,6 +155,8 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 
 **Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
 
+**RLS verification (local):** create a second account via `/auth/signup`, then confirm in Studio (or authenticated SQL) that each user sees only their own `entries` rows and cannot insert/update/delete another user's child rows. Cross-entry step↔paint pairings are also rejected by the `enforce_step_paint_same_entry` trigger.
+
 ### Using a cloud Supabase project instead
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:

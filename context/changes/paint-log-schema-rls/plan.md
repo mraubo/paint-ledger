@@ -342,9 +342,9 @@ Subquery-based RLS on child tables adds a small per-row cost — acceptable for 
 
 #### Automated
 
-- [ ] 3.1 `npx supabase db advisors --local` — no ERROR-level issues on new schema
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues on new schema
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
