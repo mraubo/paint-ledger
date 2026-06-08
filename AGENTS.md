@@ -51,4 +51,6 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 
 **Commits:** English; use Conventional Commit prefixes (`feat:`, `fix:`, `chore:`). Reference the roadmap slice in the subject when helpful (e.g. `feat(S-02): add entry draft form`). Link GitHub issues in the body or with `(#42)` in the subject when applicable.
 
+**After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
+
 PRs should pass GitHub Actions lint and build. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.

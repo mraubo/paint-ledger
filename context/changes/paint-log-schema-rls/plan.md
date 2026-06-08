@@ -348,5 +348,5 @@ Subquery-based RLS on child tables adds a small per-row cost — acceptable for 
 
 #### Manual
 
-- [ ] 3.4 Two-user RLS isolation smoke tests pass
-- [ ] 3.5 `supabase migration list --local` confirms single applied migration
+- [x] 3.4 Two-user RLS isolation smoke tests pass
+- [x] 3.5 `supabase migration list --local` confirms single applied migration

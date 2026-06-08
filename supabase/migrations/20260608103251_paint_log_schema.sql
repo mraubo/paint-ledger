@@ -63,6 +63,7 @@ create table public.step_paint_assignments (
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   new.updated_at = now();
@@ -92,6 +93,7 @@ execute function public.set_updated_at();
 create or replace function public.enforce_step_paint_same_entry()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   if not exists (
