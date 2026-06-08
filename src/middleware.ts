@@ -2,7 +2,7 @@ import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 
 // Page routes under /entries. When adding /api/entries/* handlers, extend this array or enforce auth per route.
-const PROTECTED_ROUTES = ["/entries"];
+const PROTECTED_ROUTES = ["/entries", "/api/entries"];
 
 const AUTH_ONLY_GUEST_ROUTES = ["/auth/signin", "/auth/signup"];
 
