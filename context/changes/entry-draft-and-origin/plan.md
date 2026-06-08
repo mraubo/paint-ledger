@@ -338,36 +338,36 @@ Wire Astro pages with SSR reads, navigation, empty state, success banners, and r
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Build passes: `npm run build`
+- [x] 1.1 Linting passes: `npm run lint` — 49b794f
+- [x] 1.2 Build passes: `npm run build` — 49b794f
 
 #### Manual
 
-- [x] 1.3 Unauthenticated POST to `/api/entries` redirects to sign-in
-- [x] 1.4 Authenticated POST creates draft row with correct `user_id`
-- [x] 1.5 Authenticated POST update succeeds for owned entry; fails for other user's id
+- [x] 1.3 Unauthenticated POST to `/api/entries` redirects to sign-in — 49b794f
+- [x] 1.4 Authenticated POST creates draft row with correct `user_id` — 49b794f
+- [x] 1.5 Authenticated POST update succeeds for owned entry; fails for other user's id — 49b794f
 
 ### Phase 2: Entry basics form
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 2.3 Create mode blocks empty title; allows valid submit
-- [ ] 2.4 Edit mode pre-populates fields; server error displays
+- [x] 2.3 Create mode blocks empty title; allows valid submit
+- [x] 2.4 Edit mode pre-populates fields; server error displays
 
 ### Phase 3: Pages and entry list
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.3 Full create → list banner → edit → saved banner flow works
-- [ ] 3.4 List shows title, Draft badge, updated date; empty state shows CTA
-- [ ] 3.5 Cross-user entry access blocked; unauthenticated routes redirect
+- [x] 3.3 Full create → list banner → edit → saved banner flow works
+- [x] 3.4 List shows title, Draft badge, updated date; empty state shows CTA
+- [x] 3.5 Cross-user entry access blocked; unauthenticated routes redirect
