@@ -38,6 +38,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          final_photo_path: string | null
           id: string
           model_info: string
           model_origin_note: string
@@ -49,6 +50,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string
+          final_photo_path?: string | null
           id?: string
           model_info?: string
           model_origin_note?: string
@@ -60,6 +62,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          final_photo_path?: string | null
           id?: string
           model_info?: string
           model_origin_note?: string
@@ -151,6 +154,7 @@ export type Database = {
           entry_id: string
           id: string
           position: number
+          storage_path: string | null
           updated_at: string
         }
         Insert: {
@@ -159,6 +163,7 @@ export type Database = {
           entry_id: string
           id?: string
           position: number
+          storage_path?: string | null
           updated_at?: string
         }
         Update: {
@@ -167,6 +172,7 @@ export type Database = {
           entry_id?: string
           id?: string
           position?: number
+          storage_path?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -147,7 +147,7 @@ This recreates the local database from migrations and runs `supabase/seed.sql`. 
 | Email    | `seed@paint-ledger.local` |
 | Password | `seed-password-123`      |
 
-After schema changes, regenerate TypeScript types:
+After schema changes, regenerate TypeScript types (includes photo path columns on `entries` and `steps`):
 
 ```bash
 npx supabase gen types typescript --local > src/lib/database.types.ts
@@ -156,6 +156,19 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 **Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
 
 **RLS verification (local):** create a second account via `/auth/signup`, then confirm in Studio (or authenticated SQL) that each user sees only their own `entries` rows and cannot insert/update/delete another user's child rows. Cross-entry step↔paint pairings are also rejected by the `enforce_step_paint_same_entry` trigger.
+
+### Entry photo storage (local)
+
+Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload UI is deferred to a later slice (S-05); until then, objects can be uploaded manually via Studio for verification. Replacing or deleting entries does not yet remove orphaned Storage objects.
+
+| Kind  | Object key (relative to bucket)              | DB column                 |
+| ----- | -------------------------------------------- | ------------------------- |
+| Step  | `{user_id}/{entry_id}/steps/{step_id}`       | `steps.storage_path`      |
+| Final | `{user_id}/{entry_id}/final`                 | `entries.final_photo_path` |
+
+**Constraints:** JPEG, PNG, and WebP only; **4 MiB** per object. Paths are fixed (no file extension in the key) so S-05 can upsert over the same object.
+
+**Storage RLS verification (local):** see the two-user smoke procedure in the project change plan (`context/changes/photo-storage-buckets/plan.md`, Phase 3) — upload to own paths succeeds; cross-user and cross-entry paths are denied.
 
 ### Using a cloud Supabase project instead
 

@@ -312,27 +312,27 @@ Subquery-based Storage RLS adds per-request policy evaluation — acceptable for
 
 #### Automated
 
-- [x] 1.1 `supabase migration new entry_photo_storage` creates migration file
-- [x] 1.2 `supabase db reset` applies F-01 + F-02 migrations without SQL errors
-- [x] 1.3 `supabase migration list --local` shows both migrations applied
+- [x] 1.1 `supabase migration new entry_photo_storage` creates migration file — 231e642
+- [x] 1.2 `supabase db reset` applies F-01 + F-02 migrations without SQL errors — 231e642
+- [x] 1.3 `supabase migration list --local` shows both migrations applied — 231e642
 
 #### Manual
 
-- [x] 1.4 Studio shows `entry-photos` bucket and new columns on `entries` / `steps`
-- [x] 1.5 `storage.objects` policies exist for SELECT, INSERT, UPDATE, DELETE
+- [x] 1.4 Studio shows `entry-photos` bucket and new columns on `entries` / `steps` — 231e642
+- [x] 1.5 `storage.objects` policies exist for SELECT, INSERT, UPDATE, DELETE — 231e642
 
 ### Phase 2: Local config, TypeScript types, and documentation
 
 #### Automated
 
-- [ ] 2.1 `supabase db reset` succeeds with `config.toml` bucket block
-- [ ] 2.2 `npm run lint` passes
-- [ ] 2.3 `npm run build` passes
+- [x] 2.1 `supabase db reset` succeeds with `config.toml` bucket block
+- [x] 2.2 `npm run lint` passes
+- [x] 2.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 2.4 `database.types.ts` includes `final_photo_path` and `storage_path`
-- [ ] 2.5 README documents bucket, paths, limits, and verification pointer
+- [x] 2.4 `database.types.ts` includes `final_photo_path` and `storage_path`
+- [x] 2.5 README documents bucket, paths, limits, and verification pointer
 
 ### Phase 3: Storage RLS verification and security review
 
