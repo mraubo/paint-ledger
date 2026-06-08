@@ -351,13 +351,13 @@ Wire Astro pages with SSR reads, navigation, empty state, success banners, and r
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint` — 06f3b9f
+- [x] 2.2 Build passes: `npm run build` — 06f3b9f
 
 #### Manual
 
-- [x] 2.3 Create mode blocks empty title; allows valid submit
-- [x] 2.4 Edit mode pre-populates fields; server error displays
+- [x] 2.3 Create mode blocks empty title; allows valid submit — 06f3b9f
+- [x] 2.4 Edit mode pre-populates fields; server error displays — 06f3b9f
 
 ### Phase 3: Pages and entry list
 

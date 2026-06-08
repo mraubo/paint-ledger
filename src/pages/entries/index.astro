@@ -1,12 +1,80 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { isValidEntryId } from "@/lib/entries-api";
+import { formatEntryDate, loadEntryList } from "@/lib/entries-page";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const entries = supabase ? await loadEntryList(supabase) : [];
+
+const createdParam = Astro.url.searchParams.get("created");
+const showCreatedBanner = Boolean(createdParam && isValidEntryId(createdParam));
+const error = Astro.url.searchParams.get("error");
 ---
 
 <AppLayout title="Entries">
   <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
-    <h1 class="mb-2 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-      Entries
-    </h1>
-    <p class="text-sm text-blue-100/60">Entry workflows arrive in a later slice (S-02).</p>
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+        Entries
+      </h1>
+      <a
+        href="/entries/new"
+        class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+      >
+        Create entry
+      </a>
+    </div>
+
+    {
+      showCreatedBanner && (
+        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+          Entry created
+        </p>
+      )
+    }
+
+    {
+      error && (
+        <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
+      )
+    }
+
+    {
+      !supabase ? (
+        <p class="text-sm text-blue-100/60">Supabase is not configured. Entries cannot be loaded.</p>
+      ) : entries.length === 0 ? (
+        <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+          <p class="mb-4 text-blue-100/70">No entries yet. Create your first paint log entry to get started.</p>
+          <a
+            href="/entries/new"
+            class="inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+          >
+            Create entry
+          </a>
+        </div>
+      ) : (
+        <ul class="divide-y divide-white/10">
+          {entries.map((entry) => (
+            <li class="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0">
+              <div class="min-w-0 flex-1">
+                <a
+                  href={`/entries/${entry.id}`}
+                  class="font-medium text-purple-200 transition-colors hover:text-purple-100 hover:underline"
+                >
+                  {entry.title}
+                </a>
+                <p class="mt-1 text-xs text-blue-100/50">Updated {formatEntryDate(entry.updated_at)}</p>
+              </div>
+              {entry.status === "draft" && (
+                <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs text-blue-100/70">
+                  Draft
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </div>
 </AppLayout>
