@@ -317,14 +317,14 @@ Subquery-based RLS on child tables adds a small per-row cost — acceptable for 
 
 #### Automated
 
-- [x] 1.1 `supabase migration new paint_log_schema` creates migration file
-- [x] 1.2 `supabase db reset` applies migration without SQL errors
-- [x] 1.3 `supabase migration list --local` shows applied migration
+- [x] 1.1 `supabase migration new paint_log_schema` creates migration file — ed9b7fe
+- [x] 1.2 `supabase db reset` applies migration without SQL errors — ed9b7fe
+- [x] 1.3 `supabase migration list --local` shows applied migration — ed9b7fe
 
 #### Manual
 
-- [x] 1.4 Tables, FKs, and indexes match contract in local psql/Studio
-- [x] 1.5 Cross-entry junction insert rejected by trigger
+- [x] 1.4 Tables, FKs, and indexes match contract in local psql/Studio — ed9b7fe
+- [x] 1.5 Cross-entry junction insert rejected by trigger — ed9b7fe
 
 ### Phase 2: Seed fixture, TypeScript types, and documentation
 
