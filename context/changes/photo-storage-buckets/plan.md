@@ -338,12 +338,12 @@ Subquery-based Storage RLS adds per-request policy evaluation — acceptable for
 
 #### Automated
 
-- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npx supabase db advisors --local` — no ERROR-level issues — 9651724
+- [x] 3.2 `npm run lint` passes — 9651724
+- [x] 3.3 `npm run build` passes — 9651724
 
 #### Manual
 
-- [x] 3.4 Two-user Storage RLS isolation smoke tests pass
-- [x] 3.5 Upsert overwrite on fixed step path verified
-- [x] 3.6 `supabase migration list --local` confirms two applied migrations
+- [x] 3.4 Two-user Storage RLS isolation smoke tests pass — 9651724
+- [x] 3.5 Upsert overwrite on fixed step path verified — 9651724
+- [x] 3.6 `supabase migration list --local` confirms two applied migrations — 9651724
