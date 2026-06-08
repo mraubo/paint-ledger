@@ -192,6 +192,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Paint inventory, model wishlist, or collection management** — Why parked: PRD §Non-Goals.
 - **Tutorial versioning, recipe comparison, paint scaling, or shopping checklist** — Why parked: PRD §Non-Goals.
 - **Observability baseline (Sentry/OTel)** — Why parked: speed goal; add after US-01 validates unless production errors force earlier.
+- **CSRF protection for cookie-session form POSTs** — Why parked: S-01/S-02 use native `method="POST"` + redirect (parity with auth); add token middleware or `SameSite=Strict` hardening before production exposure or when adding more state-changing forms.
 
 ## Done
 

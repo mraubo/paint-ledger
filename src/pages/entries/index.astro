@@ -5,7 +5,9 @@ import { isValidEntryId } from "@/lib/entries-api";
 import { formatEntryDate, loadEntryList } from "@/lib/entries-page";
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-const entries = supabase ? await loadEntryList(supabase) : [];
+const listResult = supabase ? await loadEntryList(supabase) : { ok: true as const, entries: [] };
+const entries = listResult.ok ? listResult.entries : [];
+const listError = listResult.ok ? null : listResult.error;
 
 const createdParam = Astro.url.searchParams.get("created");
 const showCreatedBanner = Boolean(createdParam && isValidEntryId(createdParam));
@@ -41,9 +43,17 @@ const error = Astro.url.searchParams.get("error");
     }
 
     {
+      listError && (
+        <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+          Could not load entries. Please try again.
+        </p>
+      )
+    }
+
+    {
       !supabase ? (
         <p class="text-sm text-blue-100/60">Supabase is not configured. Entries cannot be loaded.</p>
-      ) : entries.length === 0 ? (
+      ) : listError ? null : entries.length === 0 ? (
         <div class="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
           <p class="mb-4 text-blue-100/70">No entries yet. Create your first paint log entry to get started.</p>
           <a

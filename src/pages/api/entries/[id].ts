@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { isValidEntryId, parseEntryBasicsFormData, requireUser } from "@/lib/entries-api";
+import { isValidEntryId, parseEntryBasicsFormData, requireUser, toUserFacingDbError } from "@/lib/entries-api";
 
 export const POST: APIRoute = async (context) => {
   const id = context.params.id;
@@ -25,7 +25,7 @@ export const POST: APIRoute = async (context) => {
   }
 
   const { fields } = parsed;
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("entries")
     .update({
       title: fields.title,
@@ -34,11 +34,16 @@ export const POST: APIRoute = async (context) => {
       model_origin_note: fields.model_origin_note,
     })
     .eq("id", id)
+    .eq("user_id", user.id)
     .select("id")
-    .single();
+    .maybeSingle();
 
   if (error) {
-    return context.redirect(`/entries/${id}?error=${encodeURIComponent(error.message)}`);
+    return context.redirect(`/entries/${id}?error=${encodeURIComponent(toUserFacingDbError(error))}`);
+  }
+
+  if (!data) {
+    return context.redirect(`/entries/${id}?error=${encodeURIComponent("Entry not found")}`);
   }
 
   return context.redirect(`/entries/${id}?saved=1`);

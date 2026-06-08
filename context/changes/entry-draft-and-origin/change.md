@@ -1,7 +1,7 @@
 ---
 change_id: entry-draft-and-origin
 title: Create a draft entry with basics and custom model origin note
-status: implemented
+status: impl_reviewed
 created: 2026-06-08
 updated: 2026-06-08
 archived_at: null

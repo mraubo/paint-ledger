@@ -320,6 +320,10 @@ Wire Astro pages with SSR reads, navigation, empty state, success banners, and r
 - No schema changes required; F-01 migration must be applied locally (`supabase db reset` or equivalent).
 - `published` status deferred; if PRD requires it later, add enum migration in a separate change.
 
+## Addendum: Tooling (Phase 3)
+
+- `eslint.config.js`: disabled `@typescript-eslint/no-misused-promises` for `*.astro` files — `astro-eslint-parser` crashes when the rule visits `return Astro.redirect()` in frontmatter (`[id].astro`). Required for lint to pass on edit page.
+
 ## References
 
 - PRD: `context/foundation/prd.md` (FR-003, FR-004)

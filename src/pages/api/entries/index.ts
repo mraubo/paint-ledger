@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { parseEntryBasicsFormData, requireUser } from "@/lib/entries-api";
+import { parseEntryBasicsFormData, requireUser, toUserFacingDbError } from "@/lib/entries-api";
 
 export const POST: APIRoute = async (context) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -33,7 +33,7 @@ export const POST: APIRoute = async (context) => {
     .single();
 
   if (error) {
-    return context.redirect(`/entries/new?error=${encodeURIComponent(error.message)}`);
+    return context.redirect(`/entries/new?error=${encodeURIComponent(toUserFacingDbError(error))}`);
   }
 
   return context.redirect(`/entries?created=${data.id}`);

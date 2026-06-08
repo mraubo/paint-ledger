@@ -14,17 +14,19 @@ export interface EntryBasicsRow extends EntryBasicsFields {
   status: Database["public"]["Enums"]["entry_status"];
 }
 
-export async function loadEntryList(supabase: SupabaseClient<Database>): Promise<EntryListRow[]> {
+export type EntryListResult = { ok: true; entries: EntryListRow[] } | { ok: false; error: string };
+
+export async function loadEntryList(supabase: SupabaseClient<Database>): Promise<EntryListResult> {
   const { data, error } = await supabase
     .from("entries")
     .select("id, title, status, updated_at")
     .order("updated_at", { ascending: false });
 
   if (error) {
-    return [];
+    return { ok: false, error: error.message };
   }
 
-  return data;
+  return { ok: true, entries: data };
 }
 
 export async function loadEntryForEdit(supabase: SupabaseClient<Database>, id: string): Promise<EntryBasicsRow | null> {
