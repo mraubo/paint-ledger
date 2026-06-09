@@ -425,9 +425,9 @@ Signed URLs generated per step on list load — acceptable for hobby-scale step 
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npm run build` passes
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.3 Final photo section; draft soft warning; step-delete Storage cleanup
+- [x] 3.3 Final photo section; draft soft warning; step-delete Storage cleanup

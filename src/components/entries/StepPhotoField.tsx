@@ -20,7 +20,7 @@ export function StepPhotoField({ fieldIdPrefix, initialPhotoUrl, hasExistingPhot
 
       {initialPhotoUrl ? (
         <img
-          src={initialPhotoUrl ?? undefined}
+          src={initialPhotoUrl}
           alt="Current step photo"
           className="max-h-40 max-w-full rounded-lg border border-white/20 object-cover"
         />
