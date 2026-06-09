@@ -396,24 +396,24 @@ Wire SSR steps page with ordered list, paint cards per step, `?edit=` flow, move
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Build passes: `npm run build`
+- [x] 1.1 Linting passes: `npm run lint` — e564775
+- [x] 1.2 Build passes: `npm run build` — e564775
 
 #### Manual
 
-- [x] 1.3 Unauthenticated POST to step APIs redirects to sign-in
-- [x] 1.4 Authenticated POST creates `steps` row at next position with correct `entry_id`
-- [x] 1.5 Authenticated POST update changes description and replaces assignments
-- [x] 1.6 Authenticated POST delete removes step and renumbers positions
-- [x] 1.7 Authenticated POST move swaps adjacent positions; edge moves fail gracefully
-- [x] 1.8 Paint delete blocked when assigned; paint create `redirect_to` returns to step edit
+- [x] 1.3 Unauthenticated POST to step APIs redirects to sign-in — e564775
+- [x] 1.4 Authenticated POST creates `steps` row at next position with correct `entry_id` — e564775
+- [x] 1.5 Authenticated POST update changes description and replaces assignments — e564775
+- [x] 1.6 Authenticated POST delete removes step and renumbers positions — e564775
+- [x] 1.7 Authenticated POST move swaps adjacent positions; edge moves fail gracefully — e564775
+- [x] 1.8 Paint delete blocked when assigned; paint create `redirect_to` returns to step edit — e564775
 
 ### Phase 2: Step form components
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Build passes: `npm run build`
 
 #### Manual
 
