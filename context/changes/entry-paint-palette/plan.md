@@ -333,22 +333,22 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Build passes: `npm run build`
+- [x] 1.1 Linting passes: `npm run lint` — ba9b660
+- [x] 1.2 Build passes: `npm run build` — ba9b660
 
 #### Manual
 
-- [x] 1.3 Unauthenticated POST to paint APIs redirects to sign-in
-- [x] 1.4 Authenticated POST creates entry_paints row with correct entry_id and fields
-- [x] 1.5 Authenticated POST update changes owned paint; wrong paintId fails gracefully
-- [x] 1.6 Authenticated POST delete removes row
+- [x] 1.3 Unauthenticated POST to paint APIs redirects to sign-in — ba9b660
+- [x] 1.4 Authenticated POST creates entry_paints row with correct entry_id and fields — ba9b660
+- [x] 1.5 Authenticated POST update changes owned paint; wrong paintId fails gracefully — ba9b660
+- [x] 1.6 Authenticated POST delete removes row — ba9b660
 
 ### Phase 2: Paint form components
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Build passes: `npm run build`
 
 #### Manual
 
