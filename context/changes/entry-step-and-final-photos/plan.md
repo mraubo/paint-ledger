@@ -425,9 +425,9 @@ Signed URLs generated per step on list load — acceptable for hobby-scale step 
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npm run build` passes
+- [x] 3.1 `npm run lint` passes — eb18990
+- [x] 3.2 `npm run build` passes — eb18990
 
 #### Manual
 
-- [x] 3.3 Final photo section; draft soft warning; step-delete Storage cleanup
+- [x] 3.3 Final photo section; draft soft warning; step-delete Storage cleanup — eb18990
