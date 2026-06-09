@@ -27,6 +27,23 @@ export const POST: APIRoute = async (context) => {
     return context.redirect("/auth/signin");
   }
 
+  const { data: assignment, error: assignmentError } = await supabase
+    .from("step_paint_assignments")
+    .select("step_id")
+    .eq("entry_paint_id", paintId)
+    .limit(1)
+    .maybeSingle();
+
+  if (assignmentError) {
+    return context.redirect(`${paintsUrl}?error=${encodeURIComponent(toUserFacingDbError(assignmentError))}`);
+  }
+
+  if (assignment) {
+    return context.redirect(
+      `${paintsUrl}?error=${encodeURIComponent("This paint is assigned to one or more steps. Unassign it from steps first.")}`,
+    );
+  }
+
   const { data, error } = await supabase
     .from("entry_paints")
     .delete()
