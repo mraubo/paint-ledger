@@ -412,8 +412,8 @@ Wire SSR steps page with ordered list, paint cards per step, `?edit=` flow, move
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint` — fbde808
+- [x] 2.2 Build passes: `npm run build` — fbde808
 
 #### Manual
 
@@ -426,8 +426,8 @@ Wire SSR steps page with ordered list, paint cards per step, `?edit=` flow, move
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build passes: `npm run build`
 
 #### Manual
 

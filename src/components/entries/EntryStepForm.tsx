@@ -180,7 +180,12 @@ export default function EntryStepForm(props: Props) {
       </form>
 
       {isEdit ? (
-        <EntryStepInlinePaintAdd entryId={props.entryId} stepId={props.stepId} serverError={props.inlinePaintError} />
+        <EntryStepInlinePaintAdd
+          entryId={props.entryId}
+          stepId={props.stepId}
+          serverError={props.inlinePaintError}
+          defaultOpen={props.entryPaints.length === 0}
+        />
       ) : null}
     </div>
   );
