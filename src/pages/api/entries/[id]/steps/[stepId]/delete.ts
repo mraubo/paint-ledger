@@ -36,17 +36,17 @@ export const POST: APIRoute = async (context) => {
     .eq("entry_id", entryId)
     .maybeSingle();
 
-  if (step?.storage_path) {
-    const photoDeleteResult = await deleteEntryPhoto(supabase, step.storage_path);
-    if (!photoDeleteResult.ok) {
-      // eslint-disable-next-line no-console -- best-effort cleanup; step delete still proceeds
-      console.warn("Failed to delete step photo from storage:", step.storage_path, photoDeleteResult.error);
-    }
-  }
-
   const deleteResult = await deleteStepAndRenumber(supabase, entryId, stepId);
   if (!deleteResult.ok) {
     return context.redirect(`${stepsUrl}?error=${encodeURIComponent(deleteResult.error)}`);
+  }
+
+  if (step?.storage_path) {
+    const photoDeleteResult = await deleteEntryPhoto(supabase, step.storage_path);
+    if (!photoDeleteResult.ok) {
+      // eslint-disable-next-line no-console -- best-effort cleanup after step row removed
+      console.warn("Failed to delete step photo from storage:", step.storage_path, photoDeleteResult.error);
+    }
   }
 
   return context.redirect(`${stepsUrl}?deleted=1`);

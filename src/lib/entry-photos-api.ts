@@ -17,10 +17,48 @@ export function buildFinalPhotoPath(userId: string, entryId: string): string {
   return `${userId}/${entryId}/final`;
 }
 
-export function parseOptionalPhotoFile(
+const PHOTO_HEADER_BYTES = 12;
+
+function detectImageMimeFromHeader(header: Uint8Array): string | null {
+  if (header.length >= 3 && header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff) {
+    return "image/jpeg";
+  }
+
+  if (
+    header.length >= 8 &&
+    header[0] === 0x89 &&
+    header[1] === 0x50 &&
+    header[2] === 0x4e &&
+    header[3] === 0x47 &&
+    header[4] === 0x0d &&
+    header[5] === 0x0a &&
+    header[6] === 0x1a &&
+    header[7] === 0x0a
+  ) {
+    return "image/png";
+  }
+
+  if (
+    header.length >= 12 &&
+    header[0] === 0x52 &&
+    header[1] === 0x49 &&
+    header[2] === 0x46 &&
+    header[3] === 0x46 &&
+    header[8] === 0x57 &&
+    header[9] === 0x45 &&
+    header[10] === 0x42 &&
+    header[11] === 0x50
+  ) {
+    return "image/webp";
+  }
+
+  return null;
+}
+
+export async function parseOptionalPhotoFile(
   formData: FormData,
   fieldName: string,
-): { ok: true; file: File | null } | { ok: false; error: string } {
+): Promise<{ ok: true; file: File | null } | { ok: false; error: string }> {
   if (!formData.has(fieldName)) {
     return { ok: true, file: null };
   }
@@ -44,6 +82,16 @@ export function parseOptionalPhotoFile(
 
   if (value.size > MAX_PHOTO_BYTES) {
     return { ok: false, error: "Photo must be 4 MB or smaller" };
+  }
+
+  const header = new Uint8Array(await value.slice(0, PHOTO_HEADER_BYTES).arrayBuffer());
+  const detectedMime = detectImageMimeFromHeader(header);
+  if (!detectedMime || !ALLOWED_PHOTO_MIME_TYPES.has(detectedMime)) {
+    return { ok: false, error: "Photo must be JPEG, PNG, or WebP" };
+  }
+
+  if (value.type !== detectedMime) {
+    return { ok: false, error: "Photo file type does not match its contents" };
   }
 
   return { ok: true, file: value };

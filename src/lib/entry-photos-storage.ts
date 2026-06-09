@@ -49,19 +49,39 @@ export async function createSignedPhotoUrl(
   path: string,
   expiresInSeconds: number,
 ): Promise<string | null> {
-  const { data, error } = await supabase.storage.from(ENTRY_PHOTOS_BUCKET).createSignedUrl(path, expiresInSeconds);
+  const urlMap = await createSignedPhotoUrlMap(supabase, [path], expiresInSeconds);
+  return urlMap.get(path) ?? null;
+}
+
+export async function createSignedPhotoUrlMap(
+  supabase: SupabaseClient<Database>,
+  paths: string[],
+  expiresInSeconds: number,
+): Promise<Map<string, string>> {
+  const uniquePaths = [...new Set(paths)];
+  if (uniquePaths.length === 0) {
+    return new Map();
+  }
+
+  const { data, error } = await supabase.storage
+    .from(ENTRY_PHOTOS_BUCKET)
+    .createSignedUrls(uniquePaths, expiresInSeconds);
 
   if (error) {
     // eslint-disable-next-line no-console -- server-side diagnostic
-    console.warn("Entry photo signed URL error:", error.message);
-    return null;
+    console.warn("Entry photo signed URL batch error:", error.message);
+    return new Map();
   }
 
-  if (!data.signedUrl) {
-    // eslint-disable-next-line no-console -- server-side diagnostic
-    console.warn("Entry photo signed URL error: missing signedUrl");
-    return null;
+  const urlMap = new Map<string, string>();
+  for (const item of data) {
+    if (item.path && item.signedUrl) {
+      urlMap.set(item.path, item.signedUrl);
+    } else if (item.error) {
+      // eslint-disable-next-line no-console -- server-side diagnostic
+      console.warn("Entry photo signed URL error:", item.path ?? "unknown", item.error);
+    }
   }
 
-  return data.signedUrl;
+  return urlMap;
 }

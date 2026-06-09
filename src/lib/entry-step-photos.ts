@@ -36,27 +36,44 @@ export async function applyStepPhotoFromForm(
   stepId: string,
   formData: FormData,
 ): Promise<{ ok: true; storagePath: string | null } | { ok: false; error: string }> {
-  const parsedFile = parseOptionalPhotoFile(formData, STEP_PHOTO_FIELD);
+  const parsedFile = await parseOptionalPhotoFile(formData, STEP_PHOTO_FIELD);
   if (!parsedFile.ok) {
     return parsedFile;
   }
 
   if (parsedFile.file) {
     const path = buildStepPhotoPath(userId, entryId, stepId);
+    const priorPathResult = await loadStepStoragePath(supabase, entryId, stepId);
+    if (!priorPathResult.ok) {
+      return priorPathResult;
+    }
+    const hadPriorPhoto = priorPathResult.storagePath !== null;
+
     const uploadResult = await uploadEntryPhoto(supabase, path, parsedFile.file);
     if (!uploadResult.ok) {
       return uploadResult;
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("steps")
       .update({ storage_path: path })
       .eq("id", stepId)
-      .eq("entry_id", entryId);
+      .eq("entry_id", entryId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      await deleteEntryPhoto(supabase, path);
+      if (!hadPriorPhoto) {
+        await deleteEntryPhoto(supabase, path);
+      }
       return { ok: false, error: toUserFacingDbError(error) };
+    }
+
+    if (!data) {
+      if (!hadPriorPhoto) {
+        await deleteEntryPhoto(supabase, path);
+      }
+      return { ok: false, error: "Step not found" };
     }
 
     return { ok: true, storagePath: path };
@@ -64,19 +81,27 @@ export async function applyStepPhotoFromForm(
 
   if (parseRemovePhotoFlag(formData, REMOVE_STEP_PHOTO_FIELD)) {
     const path = buildStepPhotoPath(userId, entryId, stepId);
-    const deleteResult = await deleteEntryPhoto(supabase, path);
-    if (!deleteResult.ok) {
-      return deleteResult;
-    }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("steps")
       .update({ storage_path: null })
       .eq("id", stepId)
-      .eq("entry_id", entryId);
+      .eq("entry_id", entryId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       return { ok: false, error: toUserFacingDbError(error) };
+    }
+
+    if (!data) {
+      return { ok: false, error: "Step not found" };
+    }
+
+    const deleteResult = await deleteEntryPhoto(supabase, path);
+    if (!deleteResult.ok) {
+      // eslint-disable-next-line no-console -- best-effort cleanup; DB path already cleared
+      console.warn("Failed to delete step photo from storage:", path, deleteResult.error);
     }
 
     return { ok: true, storagePath: null };

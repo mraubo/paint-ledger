@@ -29,23 +29,43 @@ export async function applyFinalPhotoFromForm(
   entryId: string,
   formData: FormData,
 ): Promise<{ ok: true; storagePath: string | null } | { ok: false; error: string }> {
-  const parsedFile = parseOptionalPhotoFile(formData, FINAL_PHOTO_FIELD);
+  const parsedFile = await parseOptionalPhotoFile(formData, FINAL_PHOTO_FIELD);
   if (!parsedFile.ok) {
     return parsedFile;
   }
 
   if (parsedFile.file) {
     const path = buildFinalPhotoPath(userId, entryId);
+    const priorPathResult = await loadFinalPhotoPath(supabase, entryId);
+    if (!priorPathResult.ok) {
+      return priorPathResult;
+    }
+    const hadPriorPhoto = priorPathResult.storagePath !== null;
+
     const uploadResult = await uploadEntryPhoto(supabase, path, parsedFile.file);
     if (!uploadResult.ok) {
       return uploadResult;
     }
 
-    const { error } = await supabase.from("entries").update({ final_photo_path: path }).eq("id", entryId);
+    const { data, error } = await supabase
+      .from("entries")
+      .update({ final_photo_path: path })
+      .eq("id", entryId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      await deleteEntryPhoto(supabase, path);
+      if (!hadPriorPhoto) {
+        await deleteEntryPhoto(supabase, path);
+      }
       return { ok: false, error: toUserFacingDbError(error) };
+    }
+
+    if (!data) {
+      if (!hadPriorPhoto) {
+        await deleteEntryPhoto(supabase, path);
+      }
+      return { ok: false, error: "Entry not found" };
     }
 
     return { ok: true, storagePath: path };
@@ -53,15 +73,26 @@ export async function applyFinalPhotoFromForm(
 
   if (parseRemovePhotoFlag(formData, REMOVE_FINAL_PHOTO_FIELD)) {
     const path = buildFinalPhotoPath(userId, entryId);
-    const deleteResult = await deleteEntryPhoto(supabase, path);
-    if (!deleteResult.ok) {
-      return deleteResult;
-    }
 
-    const { error } = await supabase.from("entries").update({ final_photo_path: null }).eq("id", entryId);
+    const { data, error } = await supabase
+      .from("entries")
+      .update({ final_photo_path: null })
+      .eq("id", entryId)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       return { ok: false, error: toUserFacingDbError(error) };
+    }
+
+    if (!data) {
+      return { ok: false, error: "Entry not found" };
+    }
+
+    const deleteResult = await deleteEntryPhoto(supabase, path);
+    if (!deleteResult.ok) {
+      // eslint-disable-next-line no-console -- best-effort cleanup; DB path already cleared
+      console.warn("Failed to delete final photo from storage:", path, deleteResult.error);
     }
 
     return { ok: true, storagePath: null };

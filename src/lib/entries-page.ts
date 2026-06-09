@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import type { EntryBasicsFields } from "@/lib/entries-api";
-import { createSignedPhotoUrl } from "@/lib/entry-photos-storage";
+import { createSignedPhotoUrl, createSignedPhotoUrlMap } from "@/lib/entry-photos-storage";
 
 const SIGNED_PHOTO_URL_EXPIRY_SECONDS = 3600;
 
@@ -31,15 +31,16 @@ export async function loadEntryList(supabase: SupabaseClient<Database>): Promise
     return { ok: false, error: error.message };
   }
 
-  const entries = await Promise.all(
-    data.map(async (row) => ({
-      id: row.id,
-      title: row.title,
-      status: row.status,
-      updated_at: row.updated_at,
-      photo_url: await resolveEntryFinalPhotoUrl(supabase, row.final_photo_path),
-    })),
-  );
+  const photoPaths = data.flatMap((row) => (row.final_photo_path ? [row.final_photo_path] : []));
+  const signedPhotoUrls = await createSignedPhotoUrlMap(supabase, photoPaths, SIGNED_PHOTO_URL_EXPIRY_SECONDS);
+
+  const entries = data.map((row) => ({
+    id: row.id,
+    title: row.title,
+    status: row.status,
+    updated_at: row.updated_at,
+    photo_url: row.final_photo_path ? (signedPhotoUrls.get(row.final_photo_path) ?? null) : null,
+  }));
 
   return { ok: true, entries };
 }

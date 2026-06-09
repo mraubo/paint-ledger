@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
-import { createSignedPhotoUrl } from "@/lib/entry-photos-storage";
+import { createSignedPhotoUrlMap } from "@/lib/entry-photos-storage";
 
 const SIGNED_PHOTO_URL_EXPIRY_SECONDS = 3600;
 
@@ -73,30 +73,30 @@ export async function loadEntrySteps(supabase: SupabaseClient<Database>, entryId
     return { ok: false, error: error.message };
   }
 
-  const steps = await Promise.all(
-    (data as StepWithAssignments[]).map(async (step) => {
-      const assigned_paints = (step.step_paint_assignments ?? [])
-        .map((assignment) => assignment.entry_paints)
-        .filter((paint): paint is AssignedPaintSummary => paint !== null)
-        .sort((a, b) => a.name.localeCompare(b.name));
+  const stepRows = data as StepWithAssignments[];
+  const photoPaths = stepRows.flatMap((step) => (step.storage_path ? [step.storage_path] : []));
+  const signedPhotoUrls = await createSignedPhotoUrlMap(supabase, photoPaths, SIGNED_PHOTO_URL_EXPIRY_SECONDS);
 
-      const photo_url = step.storage_path
-        ? await createSignedPhotoUrl(supabase, step.storage_path, SIGNED_PHOTO_URL_EXPIRY_SECONDS)
-        : null;
+  const steps = stepRows.map((step) => {
+    const assigned_paints = (step.step_paint_assignments ?? [])
+      .map((assignment) => assignment.entry_paints)
+      .filter((paint): paint is AssignedPaintSummary => paint !== null)
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-      return {
-        id: step.id,
-        entry_id: step.entry_id,
-        position: step.position,
-        description: step.description,
-        storage_path: step.storage_path,
-        photo_url,
-        created_at: step.created_at,
-        updated_at: step.updated_at,
-        assigned_paints,
-      };
-    }),
-  );
+    const photo_url = step.storage_path ? (signedPhotoUrls.get(step.storage_path) ?? null) : null;
+
+    return {
+      id: step.id,
+      entry_id: step.entry_id,
+      position: step.position,
+      description: step.description,
+      storage_path: step.storage_path,
+      photo_url,
+      created_at: step.created_at,
+      updated_at: step.updated_at,
+      assigned_paints,
+    };
+  });
 
   return { ok: true, steps };
 }

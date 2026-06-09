@@ -385,6 +385,10 @@ Signed URLs generated per step on list load — acceptable for hobby-scale step 
 - Remote: ensure F-02 migration applied before deploy (`supabase db push`).
 - Types already include `storage_path` and `final_photo_path` — no regen required unless schema drift.
 
+## Addendum (impl-review 2026-06-09)
+
+**Entry list final-photo thumbnails (S-06 preview).** During implementation, `loadEntryList` and `/entries` were extended to show a small final-photo thumbnail when `final_photo_path` is set (`src/lib/entries-page.ts`, `src/pages/entries/index.astro`). Full entry list/detail recall with photo gallery remains S-06 (FR-011); this is a minimal preview only — one thumbnail per entry row, no gallery or detail recall.
+
 ## References
 
 - Roadmap S-05: `context/foundation/roadmap.md`
