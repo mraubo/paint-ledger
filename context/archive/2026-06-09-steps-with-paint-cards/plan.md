@@ -417,10 +417,10 @@ Wire SSR steps page with ordered list, paint cards per step, `?edit=` flow, move
 
 #### Manual
 
-- [x] 2.3 Add form validates and submits description
-- [x] 2.4 Edit form checklist reflects and saves assignments
-- [x] 2.5 Inline add returns with new paint checked
-- [x] 2.6 PaintCard renders swatch + name safely
+- [x] 2.3 Add form validates and submits description — ec5a572
+- [x] 2.4 Edit form checklist reflects and saves assignments — ec5a572
+- [x] 2.5 Inline add returns with new paint checked — ec5a572
+- [x] 2.6 PaintCard renders swatch + name safely — ec5a572
 
 ### Phase 3: Steps page and navigation
 
@@ -431,7 +431,7 @@ Wire SSR steps page with ordered list, paint cards per step, `?edit=` flow, move
 
 #### Manual
 
-- [x] 3.3 Full FR-006/007/008 UI flow while signed in
-- [x] 3.4 Empty state, invalid edit param, and error banners behave correctly
-- [x] 3.5 Move, delete, and cross-navigation (entry ↔ steps ↔ paints) work
-- [x] 3.6 Unauthenticated `/entries/[id]/steps` redirects per middleware
+- [x] 3.3 Full FR-006/007/008 UI flow while signed in — ec5a572
+- [x] 3.4 Empty state, invalid edit param, and error banners behave correctly — ec5a572
+- [x] 3.5 Move, delete, and cross-navigation (entry ↔ steps ↔ paints) work — ec5a572
+- [x] 3.6 Unauthenticated `/entries/[id]/steps` redirects per middleware — ec5a572
