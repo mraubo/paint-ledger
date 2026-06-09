@@ -67,14 +67,7 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`${stepsUrl}?error=${encodeURIComponent(message)}`);
   }
 
-  const swapResult = await swapStepPositions(
-    supabase,
-    entryId,
-    currentStep.id,
-    neighborStep.id,
-    currentStep.position,
-    neighborStep.position,
-  );
+  const swapResult = await swapStepPositions(supabase, entryId, currentStep.id, neighborStep.id);
 
   if (!swapResult.ok) {
     return context.redirect(`${stepsUrl}?error=${encodeURIComponent(swapResult.error)}`);

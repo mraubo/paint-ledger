@@ -53,7 +53,8 @@ export const POST: APIRoute = async (context) => {
     .single();
 
   if (error) {
-    return context.redirect(`${errorRedirectBase}?error=${encodeURIComponent(toUserFacingDbError(error))}`);
+    const separator = errorRedirectBase.includes("?") ? "&" : "?";
+    return context.redirect(`${errorRedirectBase}${separator}error=${encodeURIComponent(toUserFacingDbError(error))}`);
   }
 
   if (redirectTo) {

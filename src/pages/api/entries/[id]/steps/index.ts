@@ -1,23 +1,9 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { isValidEntryId, requireUser, toUserFacingDbError } from "@/lib/entries-api";
+import { isValidEntryId, requireUser } from "@/lib/entries-api";
 import { loadEntryExists } from "@/lib/entry-paints-page";
+import { createStepAtNextPosition } from "@/lib/entry-steps-mutations";
 import { parseEntryStepFormData, stepsPagePath } from "@/lib/entry-steps-api";
-
-async function nextStepPosition(
-  supabase: NonNullable<ReturnType<typeof createClient>>,
-  entryId: string,
-): Promise<number> {
-  const { data } = await supabase
-    .from("steps")
-    .select("position")
-    .eq("entry_id", entryId)
-    .order("position", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  return data ? data.position + 1 : 1;
-}
 
 export const POST: APIRoute = async (context) => {
   const entryId = context.params.id;
@@ -48,15 +34,9 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`${stepsUrl}?error=${encodeURIComponent(parsed.error)}`);
   }
 
-  const position = await nextStepPosition(supabase, entryId);
-  const { error } = await supabase.from("steps").insert({
-    entry_id: entryId,
-    position,
-    description: parsed.fields.description,
-  });
-
-  if (error) {
-    return context.redirect(`${stepsUrl}?error=${encodeURIComponent(toUserFacingDbError(error))}`);
+  const createResult = await createStepAtNextPosition(supabase, entryId, parsed.fields.description);
+  if (!createResult.ok) {
+    return context.redirect(`${stepsUrl}?error=${encodeURIComponent(createResult.error)}`);
   }
 
   return context.redirect(`${stepsUrl}?added=1`);

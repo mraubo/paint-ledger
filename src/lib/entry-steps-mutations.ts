@@ -3,12 +3,11 @@ import type { Database } from "@/lib/database.types";
 import { toUserFacingDbError } from "@/lib/entries-api";
 import { loadEntryPaints } from "@/lib/entry-paints-page";
 
-export async function syncStepPaintAssignments(
+async function filterValidPaintIds(
   supabase: SupabaseClient<Database>,
   entryId: string,
-  stepId: string,
   submittedPaintIds: string[],
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; paintIds: string[] } | { ok: false; error: string }> {
   const paintsResult = await loadEntryPaints(supabase, entryId);
   if (!paintsResult.ok) {
     return { ok: false, error: paintsResult.error };
@@ -17,99 +16,111 @@ export async function syncStepPaintAssignments(
   const validPaintIds = new Set(paintsResult.paints.map((paint) => paint.id));
   const paintIds = submittedPaintIds.filter((paintId) => validPaintIds.has(paintId));
 
-  const { error: deleteError } = await supabase.from("step_paint_assignments").delete().eq("step_id", stepId);
-
-  if (deleteError) {
-    return { ok: false, error: toUserFacingDbError(deleteError) };
-  }
-
-  if (paintIds.length === 0) {
-    return { ok: true };
-  }
-
-  const { error: insertError } = await supabase.from("step_paint_assignments").insert(
-    paintIds.map((entry_paint_id) => ({
-      step_id: stepId,
-      entry_paint_id,
-    })),
-  );
-
-  if (insertError) {
-    return { ok: false, error: toUserFacingDbError(insertError) };
-  }
-
-  return { ok: true };
+  return { ok: true, paintIds };
 }
 
-export async function renumberStepsAfterDelete(
+export async function syncStepPaintAssignments(
   supabase: SupabaseClient<Database>,
   entryId: string,
-  deletedPosition: number,
+  stepId: string,
+  submittedPaintIds: string[],
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { data, error } = await supabase
-    .from("steps")
-    .select("id, position")
-    .eq("entry_id", entryId)
-    .gt("position", deletedPosition)
-    .order("position", { ascending: true });
+  const filtered = await filterValidPaintIds(supabase, entryId, submittedPaintIds);
+  if (!filtered.ok) {
+    return filtered;
+  }
+
+  const { error } = await supabase.rpc("sync_step_paint_assignments", {
+    p_entry_id: entryId,
+    p_step_id: stepId,
+    p_paint_ids: filtered.paintIds,
+  });
 
   if (error) {
     return { ok: false, error: toUserFacingDbError(error) };
   }
 
-  for (const step of data) {
-    const { error: updateError } = await supabase
-      .from("steps")
-      .update({ position: step.position - 1 })
-      .eq("id", step.id)
-      .eq("entry_id", entryId);
+  return { ok: true };
+}
 
-    if (updateError) {
-      return { ok: false, error: toUserFacingDbError(updateError) };
-    }
+export async function updateStepWithAssignments(
+  supabase: SupabaseClient<Database>,
+  entryId: string,
+  stepId: string,
+  description: string,
+  submittedPaintIds: string[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const filtered = await filterValidPaintIds(supabase, entryId, submittedPaintIds);
+  if (!filtered.ok) {
+    return filtered;
+  }
+
+  const { error } = await supabase.rpc("update_step_with_assignments", {
+    p_entry_id: entryId,
+    p_step_id: stepId,
+    p_description: description,
+    p_paint_ids: filtered.paintIds,
+  });
+
+  if (error) {
+    return { ok: false, error: toUserFacingDbError(error) };
   }
 
   return { ok: true };
 }
 
-const TEMP_POSITION = -1;
+export async function createStepAtNextPosition(
+  supabase: SupabaseClient<Database>,
+  entryId: string,
+  description: string,
+): Promise<{ ok: true; stepId: string } | { ok: false; error: string }> {
+  const { data, error } = await supabase.rpc("create_step_at_next_position", {
+    p_entry_id: entryId,
+    p_description: description,
+  });
+
+  if (error) {
+    return { ok: false, error: toUserFacingDbError(error) };
+  }
+
+  if (!data) {
+    return { ok: false, error: "Failed to create step" };
+  }
+
+  return { ok: true, stepId: data };
+}
+
+export async function deleteStepAndRenumber(
+  supabase: SupabaseClient<Database>,
+  entryId: string,
+  stepId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { error } = await supabase.rpc("delete_step_and_renumber", {
+    p_entry_id: entryId,
+    p_step_id: stepId,
+  });
+
+  if (error) {
+    return { ok: false, error: toUserFacingDbError(error) };
+  }
+
+  return { ok: true };
+}
 
 export async function swapStepPositions(
   supabase: SupabaseClient<Database>,
   entryId: string,
-  currentStepId: string,
-  neighborStepId: string,
-  currentPosition: number,
-  neighborPosition: number,
+  stepAId: string,
+  stepBId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { error: tempError } = await supabase
-    .from("steps")
-    .update({ position: TEMP_POSITION })
-    .eq("id", currentStepId)
-    .eq("entry_id", entryId);
+  const { error } = await supabase.rpc("swap_step_positions", {
+    p_entry_id: entryId,
+    p_step_a: stepAId,
+    p_step_b: stepBId,
+  });
 
-  if (tempError) {
-    return { ok: false, error: toUserFacingDbError(tempError) };
-  }
-
-  const { error: neighborError } = await supabase
-    .from("steps")
-    .update({ position: currentPosition })
-    .eq("id", neighborStepId)
-    .eq("entry_id", entryId);
-
-  if (neighborError) {
-    return { ok: false, error: toUserFacingDbError(neighborError) };
-  }
-
-  const { error: currentError } = await supabase
-    .from("steps")
-    .update({ position: neighborPosition })
-    .eq("id", currentStepId)
-    .eq("entry_id", entryId);
-
-  if (currentError) {
-    return { ok: false, error: toUserFacingDbError(currentError) };
+  if (error) {
+    return { ok: false, error: toUserFacingDbError(error) };
   }
 
   return { ok: true };

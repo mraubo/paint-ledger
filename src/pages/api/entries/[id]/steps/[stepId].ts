@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { isValidEntryId, requireUser, toUserFacingDbError } from "@/lib/entries-api";
-import { syncStepPaintAssignments } from "@/lib/entry-steps-mutations";
+import { isValidEntryId, requireUser } from "@/lib/entries-api";
+import { updateStepWithAssignments } from "@/lib/entry-steps-mutations";
 import {
   isReturnToEdit,
   isValidStepId,
@@ -42,36 +42,17 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`${errorUrl}${encodeURIComponent(parsed.error)}`);
   }
 
-  const { data: step, error: stepError } = await supabase
-    .from("steps")
-    .select("id")
-    .eq("id", stepId)
-    .eq("entry_id", entryId)
-    .maybeSingle();
+  const updateResult = await updateStepWithAssignments(
+    supabase,
+    entryId,
+    stepId,
+    parsed.fields.description,
+    parseStepPaintIds(form),
+  );
 
-  if (stepError) {
-    return context.redirect(`${stepsUrl}?error=${encodeURIComponent(toUserFacingDbError(stepError))}`);
-  }
-
-  if (!step) {
-    return context.redirect(`${stepsUrl}?error=${encodeURIComponent("Step not found")}`);
-  }
-
-  const { error: updateError } = await supabase
-    .from("steps")
-    .update({ description: parsed.fields.description })
-    .eq("id", stepId)
-    .eq("entry_id", entryId);
-
-  if (updateError) {
+  if (!updateResult.ok) {
     const errorUrl = isReturnToEdit(form) ? `${stepEditPath(entryId, stepId)}&error=` : `${stepsUrl}?error=`;
-    return context.redirect(`${errorUrl}${encodeURIComponent(toUserFacingDbError(updateError))}`);
-  }
-
-  const assignmentResult = await syncStepPaintAssignments(supabase, entryId, stepId, parseStepPaintIds(form));
-  if (!assignmentResult.ok) {
-    const errorUrl = isReturnToEdit(form) ? `${stepEditPath(entryId, stepId)}&error=` : `${stepsUrl}?error=`;
-    return context.redirect(`${errorUrl}${encodeURIComponent(assignmentResult.error)}`);
+    return context.redirect(`${errorUrl}${encodeURIComponent(updateResult.error)}`);
   }
 
   if (isReturnToEdit(form)) {

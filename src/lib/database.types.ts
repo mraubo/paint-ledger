@@ -190,7 +190,45 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_step_at_next_position: {
+        Args: {
+          p_description: string
+          p_entry_id: string
+        }
+        Returns: string
+      }
+      delete_step_and_renumber: {
+        Args: {
+          p_entry_id: string
+          p_step_id: string
+        }
+        Returns: undefined
+      }
+      swap_step_positions: {
+        Args: {
+          p_entry_id: string
+          p_step_a: string
+          p_step_b: string
+        }
+        Returns: undefined
+      }
+      sync_step_paint_assignments: {
+        Args: {
+          p_entry_id: string
+          p_paint_ids: string[]
+          p_step_id: string
+        }
+        Returns: undefined
+      }
+      update_step_with_assignments: {
+        Args: {
+          p_description: string
+          p_entry_id: string
+          p_paint_ids: string[]
+          p_step_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       entry_status: "draft" | "ready"
