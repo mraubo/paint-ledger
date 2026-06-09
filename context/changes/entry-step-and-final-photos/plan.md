@@ -414,12 +414,12 @@ Signed URLs generated per step on list load — acceptable for hobby-scale step 
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run build` passes
+- [x] 2.1 `npm run lint` passes — eb45ee9
+- [x] 2.2 `npm run build` passes — eb45ee9
 
 #### Manual
 
-- [x] 2.3 Add/edit form parity; step photo upload/replace/remove; list thumbnails
+- [x] 2.3 Add/edit form parity; step photo upload/replace/remove; list thumbnails — eb45ee9
 
 ### Phase 3: Final photo, soft warning, and cleanup
 
