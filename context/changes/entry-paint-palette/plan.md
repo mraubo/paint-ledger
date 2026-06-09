@@ -38,7 +38,7 @@ After S-03:
 - Signed-in user opens `/entries/[id]` and follows "Manage paints" to `/entries/[id]/paints`.
 - Paints page shows an alphabetical list (by name) with color swatch, name, brand, and color description; empty state prompts first add.
 - User adds a paint via form (name required; brand and color description optional; color defaults to `#000000` if left unset).
-- User edits a paint inline (row expands to form); save POSTs to update API; cancel collapses row.
+- User edits a paint via `?edit=<paintId>` full-page view with `EntryPaintForm`; save POSTs to update API; cancel returns to list.
 - User deletes a paint via button → `confirm()` → form POST; list refreshes with success banner.
 - Success feedback via query flags: `?added=`, `?updated=`, `?deleted=` (POST-redirect-GET).
 - `npm run lint` and `npm run build` pass.
@@ -186,24 +186,24 @@ Build `ColorField`, add/edit paint form, and list row with inline expand-to-edit
 
 **Contract**:
 
-- Discriminated props: `{ mode: "add"; entryId; serverError? }` | `{ mode: "edit"; entryId; paintId; initialValues: EntryPaintFields; serverError?; onCancel? }`.
+- Discriminated props: `{ mode: "add"; entryId; serverError? }` | `{ mode: "edit"; entryId; paintId; initialValues: EntryPaintFields; serverError?; cancelHref: string }`.
 - Fields: `name` (`FormField`, required), `brand` (`FormField`), `color_description` (`TextareaField` or `FormField`), `approximate_color` (`ColorField`).
 - Client validation: name trim required before submit.
 - `method="POST"`; `action` = `/api/entries/${entryId}/paints` (add) or `/api/entries/${entryId}/paints/${paintId}` (edit).
 - Reuse `ServerError`, `SubmitButton`; labels "Add paint" / "Save paint".
 
-#### 3. Paint list with inline edit
+#### 3. Paint list (SSR in paints page)
 
-**File**: `src/components/entries/EntryPaintList.tsx` (new)
+**File**: `src/pages/entries/[id]/paints.astro` (list section)
 
-**Intent**: Render paint rows with swatch, metadata, edit expand, and delete.
+**Intent**: Render paint rows with swatch, metadata, edit link, and delete.
 
 **Contract**:
 
-- Props: `entryId`, `paints: EntryPaintRow[]` (id + fields), optional `serverError`.
-- Each row: color swatch, name (primary), brand + color description (secondary), Edit button toggles inline `EntryPaintForm` in edit mode; Cancel collapses.
-- Delete: separate `<form method="POST" action=".../delete">` with button; `onClick` calls `confirm("Delete this paint?")` and `preventDefault` if cancelled.
-- List sorted by name on server — component renders in given order.
+- SSR list in `paints.astro` (no separate `EntryPaintList` component).
+- Each row: color swatch, name (primary), brand + color description (secondary), Edit link → `?edit=<paintId>` full-page edit view.
+- Delete: separate `<form method="POST" action=".../delete">` with `onsubmit="return confirm('Delete this paint?')"`.
+- List sorted by name on server — page renders in given order.
 
 ### Success Criteria:
 
@@ -215,7 +215,7 @@ Build `ColorField`, add/edit paint form, and list row with inline expand-to-edit
 #### Manual Verification:
 
 - Add form blocks empty name; valid submit reaches API
-- Edit expand/collapse works; fields pre-populate including color picker + hex
+- Edit via `?edit=` works; fields pre-populate including color picker + hex; cancel returns to list
 - Delete confirm cancels vs proceeds correctly
 - Server error from `?error=` displays in banner/form
 
@@ -247,14 +247,15 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 
 **File**: `src/pages/entries/[id]/paints.astro` (new)
 
-**Intent**: Host add form, paint list island, and success/error banners.
+**Intent**: Host add form, SSR paint list, URL-based edit view, and success/error banners.
 
 **Contract**:
 
 - Validate `id` param; invalid → redirect `/entries?error=...`.
-- Load entry exists + paints via SSR helpers; missing entry → redirect `/entries?error=Entry not found`.
-- Query params: `added`, `updated`, `deleted` → green success banners; `error` → pass to components.
-- Render page title (entry context), `EntryPaintForm` (add, `client:load`), `EntryPaintList` (`client:load`).
+- Load entry via `loadEntryForEdit` + paints via `loadEntryPaints`; missing entry → redirect `/entries?error=Entry not found`.
+- Query params: `added`, `updated`, `deleted` → green success banners; `error` → pass to components (split between add/edit views when `?edit=` is set).
+- `?edit=<paintId>` (validated against loaded paints) → full-page `EntryPaintForm` in edit mode with `cancelHref` back to list.
+- Default view: `EntryPaintForm` (add, `client:load`) + SSR paint list with Edit links and delete forms.
 - Empty state copy when `paints.length === 0` above or beside add form.
 - "Back to entry" link to `/entries/[id]`.
 - `AppLayout` + card shell consistent with entry edit page.
@@ -276,7 +277,7 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 
 #### Manual Verification:
 
-- Full flow: entry edit → manage paints → add → list shows swatch/name → inline edit → delete with confirm
+- Full flow: entry edit → manage paints → add → list shows swatch/name → edit via `?edit=` → delete with confirm
 - Empty paints page shows helpful CTA
 - Unauthenticated `/entries/[id]/paints` redirects to sign-in
 - Cross-user paints URL blocked by RLS
@@ -301,7 +302,7 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 2. Submit add form with empty name → inline error.
 3. Add paint with name only → appears in list with default/black swatch if no color picked.
 4. Add second paint with brand, description, and custom color → list sorted alphabetically by name.
-5. Edit paint inline → save → `?updated=` banner; values persist.
+5. Edit paint via `?edit=` → save → `?updated=` banner; values persist.
 6. Delete paint → confirm → row removed; `?deleted=` banner.
 7. Sign in as different user; open other user's paints URL → blocked.
 8. Run `npm run lint` and `npm run build`.
@@ -309,7 +310,7 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 ## Performance Considerations
 
 - Single `select` per paints page with no joins — fine at MVP scale.
-- Inline edit mounts one form at a time; no virtual list needed.
+- URL-based edit mounts one form at a time; no virtual list needed.
 
 ## Migration Notes
 
@@ -368,3 +369,13 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 - [x] 3.3 Full add → list → edit → delete flow works from paints page — 4000ab9
 - [x] 3.4 List sorted by name; empty state and success banners display — 4000ab9
 - [x] 3.5 Manage paints link on entry edit; cross-user and unauthenticated access blocked — 4000ab9
+
+## Addendum: URL-based edit (impl review 2026-06-09)
+
+Phase 3 shipped **URL-based edit** (`?edit=<paintId>`) instead of the originally planned `EntryPaintList` React island with inline expand/collapse. Rationale: simpler state management on a single Astro page; delete confirm uses native `onsubmit` on SSR forms.
+
+**Superseded:**
+- `src/components/entries/EntryPaintList.tsx` — never merged to main; list logic lives in `paints.astro`.
+- Inline edit / `onCancel` callback on `EntryPaintForm` — replaced by `cancelHref` link.
+
+**Unchanged:** API contracts, hex validation, POST-redirect-GET banners, alphabetical sort, auth/RLS boundaries.

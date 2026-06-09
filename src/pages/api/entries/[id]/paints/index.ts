@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId, requireUser, toUserFacingDbError } from "@/lib/entries-api";
 import { paintsPagePath, parseEntryPaintFormData } from "@/lib/entry-paints-api";
+import { loadEntryExists } from "@/lib/entry-paints-page";
 
 export const POST: APIRoute = async (context) => {
   const entryId = context.params.id;
@@ -19,6 +20,11 @@ export const POST: APIRoute = async (context) => {
   const user = await requireUser(supabase);
   if (!user) {
     return context.redirect("/auth/signin");
+  }
+
+  const entryExists = await loadEntryExists(supabase, entryId);
+  if (!entryExists) {
+    return context.redirect(`/entries?error=${encodeURIComponent("Entry not found")}`);
   }
 
   const form = await context.request.formData();

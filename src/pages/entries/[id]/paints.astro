@@ -3,7 +3,7 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import EntryPaintForm from "@/components/entries/EntryPaintForm";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
-import { isValidPaintId } from "@/lib/entry-paints-api";
+import { isValidHexColor, isValidPaintId } from "@/lib/entry-paints-api";
 import { loadEntryPaints, type EntryPaintRow } from "@/lib/entry-paints-page";
 import { loadEntryForEdit } from "@/lib/entries-page";
 
@@ -146,13 +146,14 @@ const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : ent
               <ul class="space-y-3">
                 {paintRows.map((paint) => {
                   const metaParts = [paint.brand, paint.color_description].filter((part) => part.trim().length > 0);
+                  const swatchColor = isValidHexColor(paint.approximate_color) ? paint.approximate_color : "#000000";
 
                   return (
                     <li class="rounded-lg border border-white/10 bg-white/5 p-4">
                       <div class="flex flex-wrap items-start gap-4">
                         <span
                           class="mt-0.5 size-10 shrink-0 rounded-lg border border-white/20"
-                          style={{ backgroundColor: paint.approximate_color }}
+                          style={{ backgroundColor: swatchColor }}
                           aria-hidden="true"
                         />
                         <div class="min-w-0 flex-1">
