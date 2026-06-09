@@ -19,7 +19,7 @@ interface EditProps {
   paintId: string;
   initialValues: EntryPaintFields;
   serverError?: string | null;
-  onCancel?: () => void;
+  cancelHref: string;
 }
 
 type Props = AddProps | EditProps;
@@ -115,14 +115,13 @@ export default function EntryPaintForm(props: Props) {
         >
           {isEdit ? "Save paint" : "Add paint"}
         </SubmitButton>
-        {isEdit && props.onCancel ? (
-          <button
-            type="button"
-            onClick={props.onCancel}
-            className="rounded-lg border border-white/20 px-4 py-2 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+        {isEdit ? (
+          <a
+            href={props.cancelHref}
+            className="inline-flex items-center rounded-lg border border-white/20 px-4 py-2 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
           >
             Cancel
-          </button>
+          </a>
         ) : null}
       </div>
     </form>

@@ -347,24 +347,24 @@ Wire Astro paints page with SSR reads, empty state, success banners, and link fr
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint` — 4ed8bf2
+- [x] 2.2 Build passes: `npm run build` — 4ed8bf2
 
 #### Manual
 
-- [ ] 2.3 Add form blocks empty name; color picker and hex stay synced
-- [ ] 2.4 Inline edit expand/collapse works; delete confirm behaves correctly
-- [ ] 2.5 Server error from query param displays in UI
+- [x] 2.3 Add form blocks empty name; color picker and hex stay synced
+- [x] 2.4 Inline edit expand/collapse works; delete confirm behaves correctly
+- [x] 2.5 Server error from query param displays in UI
 
 ### Phase 3: Paints page and navigation
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.3 Full add → list → edit → delete flow works from paints page
-- [ ] 3.4 List sorted by name; empty state and success banners display
-- [ ] 3.5 Manage paints link on entry edit; cross-user and unauthenticated access blocked
+- [x] 3.3 Full add → list → edit → delete flow works from paints page
+- [x] 3.4 List sorted by name; empty state and success banners display
+- [x] 3.5 Manage paints link on entry edit; cross-user and unauthenticated access blocked

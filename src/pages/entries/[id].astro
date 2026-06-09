@@ -65,6 +65,8 @@ const initialValues = {
 
     <EntryBasicsForm mode="edit" entryId={entry.id} initialValues={initialValues} serverError={error} client:load />
     <p class="mt-4 text-center text-sm text-blue-100/60">
+      <a href={`/entries/${entry.id}/paints`} class="text-purple-300 hover:underline">Manage paints</a>
+      <span class="mx-2 text-blue-100/30">·</span>
       <a href="/entries" class="text-purple-300 hover:underline">Back to entries</a>
     </p>
   </div>
