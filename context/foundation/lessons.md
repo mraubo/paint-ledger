@@ -8,3 +8,17 @@
 - **Problem**: Routes not listed in `PROTECTED_ROUTES` (and without per-handler auth) are reachable without a session — entry workflows can ship unprotected by mistake.
 - **Rule**: When adding a new route, explicitly decide whether it belongs in `PROTECTED_ROUTES` in `src/middleware.ts` or enforces auth in the handler.
 - **Applies to**: plan
+
+## Include Origin header in authenticated curl POSTs
+
+- **Context**: Manual API verification with `curl` against the Astro dev server (`/api/**` POST handlers), including the AGENTS.md `.cookies` auth pattern.
+- **Problem**: POST without a matching `Origin` header returns `403` with "Cross-site POST form submissions are forbidden" — easy to misread as an auth or handler bug when it is Astro CSRF protection.
+- **Rule**: When curl-testing any form POST API locally, always send `-H "Origin: http://localhost:4321"` (match your dev server origin). Do not use `-I` with POST; use `-s -D -` to inspect redirect headers.
+- **Applies to**: implement, plan, impl-review
+
+## Exclude Vite dev paths from run_worker_first
+
+- **Context**: Astro 6 + `@astrojs/cloudflare` local dev (`wrangler.jsonc` → `assets.run_worker_first`).
+- **Problem**: A catch-all `/*` rule without Vite exclusions routes `/@vite/client`, `/@react-refresh`, `/@id/*`, `/src/*`, and public assets to the Worker. The browser gets HTML 404s instead of JS/CSS — console shows MIME type / NS_ERROR_CORRUPTED_CONTENT errors and React islands fail to hydrate.
+- **Rule**: When using `run_worker_first: ["/*", …]`, always add negative rules for Vite dev paths (`!/@*`, `!/src/*`, `!/node_modules/*`, `!/_astro/*`, and common public static extensions). After changing `wrangler.jsonc`, restart `astro dev` and verify `/@vite/client` returns `200` with `text/javascript` before debugging hydration.
+- **Applies to**: frame, plan

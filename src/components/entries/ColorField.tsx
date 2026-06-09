@@ -1,4 +1,4 @@
-import { CircleAlert, Palette } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isValidHexColor, normalizeHexColor } from "@/lib/entry-paints-api";
 
@@ -27,6 +27,13 @@ function swatchValue(value: string): string {
 export function ColorField({ id, name, label, value, onChange, error }: ColorFieldProps) {
   const fieldName = name ?? id;
 
+  function handlePickerUpdate(raw: string) {
+    const normalized = normalizeHexColor(raw);
+    if (normalized) {
+      onChange(normalized);
+    }
+  }
+
   return (
     <div>
       <label htmlFor={`${id}-hex`} className="mb-1 block text-sm text-blue-100/80">
@@ -42,23 +49,31 @@ export function ColorField({ id, name, label, value, onChange, error }: ColorFie
           id={`${id}-picker`}
           type="color"
           value={pickerValue(value)}
+          onInput={(e) => {
+            handlePickerUpdate(e.currentTarget.value);
+          }}
           onChange={(e) => {
-            onChange(e.target.value);
+            handlePickerUpdate(e.currentTarget.value);
           }}
           className="h-10 w-14 cursor-pointer rounded-lg border border-white/20 bg-transparent p-1"
           aria-label={`${label} picker`}
         />
         <div className="relative min-w-[8rem] flex-1">
-          <span className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-white/40">
-            <Palette className="size-4" />
-          </span>
+          <span
+            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 rounded border border-white/20"
+            style={{ backgroundColor: swatchValue(value) }}
+            aria-hidden="true"
+          />
           <input
             id={`${id}-hex`}
             name={fieldName}
             type="text"
             value={value}
+            onInput={(e) => {
+              onChange(e.currentTarget.value);
+            }}
             onChange={(e) => {
-              onChange(e.target.value);
+              onChange(e.currentTarget.value);
             }}
             placeholder="#000000"
             className={cn(

@@ -8,7 +8,17 @@
     "binding": "ASSETS",
     "directory": "./dist",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/*", "!/_astro/*"],
+    "run_worker_first": [
+      "/*",
+      "!/_astro/*",
+      "!/@*",
+      "!/node_modules/*",
+      "!/src/*",
+      "!/*.svg",
+      "!/*.png",
+      "!/*.ico",
+      "!/*.webmanifest",
+    ],
   },
   "observability": {
     "enabled": true,

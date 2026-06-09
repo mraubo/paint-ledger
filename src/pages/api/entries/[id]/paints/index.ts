@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId, requireUser, toUserFacingDbError } from "@/lib/entries-api";
+import { parsePaintCreateRedirectTo } from "@/lib/entry-steps-api";
 import { paintsPagePath, parseEntryPaintFormData } from "@/lib/entry-paints-api";
 import { loadEntryExists } from "@/lib/entry-paints-page";
 
@@ -28,22 +29,37 @@ export const POST: APIRoute = async (context) => {
   }
 
   const form = await context.request.formData();
+  const redirectTo = parsePaintCreateRedirectTo(form, entryId);
+  const errorRedirectBase = redirectTo ?? paintsUrl;
+
   const parsed = parseEntryPaintFormData(form);
   if (!parsed.ok) {
-    return context.redirect(`${paintsUrl}?error=${encodeURIComponent(parsed.error)}`);
+    const separator = errorRedirectBase.includes("?") ? "&" : "?";
+    return context.redirect(`${errorRedirectBase}${separator}error=${encodeURIComponent(parsed.error)}`);
   }
 
   const { fields } = parsed;
-  const { error } = await supabase.from("entry_paints").insert({
-    entry_id: entryId,
-    name: fields.name,
-    brand: fields.brand,
-    color_description: fields.color_description,
-    approximate_color: fields.approximate_color,
-  });
+
+  const { data, error } = await supabase
+    .from("entry_paints")
+    .insert({
+      entry_id: entryId,
+      name: fields.name,
+      brand: fields.brand,
+      color_description: fields.color_description,
+      approximate_color: fields.approximate_color,
+    })
+    .select("id")
+    .single();
 
   if (error) {
-    return context.redirect(`${paintsUrl}?error=${encodeURIComponent(toUserFacingDbError(error))}`);
+    const separator = errorRedirectBase.includes("?") ? "&" : "?";
+    return context.redirect(`${errorRedirectBase}${separator}error=${encodeURIComponent(toUserFacingDbError(error))}`);
+  }
+
+  if (redirectTo) {
+    const separator = redirectTo.includes("?") ? "&" : "?";
+    return context.redirect(`${redirectTo}${separator}paint_added=${encodeURIComponent(data.id)}`);
   }
 
   return context.redirect(`${paintsUrl}?added=1`);

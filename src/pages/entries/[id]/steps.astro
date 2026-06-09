@@ -1,0 +1,270 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import EntryStepForm from "@/components/entries/EntryStepForm";
+import { PaintCard } from "@/components/entries/PaintCard";
+import { createClient } from "@/lib/supabase";
+import { isValidEntryId } from "@/lib/entries-api";
+import { isValidPaintId } from "@/lib/entry-paints-api";
+import { isValidStepId } from "@/lib/entry-steps-api";
+import { loadEntryPaints, type EntryPaintRow } from "@/lib/entry-paints-page";
+import { loadEntrySteps, type EntryStepRow } from "@/lib/entry-steps-page";
+import { loadEntryForEdit } from "@/lib/entries-page";
+
+const { id } = Astro.params;
+const notFoundUrl = `/entries?error=${encodeURIComponent("Entry not found")}`;
+
+let redirectUrl: string | null = null;
+let entryId = "";
+let entryTitle = "Entry steps";
+let stepRows: EntryStepRow[] = [];
+let paintRows: EntryPaintRow[] = [];
+let listError: string | null = null;
+
+if (!id || !isValidEntryId(id)) {
+  redirectUrl = notFoundUrl;
+} else {
+  entryId = id;
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+  if (!supabase) {
+    redirectUrl = `/entries?error=${encodeURIComponent("Supabase is not configured")}`;
+  } else {
+    const entry = await loadEntryForEdit(supabase, id);
+    if (!entry) {
+      redirectUrl = notFoundUrl;
+    } else {
+      entryTitle = `${entry.title} — Steps`;
+      const stepsResult = await loadEntrySteps(supabase, id);
+      if (!stepsResult.ok) {
+        listError = stepsResult.error;
+      } else {
+        stepRows = stepsResult.steps;
+      }
+
+      const paintsResult = await loadEntryPaints(supabase, id);
+      if (paintsResult.ok) {
+        paintRows = paintsResult.paints;
+      }
+    }
+  }
+}
+
+if (redirectUrl) {
+  return Astro.redirect(redirectUrl);
+}
+
+const stepsBaseUrl = `/entries/${entryId}/steps`;
+const error = Astro.url.searchParams.get("error");
+const showAddedBanner = Astro.url.searchParams.get("added") === "1";
+const showUpdatedBanner = Astro.url.searchParams.get("updated") === "1";
+const showDeletedBanner = Astro.url.searchParams.get("deleted") === "1";
+const showMovedBanner = Astro.url.searchParams.get("moved") === "1";
+
+const editParam = Astro.url.searchParams.get("edit");
+const editingStepId =
+  editParam && isValidStepId(editParam) && stepRows.some((step) => step.id === editParam) ? editParam : null;
+const editingStep = editingStepId ? stepRows.find((step) => step.id === editingStepId) : undefined;
+const editFormError = editingStepId ? error : null;
+const addFormError = editingStepId ? null : error;
+const isEditView = Boolean(editingStep && editingStepId);
+
+const paintAddedParam = Astro.url.searchParams.get("paint_added");
+const paintAddedId =
+  paintAddedParam && isValidPaintId(paintAddedParam) && paintRows.some((paint) => paint.id === paintAddedParam)
+    ? paintAddedParam
+    : null;
+
+const assignedPaintIds = editingStep ? editingStep.assigned_paints.map((paint) => paint.id) : [];
+const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}` : entryTitle;
+---
+
+<AppLayout title={pageTitle}>
+  <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+    {
+      isEditView && editingStep && editingStepId ? (
+        <>
+          <div class="mb-6">
+            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+              Edit step
+            </h1>
+            <p class="mt-1 text-sm text-blue-100/60">Step {editingStep.position}</p>
+          </div>
+
+          {showUpdatedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Step updated
+            </p>
+          )}
+
+          {paintAddedId && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Paint added and selected
+            </p>
+          )}
+
+          <EntryStepForm
+            mode="edit"
+            entryId={entryId}
+            stepId={editingStepId}
+            initialDescription={editingStep.description}
+            entryPaints={paintRows}
+            assignedPaintIds={assignedPaintIds}
+            paintAddedId={paintAddedId}
+            serverError={editFormError}
+            inlinePaintError={editFormError}
+            cancelHref={stepsBaseUrl}
+            client:load
+          />
+
+          <p class="mt-6 text-center text-sm text-blue-100/60">
+            <a href={stepsBaseUrl} class="text-purple-300 hover:underline">
+              Back to steps
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href={`/entries/${entryId}/paints`} class="text-purple-300 hover:underline">
+              Manage paints
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href={`/entries/${entryId}`} class="text-purple-300 hover:underline">
+              Back to entry
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href="/entries" class="text-purple-300 hover:underline">
+              Back to entries
+            </a>
+          </p>
+        </>
+      ) : (
+        <>
+          <div class="mb-6">
+            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+              Tutorial steps
+            </h1>
+            <p class="mt-1 text-sm text-blue-100/60">Ordered steps with paint assignments for this entry.</p>
+          </div>
+
+          {showAddedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Step added
+            </p>
+          )}
+
+          {showUpdatedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Step updated
+            </p>
+          )}
+
+          {showDeletedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Step deleted
+            </p>
+          )}
+
+          {showMovedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Step order updated
+            </p>
+          )}
+
+          {listError && (
+            <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+              Could not load steps. Please try again.
+            </p>
+          )}
+
+          {stepRows.length === 0 && !listError && (
+            <div class="mb-6 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+              <p class="text-blue-100/70">No steps yet. Add the first step to this entry&apos;s tutorial.</p>
+            </div>
+          )}
+
+          <div class="mb-8">
+            <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Add step</h2>
+            <EntryStepForm mode="add" entryId={entryId} serverError={addFormError} client:load />
+          </div>
+
+          {stepRows.length > 0 && (
+            <div>
+              <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Steps</h2>
+              <ul class="space-y-3">
+                {stepRows.map((step, index) => (
+                  <li class="rounded-lg border border-white/10 bg-white/5 p-4">
+                    <div class="flex flex-wrap items-start gap-4">
+                      <div class="min-w-0 flex-1">
+                        <p class="text-xs font-medium tracking-wide text-blue-100/50 uppercase">Step {step.position}</p>
+                        <p class="mt-1 whitespace-pre-wrap text-white">{step.description}</p>
+                        {step.assigned_paints.length > 0 && (
+                          <div class="mt-3 flex flex-wrap gap-2">
+                            {step.assigned_paints.map((paint) => (
+                              <PaintCard name={paint.name} approximate_color={paint.approximate_color} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div class="flex shrink-0 flex-wrap gap-2">
+                        <a
+                          href={`${stepsBaseUrl}?edit=${step.id}`}
+                          class="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+                        >
+                          Edit
+                        </a>
+                        {index > 0 && (
+                          <form method="POST" action={`/api/entries/${entryId}/steps/${step.id}/move`}>
+                            <input type="hidden" name="direction" value="up" />
+                            <button
+                              type="submit"
+                              class="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+                            >
+                              Move up
+                            </button>
+                          </form>
+                        )}
+                        {index < stepRows.length - 1 && (
+                          <form method="POST" action={`/api/entries/${entryId}/steps/${step.id}/move`}>
+                            <input type="hidden" name="direction" value="down" />
+                            <button
+                              type="submit"
+                              class="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+                            >
+                              Move down
+                            </button>
+                          </form>
+                        )}
+                        <form
+                          method="POST"
+                          action={`/api/entries/${entryId}/steps/${step.id}/delete`}
+                          onsubmit="return confirm('Delete this step?')"
+                        >
+                          <button
+                            type="submit"
+                            class="inline-flex items-center gap-1 rounded-lg border border-red-400/30 px-3 py-1.5 text-sm text-red-200/90 transition-colors hover:bg-red-900/20"
+                          >
+                            Delete
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <p class="mt-6 text-center text-sm text-blue-100/60">
+            <a href={`/entries/${entryId}/paints`} class="text-purple-300 hover:underline">
+              Manage paints
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href={`/entries/${entryId}`} class="text-purple-300 hover:underline">
+              Back to entry
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href="/entries" class="text-purple-300 hover:underline">
+              Back to entries
+            </a>
+          </p>
+        </>
+      )
+    }
+  </div>
+</AppLayout>
