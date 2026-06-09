@@ -2,8 +2,9 @@ import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId, requireUser } from "@/lib/entries-api";
 import { loadEntryExists } from "@/lib/entry-paints-page";
-import { createStepAtNextPosition } from "@/lib/entry-steps-mutations";
-import { parseEntryStepFormData, stepsPagePath } from "@/lib/entry-steps-api";
+import { applyStepPhotoFromForm } from "@/lib/entry-step-photos";
+import { createStepAtNextPosition, syncStepPaintAssignments } from "@/lib/entry-steps-mutations";
+import { parseEntryStepFormData, parseStepPaintIds, stepsPagePath } from "@/lib/entry-steps-api";
 
 export const POST: APIRoute = async (context) => {
   const entryId = context.params.id;
@@ -37,6 +38,20 @@ export const POST: APIRoute = async (context) => {
   const createResult = await createStepAtNextPosition(supabase, entryId, parsed.fields.description);
   if (!createResult.ok) {
     return context.redirect(`${stepsUrl}?error=${encodeURIComponent(createResult.error)}`);
+  }
+
+  const assignResult = await syncStepPaintAssignments(supabase, entryId, createResult.stepId, parseStepPaintIds(form));
+  if (!assignResult.ok) {
+    return context.redirect(
+      `${stepsUrl}?error=${encodeURIComponent(`${assignResult.error} The step was created — edit it to fix paint assignments.`)}`,
+    );
+  }
+
+  const photoResult = await applyStepPhotoFromForm(supabase, user.id, entryId, createResult.stepId, form);
+  if (!photoResult.ok) {
+    return context.redirect(
+      `${stepsUrl}?error=${encodeURIComponent(`${photoResult.error} The step was created — edit it to fix the photo.`)}`,
+    );
   }
 
   return context.redirect(`${stepsUrl}?added=1`);

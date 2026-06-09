@@ -109,6 +109,7 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
             entryPaints={paintRows}
             assignedPaintIds={assignedPaintIds}
             paintAddedId={paintAddedId}
+            initialPhotoUrl={editingStep.photo_url}
             serverError={editFormError}
             inlinePaintError={editFormError}
             cancelHref={stepsBaseUrl}
@@ -166,6 +167,12 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
             </p>
           )}
 
+          {paintAddedId && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Paint added and selected
+            </p>
+          )}
+
           {listError && (
             <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
               Could not load steps. Please try again.
@@ -180,7 +187,15 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
 
           <div class="mb-8">
             <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Add step</h2>
-            <EntryStepForm mode="add" entryId={entryId} serverError={addFormError} client:load />
+            <EntryStepForm
+              mode="add"
+              entryId={entryId}
+              entryPaints={paintRows}
+              paintAddedId={paintAddedId}
+              serverError={addFormError}
+              inlinePaintError={addFormError}
+              client:load
+            />
           </div>
 
           {stepRows.length > 0 && (
@@ -190,6 +205,13 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
                 {stepRows.map((step, index) => (
                   <li class="rounded-lg border border-white/10 bg-white/5 p-4">
                     <div class="flex flex-wrap items-start gap-4">
+                      {step.photo_url && (
+                        <img
+                          src={step.photo_url}
+                          alt={`Step ${step.position}`}
+                          class="size-16 shrink-0 rounded-lg border border-white/20 object-cover"
+                        />
+                      )}
                       <div class="min-w-0 flex-1">
                         <p class="text-xs font-medium tracking-wide text-blue-100/50 uppercase">Step {step.position}</p>
                         <p class="mt-1 whitespace-pre-wrap text-white">{step.description}</p>

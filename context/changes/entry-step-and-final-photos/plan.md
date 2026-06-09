@@ -403,12 +403,12 @@ Signed URLs generated per step on list load — acceptable for hobby-scale step 
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes
-- [x] 1.2 `npm run build` passes
+- [x] 1.1 `npm run lint` passes — b8cde95
+- [x] 1.2 `npm run build` passes — b8cde95
 
 #### Manual
 
-- [x] 1.3 Path builders match README convention; signed URL helper verified locally
+- [x] 1.3 Path builders match README convention; signed URL helper verified locally — b8cde95
 
 ### Phase 2: Step form parity and step photos
 

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId, requireUser } from "@/lib/entries-api";
+import { applyStepPhotoFromForm } from "@/lib/entry-step-photos";
 import { updateStepWithAssignments } from "@/lib/entry-steps-mutations";
 import {
   isReturnToEdit,
@@ -53,6 +54,12 @@ export const POST: APIRoute = async (context) => {
   if (!updateResult.ok) {
     const errorUrl = isReturnToEdit(form) ? `${stepEditPath(entryId, stepId)}&error=` : `${stepsUrl}?error=`;
     return context.redirect(`${errorUrl}${encodeURIComponent(updateResult.error)}`);
+  }
+
+  const photoResult = await applyStepPhotoFromForm(supabase, user.id, entryId, stepId, form);
+  if (!photoResult.ok) {
+    const errorUrl = isReturnToEdit(form) ? `${stepEditPath(entryId, stepId)}&error=` : `${stepsUrl}?error=`;
+    return context.redirect(`${errorUrl}${encodeURIComponent(photoResult.error)}`);
   }
 
   if (isReturnToEdit(form)) {
