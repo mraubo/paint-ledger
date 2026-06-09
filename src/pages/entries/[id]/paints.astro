@@ -1,0 +1,200 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import EntryPaintForm from "@/components/entries/EntryPaintForm";
+import { createClient } from "@/lib/supabase";
+import { isValidEntryId } from "@/lib/entries-api";
+import { isValidHexColor, isValidPaintId } from "@/lib/entry-paints-api";
+import { loadEntryPaints, type EntryPaintRow } from "@/lib/entry-paints-page";
+import { loadEntryForEdit } from "@/lib/entries-page";
+
+const { id } = Astro.params;
+const notFoundUrl = `/entries?error=${encodeURIComponent("Entry not found")}`;
+
+let redirectUrl: string | null = null;
+let entryId = "";
+let entryTitle = "Entry paints";
+let paintRows: EntryPaintRow[] = [];
+let listError: string | null = null;
+
+if (!id || !isValidEntryId(id)) {
+  redirectUrl = notFoundUrl;
+} else {
+  entryId = id;
+  const supabase = createClient(Astro.request.headers, Astro.cookies);
+  if (!supabase) {
+    redirectUrl = `/entries?error=${encodeURIComponent("Supabase is not configured")}`;
+  } else {
+    const entry = await loadEntryForEdit(supabase, id);
+    if (!entry) {
+      redirectUrl = notFoundUrl;
+    } else {
+      entryTitle = `${entry.title} — Paints`;
+      const paintsResult = await loadEntryPaints(supabase, id);
+      if (!paintsResult.ok) {
+        listError = paintsResult.error;
+      } else {
+        paintRows = paintsResult.paints;
+      }
+    }
+  }
+}
+
+if (redirectUrl) {
+  return Astro.redirect(redirectUrl);
+}
+
+const paintsBaseUrl = `/entries/${entryId}/paints`;
+const error = Astro.url.searchParams.get("error");
+const showAddedBanner = Astro.url.searchParams.get("added") === "1";
+const showUpdatedBanner = Astro.url.searchParams.get("updated") === "1";
+const showDeletedBanner = Astro.url.searchParams.get("deleted") === "1";
+
+const editParam = Astro.url.searchParams.get("edit");
+const editingPaintId =
+  editParam && isValidPaintId(editParam) && paintRows.some((paint) => paint.id === editParam) ? editParam : null;
+const editingPaint = editingPaintId ? paintRows.find((paint) => paint.id === editingPaintId) : undefined;
+const editFormError = editingPaintId ? error : null;
+const addFormError = editingPaintId ? null : error;
+const isEditView = Boolean(editingPaint && editingPaintId);
+const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : entryTitle;
+---
+
+<AppLayout title={pageTitle}>
+  <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+    {
+      isEditView && editingPaint && editingPaintId ? (
+        <>
+          <div class="mb-6">
+            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+              Edit paint
+            </h1>
+            <p class="mt-1 text-sm text-blue-100/60">{editingPaint.name}</p>
+          </div>
+
+          <EntryPaintForm
+            mode="edit"
+            entryId={entryId}
+            paintId={editingPaintId}
+            initialValues={{
+              name: editingPaint.name,
+              brand: editingPaint.brand,
+              color_description: editingPaint.color_description,
+              approximate_color: editingPaint.approximate_color,
+            }}
+            serverError={editFormError}
+            cancelHref={paintsBaseUrl}
+            client:load
+          />
+
+          <p class="mt-6 text-center text-sm text-blue-100/60">
+            <a href={paintsBaseUrl} class="text-purple-300 hover:underline">
+              Back to paints
+            </a>
+            <span class="mx-2 text-blue-100/30">·</span>
+            <a href={`/entries/${entryId}`} class="text-purple-300 hover:underline">
+              Back to entry
+            </a>
+          </p>
+        </>
+      ) : (
+        <>
+          <div class="mb-6">
+            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+              Paint palette
+            </h1>
+            <p class="mt-1 text-sm text-blue-100/60">Entry-level paints for this recipe.</p>
+          </div>
+
+          {showAddedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Paint added
+            </p>
+          )}
+
+          {showUpdatedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Paint updated
+            </p>
+          )}
+
+          {showDeletedBanner && (
+            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+              Paint deleted
+            </p>
+          )}
+
+          {listError && (
+            <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+              Could not load paints. Please try again.
+            </p>
+          )}
+
+          {paintRows.length === 0 && !listError && (
+            <div class="mb-6 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
+              <p class="text-blue-100/70">No paints yet. Add the first color to this entry&apos;s palette.</p>
+            </div>
+          )}
+
+          <div class="mb-8">
+            <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Add paint</h2>
+            <EntryPaintForm mode="add" entryId={entryId} serverError={addFormError} client:load />
+          </div>
+
+          {paintRows.length > 0 && (
+            <div>
+              <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Paints</h2>
+              <ul class="space-y-3">
+                {paintRows.map((paint) => {
+                  const metaParts = [paint.brand, paint.color_description].filter((part) => part.trim().length > 0);
+                  const swatchColor = isValidHexColor(paint.approximate_color) ? paint.approximate_color : "#000000";
+
+                  return (
+                    <li class="rounded-lg border border-white/10 bg-white/5 p-4">
+                      <div class="flex flex-wrap items-start gap-4">
+                        <span
+                          class="mt-0.5 size-10 shrink-0 rounded-lg border border-white/20"
+                          style={{ backgroundColor: swatchColor }}
+                          aria-hidden="true"
+                        />
+                        <div class="min-w-0 flex-1">
+                          <p class="font-medium text-white">{paint.name}</p>
+                          {metaParts.length > 0 && <p class="text-sm text-blue-100/60">{metaParts.join(" · ")}</p>}
+                        </div>
+                        <div class="flex shrink-0 gap-2">
+                          <a
+                            href={`${paintsBaseUrl}?edit=${paint.id}`}
+                            class="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+                          >
+                            Edit
+                          </a>
+                          <form
+                            method="POST"
+                            action={`/api/entries/${entryId}/paints/${paint.id}/delete`}
+                            onsubmit="return confirm('Delete this paint?')"
+                          >
+                            <button
+                              type="submit"
+                              class="inline-flex items-center gap-1 rounded-lg border border-red-400/30 px-3 py-1.5 text-sm text-red-200/90 transition-colors hover:bg-red-900/20"
+                            >
+                              Delete
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          <p class="mt-6 text-center text-sm text-blue-100/60">
+            <a href={`/entries/${entryId}`} class="text-purple-300 hover:underline">
+              Back to entry
+            </a>
+          </p>
+        </>
+      )
+    }
+  </div>
+</AppLayout>
