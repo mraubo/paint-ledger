@@ -19,6 +19,8 @@ export interface EntryBasicsRow extends EntryBasicsFields {
   final_photo_path: string | null;
 }
 
+export type EntryDetailBasics = EntryBasicsRow;
+
 export type EntryListResult = { ok: true; entries: EntryListRow[] } | { ok: false; error: string };
 
 export async function loadEntryList(supabase: SupabaseClient<Database>): Promise<EntryListResult> {

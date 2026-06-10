@@ -297,27 +297,27 @@ Add step count badge and Ready badge on list rows; confirm list links target det
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Build passes: `npm run build`
+- [x] 1.1 Linting passes: `npm run lint` — e3f5a0e
+- [x] 1.2 Build passes: `npm run build` — e3f5a0e
 
 #### Manual
 
-- [x] 1.3 Basics save redirects to `/entries/[id]/edit?saved=1`
-- [x] 1.4 Final photo redirects to edit hub; paints/steps footers link to edit
-- [x] 1.5 Status change: mark ready with final photo; blocked without; revert ready to draft
+- [x] 1.3 Basics save redirects to `/entries/[id]/edit?saved=1` — e3f5a0e
+- [x] 1.4 Final photo redirects to edit hub; paints/steps footers link to edit — e3f5a0e
+- [x] 1.5 Status change: mark ready with final photo; blocked without; revert ready to draft — e3f5a0e
 
 ### Phase 2: Detail recall page
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 2.3 Detail shows full recall layout; hero final photo at top
-- [ ] 2.4 Empty sections hidden; Edit entry opens edit hub
-- [ ] 2.5 Invalid entry id redirects to list with error
+- [x] 2.3 Detail shows full recall layout; hero final photo at top
+- [x] 2.4 Empty sections hidden; Edit entry opens edit hub
+- [x] 2.5 Invalid entry id redirects to list with error
 
 ### Phase 3: List enhancements
 

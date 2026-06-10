@@ -1,0 +1,36 @@
+---
+import { PaintCard } from "@/components/entries/PaintCard";
+import type { EntryStepRow } from "@/lib/entry-steps-page";
+
+interface Props {
+  step: EntryStepRow;
+}
+
+const { step } = Astro.props;
+---
+
+<li class="flex h-full flex-col rounded-xl border border-white/10 bg-white/5 p-4">
+  <p class="mb-3 text-xs font-medium tracking-wide text-blue-100/50 uppercase">Step {step.position}</p>
+
+  {
+    step.photo_url && (
+      <img
+        src={step.photo_url}
+        alt={`Step ${step.position}`}
+        class="mb-3 size-[200px] rounded-lg border border-white/20 object-cover"
+      />
+    )
+  }
+
+  {
+    step.assigned_paints.length > 0 && (
+      <div class="mb-3 flex flex-wrap gap-2">
+        {step.assigned_paints.map((paint) => (
+          <PaintCard name={paint.name} approximate_color={paint.approximate_color} />
+        ))}
+      </div>
+    )
+  }
+
+  <p class="mt-auto text-sm whitespace-pre-wrap text-white">{step.description}</p>
+</li>
