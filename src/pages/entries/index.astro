@@ -2,7 +2,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
-import { formatEntryDate, loadEntryList } from "@/lib/entries-page";
+import { formatEntryDate, formatStepCount, loadEntryList } from "@/lib/entries-page";
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const listResult = supabase ? await loadEntryList(supabase) : { ok: true as const, entries: [] };
@@ -83,10 +83,18 @@ const error = Astro.url.searchParams.get("error");
                 </a>
                 <p class="mt-1 text-xs text-blue-100/50">Updated {formatEntryDate(entry.updated_at)}</p>
               </div>
-              <div class="ml-auto flex shrink-0 items-center gap-2">
+              <div class="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
+                <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs text-blue-100/70">
+                  {formatStepCount(entry.step_count)}
+                </span>
                 {entry.status === "draft" && (
                   <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs text-blue-100/70">
                     Draft
+                  </span>
+                )}
+                {entry.status === "ready" && (
+                  <span class="rounded-full border border-green-500/30 bg-green-900/30 px-2.5 py-0.5 text-xs text-green-200/90">
+                    Ready
                   </span>
                 )}
               </div>

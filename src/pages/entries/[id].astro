@@ -1,16 +1,22 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
-import EntryBasicsForm from "@/components/entries/EntryBasicsForm";
-import EntryFinalPhotoForm from "@/components/entries/EntryFinalPhotoForm";
+import EntryPaintReadOnlyRow from "@/components/entries/EntryPaintReadOnlyRow.astro";
+import EntryStepReadOnly from "@/components/entries/EntryStepReadOnly.astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
-import { loadEntryForEdit, resolveEntryFinalPhotoUrl, type EntryBasicsRow } from "@/lib/entries-page";
+import { loadEntryForEdit, resolveEntryFinalPhotoUrl, type EntryDetailBasics } from "@/lib/entries-page";
+import { loadEntryPaints, type EntryPaintRow } from "@/lib/entry-paints-page";
+import { loadEntrySteps, type EntryStepRow } from "@/lib/entry-steps-page";
 
 const { id } = Astro.params;
 const notFoundUrl = `/entries?error=${encodeURIComponent("Entry not found")}`;
 
-let entry: EntryBasicsRow | null = null;
+let entry: EntryDetailBasics | null = null;
 let finalPhotoUrl: string | null = null;
+let paintRows: EntryPaintRow[] = [];
+let stepRows: EntryStepRow[] = [];
+let paintsError: string | null = null;
+let stepsError: string | null = null;
 let redirectUrl: string | null = null;
 
 if (!id || !isValidEntryId(id)) {
@@ -24,7 +30,25 @@ if (!id || !isValidEntryId(id)) {
     if (!entry) {
       redirectUrl = notFoundUrl;
     } else {
-      finalPhotoUrl = await resolveEntryFinalPhotoUrl(supabase, entry.final_photo_path);
+      const [resolvedFinalPhotoUrl, paintsResult, stepsResult] = await Promise.all([
+        resolveEntryFinalPhotoUrl(supabase, entry.final_photo_path),
+        loadEntryPaints(supabase, id),
+        loadEntrySteps(supabase, id),
+      ]);
+
+      finalPhotoUrl = resolvedFinalPhotoUrl;
+
+      if (!paintsResult.ok) {
+        paintsError = paintsResult.error;
+      } else {
+        paintRows = paintsResult.paints;
+      }
+
+      if (!stepsResult.ok) {
+        stepsError = stepsResult.error;
+      } else {
+        stepRows = stepsResult.steps;
+      }
     }
   }
 }
@@ -33,17 +57,10 @@ if (redirectUrl) {
   return Astro.redirect(redirectUrl);
 }
 
-const error = Astro.url.searchParams.get("error");
-const showSavedBanner = Astro.url.searchParams.get("saved") === "1";
-const showFinalPhotoSavedBanner = Astro.url.searchParams.get("final_photo_saved") === "1";
-const showDraftFinalPhotoWarning = entry.status === "draft" && !entry.final_photo_path;
-
-const initialValues = {
-  title: entry.title,
-  description: entry.description,
-  model_info: entry.model_info,
-  model_origin_note: entry.model_origin_note,
-};
+const loaderError = paintsError ?? stepsError;
+const hasDescription = entry.description.trim().length > 0;
+const hasModelInfo = entry.model_info.trim().length > 0;
+const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
 ---
 
 <AppLayout title={entry.title}>
@@ -59,46 +76,98 @@ const initialValues = {
           </span>
         )
       }
+      {
+        entry.status === "ready" && (
+          <span class="rounded-full border border-green-500/30 bg-green-900/30 px-2.5 py-0.5 text-xs text-green-200/90">
+            Ready
+          </span>
+        )
+      }
     </div>
 
     {
-      showSavedBanner && (
-        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
-          Changes saved
+      loaderError && (
+        <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+          Could not load entry details. Please try again.
         </p>
       )
     }
 
     {
-      showFinalPhotoSavedBanner && (
-        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
-          Final photo saved
-        </p>
+      finalPhotoUrl && (
+        <div class="mb-8">
+          <img
+            src={finalPhotoUrl}
+            alt={`Final result for ${entry.title}`}
+            class="max-h-96 w-full rounded-xl border border-white/20 object-cover"
+          />
+        </div>
       )
     }
 
-    <EntryBasicsForm mode="edit" entryId={entry.id} initialValues={initialValues} serverError={error} client:load />
+    {
+      hasDescription && (
+        <section class="mb-8">
+          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Description</h2>
+          <p class="whitespace-pre-wrap text-blue-100/80">{entry.description}</p>
+        </section>
+      )
+    }
 
-    <section class="mt-10 border-t border-white/10 pt-8">
-      <h2 class="mb-1 text-lg font-semibold text-blue-100/90">Final result</h2>
-      <p class="mb-4 text-sm text-blue-100/60">Photo of the finished model for this entry.</p>
+    {
+      hasModelInfo && (
+        <section class="mb-8">
+          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Model information</h2>
+          <p class="whitespace-pre-wrap text-blue-100/80">{entry.model_info}</p>
+        </section>
+      )
+    }
 
-      {
-        showDraftFinalPhotoWarning && (
-          <p class="mb-4 rounded-lg border border-amber-500/30 bg-amber-900/20 px-3 py-2 text-sm text-amber-200/90">
-            Add a final result photo before marking this entry ready.
-          </p>
-        )
-      }
+    {
+      hasModelOriginNote && (
+        <section class="mb-8">
+          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Model origin</h2>
+          <p class="whitespace-pre-wrap text-blue-100/80">{entry.model_origin_note}</p>
+        </section>
+      )
+    }
 
-      <EntryFinalPhotoForm entryId={entry.id} initialPhotoUrl={finalPhotoUrl} serverError={error} client:load />
-    </section>
+    {
+      paintRows.length > 0 && (
+        <section class="mb-8">
+          <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Paint palette</h2>
+          <ul class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {paintRows.map((paint) => (
+              <EntryPaintReadOnlyRow paint={paint} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
-    <p class="mt-4 text-center text-sm text-blue-100/60">
-      <a href={`/entries/${entry.id}/paints`} class="text-purple-300 hover:underline">Manage paints</a>
-      <span class="mx-2 text-blue-100/30">·</span>
-      <a href={`/entries/${entry.id}/steps`} class="text-purple-300 hover:underline">Manage steps</a>
-      <span class="mx-2 text-blue-100/30">·</span>
+    {
+      stepRows.length > 0 && (
+        <section class="mb-8">
+          <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Tutorial steps</h2>
+          <ul class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {stepRows.map((step) => (
+              <EntryStepReadOnly step={step} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <div class="mt-8 border-t border-white/10 pt-8">
+      <a
+        href={`/entries/${entry.id}/edit`}
+        class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+      >
+        Edit entry
+      </a>
+    </div>
+
+    <p class="mt-6 text-center text-sm text-blue-100/60">
       <a href="/entries" class="text-purple-300 hover:underline">Back to entries</a>
     </p>
   </div>

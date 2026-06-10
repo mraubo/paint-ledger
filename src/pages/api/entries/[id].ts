@@ -10,7 +10,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
-    return context.redirect(`/entries/${id}?error=${encodeURIComponent("Supabase is not configured")}`);
+    return context.redirect(`/entries/${id}/edit?error=${encodeURIComponent("Supabase is not configured")}`);
   }
 
   const user = await requireUser(supabase);
@@ -21,7 +21,7 @@ export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
   const parsed = parseEntryBasicsFormData(form);
   if (!parsed.ok) {
-    return context.redirect(`/entries/${id}?error=${encodeURIComponent(parsed.error)}`);
+    return context.redirect(`/entries/${id}/edit?error=${encodeURIComponent(parsed.error)}`);
   }
 
   const { fields } = parsed;
@@ -39,12 +39,12 @@ export const POST: APIRoute = async (context) => {
     .maybeSingle();
 
   if (error) {
-    return context.redirect(`/entries/${id}?error=${encodeURIComponent(toUserFacingDbError(error))}`);
+    return context.redirect(`/entries/${id}/edit?error=${encodeURIComponent(toUserFacingDbError(error))}`);
   }
 
   if (!data) {
-    return context.redirect(`/entries/${id}?error=${encodeURIComponent("Entry not found")}`);
+    return context.redirect(`/entries/${id}/edit?error=${encodeURIComponent("Entry not found")}`);
   }
 
-  return context.redirect(`/entries/${id}?saved=1`);
+  return context.redirect(`/entries/${id}/edit?saved=1`);
 };

@@ -85,3 +85,69 @@ export function toEntrySummary(row: Pick<EntryRow, "id" | "title" | "status" | "
     updated_at: row.updated_at,
   };
 }
+
+export type EntryStatus = Database["public"]["Enums"]["entry_status"];
+
+export function parseEntryStatusChange(
+  formData: FormData,
+): { ok: true; status: "draft" | "ready" } | { ok: false; error: string } {
+  const value = readString(formData, "status");
+
+  if (value === "draft" || value === "ready") {
+    return { ok: true, status: value };
+  }
+
+  if (!value) {
+    return { ok: false, error: "Status is required" };
+  }
+
+  return { ok: false, error: "Invalid status" };
+}
+
+export async function changeEntryStatus(
+  supabase: SupabaseClient<Database>,
+  entryId: string,
+  userId: string,
+  targetStatus: "draft" | "ready",
+): Promise<{ ok: true; status: "draft" | "ready" } | { ok: false; error: string }> {
+  const { data: entry, error: loadError } = await supabase
+    .from("entries")
+    .select("id, status, final_photo_path")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (loadError) {
+    return { ok: false, error: toUserFacingDbError(loadError) };
+  }
+
+  if (!entry) {
+    return { ok: false, error: "Entry not found" };
+  }
+
+  if (entry.status === targetStatus) {
+    return { ok: false, error: `Entry is already ${targetStatus}` };
+  }
+
+  if (targetStatus === "ready" && !entry.final_photo_path) {
+    return { ok: false, error: "Add a final result photo before marking this entry ready." };
+  }
+
+  const { data, error } = await supabase
+    .from("entries")
+    .update({ status: targetStatus })
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .select("id, status")
+    .maybeSingle();
+
+  if (error) {
+    return { ok: false, error: toUserFacingDbError(error) };
+  }
+
+  if (!data) {
+    return { ok: false, error: "Entry not found" };
+  }
+
+  return { ok: true, status: data.status };
+}

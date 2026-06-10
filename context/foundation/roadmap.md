@@ -3,7 +3,7 @@ project: "Paint Ledger"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-06-09
+updated: 2026-06-10
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -38,7 +38,7 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 | S-03 | entry-paint-palette | define an entry-level paint list with approximate color picker | S-02, F-01 | FR-005 | done |
 | S-04 | steps-with-paint-cards | add ordered steps, assign paints from the entry list, and see paint cards on steps | S-03 | FR-006, FR-007, FR-008 | done |
 | S-05 | entry-step-and-final-photos | attach one optional photo per step and at least one final model photo | S-04, F-02 | FR-009, FR-010 | done |
-| S-06 | entry-list-and-detail | browse saved entries in a simple list and open full detail recall | S-05 | FR-011, FR-012, US-01 | proposed |
+| S-06 | entry-list-and-detail | browse saved entries in a simple list and open full detail recall | S-05 | FR-011, FR-012, US-01 | done |
 
 ## Streams
 
@@ -162,7 +162,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** North star / validation milestone — proves primary Success Criteria (add complete entry, reopen without external notes). List stays minimal (no search/filter per Non-Goals).
-- **Status:** proposed
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -196,6 +196,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
+- **S-06: user can browse saved entries in a simple list and open a detail view showing model info, origin note, paint list, ordered steps with assigned paint cards, step photos, and final photo — completing US-01 end-to-end.** — Archived 2026-06-10 → `context/archive/2026-06-10-entry-list-and-detail/`. Lesson: —.
 - **S-05: user can attach up to one optional photo per tutorial step and at least one final model photo in a separate result area.** — Archived 2026-06-09 → `context/archive/2026-06-09-entry-step-and-final-photos/`. Lesson: —.
 - **S-04: user can add ordered tutorial steps with descriptions, assign paints from the entry list (including inline add to the list), and see paint name and approximate color on each step.** — Archived 2026-06-09 → `context/archive/2026-06-09-steps-with-paint-cards/`. Lesson: —.
 - **S-03: user can define an entry-level paint list with name, brand, color description, and approximate color from a picker.** — Archived 2026-06-09 → `context/archive/2026-06-08-entry-paint-palette/`. Lesson: —.
