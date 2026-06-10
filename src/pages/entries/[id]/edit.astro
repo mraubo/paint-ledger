@@ -36,7 +36,10 @@ if (redirectUrl) {
 const error = Astro.url.searchParams.get("error");
 const showSavedBanner = Astro.url.searchParams.get("saved") === "1";
 const showFinalPhotoSavedBanner = Astro.url.searchParams.get("final_photo_saved") === "1";
+const statusChanged = Astro.url.searchParams.get("status_changed");
+const showStatusChangedBanner = statusChanged === "ready" || statusChanged === "draft";
 const showDraftFinalPhotoWarning = entry.status === "draft" && !entry.final_photo_path;
+const canMarkReady = entry.status === "draft" && Boolean(entry.final_photo_path);
 
 const initialValues = {
   title: entry.title,
@@ -59,6 +62,13 @@ const initialValues = {
           </span>
         )
       }
+      {
+        entry.status === "ready" && (
+          <span class="rounded-full border border-green-500/30 bg-green-900/30 px-2.5 py-0.5 text-xs text-green-200/90">
+            Ready
+          </span>
+        )
+      }
     </div>
 
     {
@@ -73,6 +83,14 @@ const initialValues = {
       showFinalPhotoSavedBanner && (
         <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
           Final photo saved
+        </p>
+      )
+    }
+
+    {
+      showStatusChangedBanner && (
+        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+          {statusChanged === "ready" ? "Entry marked as ready" : "Entry reverted to draft"}
         </p>
       )
     }
@@ -92,6 +110,61 @@ const initialValues = {
       }
 
       <EntryFinalPhotoForm entryId={entry.id} initialPhotoUrl={finalPhotoUrl} serverError={error} client:load />
+    </section>
+
+    <section class="mt-10 border-t border-white/10 pt-8">
+      <h2 class="mb-1 text-lg font-semibold text-blue-100/90">Status</h2>
+      <p class="mb-4 text-sm text-blue-100/60">
+        {
+          entry.status === "draft"
+            ? "Mark this entry ready when the recipe and final photo are complete."
+            : "Revert to draft to continue editing this entry."
+        }
+      </p>
+
+      {
+        canMarkReady && (
+          <form method="POST" action={`/api/entries/${entry.id}/status-change`}>
+            <input type="hidden" name="status" value="ready" />
+            <button
+              type="submit"
+              class="inline-flex items-center rounded-lg border border-green-500/30 bg-green-900/20 px-4 py-2 text-sm font-medium text-green-200 transition-colors hover:bg-green-900/30"
+            >
+              Mark as ready
+            </button>
+          </form>
+        )
+      }
+
+      {
+        entry.status === "draft" && !entry.final_photo_path && (
+          <button
+            type="button"
+            disabled
+            class="inline-flex cursor-not-allowed items-center rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-blue-100/40"
+          >
+            Mark as ready
+          </button>
+        )
+      }
+
+      {
+        entry.status === "ready" && (
+          <form
+            method="POST"
+            action={`/api/entries/${entry.id}/status-change`}
+            onsubmit="return confirm('Revert this entry to draft?')"
+          >
+            <input type="hidden" name="status" value="draft" />
+            <button
+              type="submit"
+              class="inline-flex items-center rounded-lg border border-white/20 px-4 py-2 text-sm font-medium text-blue-100/80 transition-colors hover:bg-white/10"
+            >
+              Revert to draft
+            </button>
+          </form>
+        )
+      }
     </section>
 
     <p class="mt-4 text-center text-sm text-blue-100/60">

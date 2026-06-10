@@ -9,7 +9,7 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/entries?error=${encodeURIComponent("Invalid entry id")}`);
   }
 
-  const entryUrl = `/entries/${id}`;
+  const entryUrl = `/entries/${id}/edit`;
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
