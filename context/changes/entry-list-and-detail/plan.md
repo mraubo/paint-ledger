@@ -310,22 +310,22 @@ Add step count badge and Ready badge on list rows; confirm list links target det
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint` — d73d965
+- [x] 2.2 Build passes: `npm run build` — d73d965
 
 #### Manual
 
-- [x] 2.3 Detail shows full recall layout; hero final photo at top
-- [x] 2.4 Empty sections hidden; Edit entry opens edit hub
-- [x] 2.5 Invalid entry id redirects to list with error
+- [x] 2.3 Detail shows full recall layout; hero final photo at top — d73d965
+- [x] 2.4 Empty sections hidden; Edit entry opens edit hub — d73d965
+- [x] 2.5 Invalid entry id redirects to list with error — d73d965
 
 ### Phase 3: List enhancements
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.3 List shows step count and Ready/Draft badges; links open detail
+- [x] 3.3 List shows step count and Ready/Draft badges; links open detail

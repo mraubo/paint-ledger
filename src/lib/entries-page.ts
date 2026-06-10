@@ -11,6 +11,7 @@ export interface EntryListRow {
   status: Database["public"]["Enums"]["entry_status"];
   updated_at: string;
   photo_url: string | null;
+  step_count: number;
 }
 
 export interface EntryBasicsRow extends EntryBasicsFields {
@@ -33,6 +34,24 @@ export async function loadEntryList(supabase: SupabaseClient<Database>): Promise
     return { ok: false, error: error.message };
   }
 
+  const entryIds = data.map((row) => row.id);
+  const stepCountByEntryId = new Map<string, number>(entryIds.map((entryId) => [entryId, 0]));
+
+  if (entryIds.length > 0) {
+    const { data: stepRows, error: stepsError } = await supabase
+      .from("steps")
+      .select("entry_id")
+      .in("entry_id", entryIds);
+
+    if (stepsError) {
+      return { ok: false, error: stepsError.message };
+    }
+
+    for (const step of stepRows) {
+      stepCountByEntryId.set(step.entry_id, (stepCountByEntryId.get(step.entry_id) ?? 0) + 1);
+    }
+  }
+
   const photoPaths = data.flatMap((row) => (row.final_photo_path ? [row.final_photo_path] : []));
   const signedPhotoUrls = await createSignedPhotoUrlMap(supabase, photoPaths, SIGNED_PHOTO_URL_EXPIRY_SECONDS);
 
@@ -42,9 +61,14 @@ export async function loadEntryList(supabase: SupabaseClient<Database>): Promise
     status: row.status,
     updated_at: row.updated_at,
     photo_url: row.final_photo_path ? (signedPhotoUrls.get(row.final_photo_path) ?? null) : null,
+    step_count: stepCountByEntryId.get(row.id) ?? 0,
   }));
 
   return { ok: true, entries };
+}
+
+export function formatStepCount(count: number): string {
+  return count === 1 ? "1 step" : `${count} steps`;
 }
 
 export async function loadEntryForEdit(supabase: SupabaseClient<Database>, id: string): Promise<EntryBasicsRow | null> {
