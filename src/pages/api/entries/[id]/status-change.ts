@@ -23,12 +23,12 @@ export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
   const parsed = parseEntryStatusChange(form);
   if (!parsed.ok) {
-    return context.redirect(`${editUrl}?error=${encodeURIComponent(parsed.error)}`);
+    return context.redirect(`${editUrl}?status_error=${encodeURIComponent(parsed.error)}`);
   }
 
   const result = await changeEntryStatus(supabase, id, user.id, parsed.status);
   if (!result.ok) {
-    return context.redirect(`${editUrl}?error=${encodeURIComponent(result.error)}`);
+    return context.redirect(`${editUrl}?status_error=${encodeURIComponent(result.error)}`);
   }
 
   return context.redirect(`${editUrl}?status_changed=${result.status}`);

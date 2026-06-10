@@ -34,6 +34,7 @@ if (redirectUrl) {
 }
 
 const error = Astro.url.searchParams.get("error");
+const statusError = Astro.url.searchParams.get("status_error");
 const showSavedBanner = Astro.url.searchParams.get("saved") === "1";
 const showFinalPhotoSavedBanner = Astro.url.searchParams.get("final_photo_saved") === "1";
 const statusChanged = Astro.url.searchParams.get("status_changed");
@@ -123,6 +124,14 @@ const initialValues = {
       </p>
 
       {
+        statusError && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+            {statusError}
+          </p>
+        )
+      }
+
+      {
         canMarkReady && (
           <form method="POST" action={`/api/entries/${entry.id}/status-change`}>
             <input type="hidden" name="status" value="ready" />
@@ -168,6 +177,8 @@ const initialValues = {
     </section>
 
     <p class="mt-4 text-center text-sm text-blue-100/60">
+      <a href={`/entries/${entry.id}`} class="text-purple-300 hover:underline">View entry</a>
+      <span class="mx-2 text-blue-100/30">·</span>
       <a href={`/entries/${entry.id}/paints`} class="text-purple-300 hover:underline">Manage paints</a>
       <span class="mx-2 text-blue-100/30">·</span>
       <a href={`/entries/${entry.id}/steps`} class="text-purple-300 hover:underline">Manage steps</a>

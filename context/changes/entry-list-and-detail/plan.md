@@ -289,6 +289,14 @@ Add step count badge and Ready badge on list rows; confirm list links target det
 - Photo signed URLs: `context/archive/2026-06-09-entry-step-and-final-photos/plan.md`
 - Change identity: `context/changes/entry-list-and-detail/change.md`
 
+## Implementation addendum
+
+**Step card layout (post-review):** `EntryStepReadOnly.astro` renders position → 200px photo → paint cards → description (not position → description → photo per original contract). Card grid: 1 column mobile, 3 columns `md+`. Intentional — matches approved recall mockup.
+
+**Paint palette grid:** 2 columns desktop (`md:grid-cols-2`), 1 column mobile.
+
+**Status-change CSRF:** `POST /api/entries/[id]/status-change` uses the same cookie-session form POST pattern as other entry mutations (no explicit CSRF token). Astro same-origin CSRF applies. Manual curl verification requires `Origin: http://localhost:4321` per `lessons.md`.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands.

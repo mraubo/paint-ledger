@@ -38,17 +38,30 @@ export async function loadEntryList(supabase: SupabaseClient<Database>): Promise
   const stepCountByEntryId = new Map<string, number>(entryIds.map((entryId) => [entryId, 0]));
 
   if (entryIds.length > 0) {
-    const { data: stepRows, error: stepsError } = await supabase
-      .from("steps")
-      .select("entry_id")
-      .in("entry_id", entryIds);
+    const countResults = await Promise.all(
+      entryIds.map(async (entryId) => {
+        const { count, error: countError } = await supabase
+          .from("steps")
+          .select("id", { count: "exact", head: true })
+          .eq("entry_id", entryId);
 
-    if (stepsError) {
-      return { ok: false, error: stepsError.message };
+        if (countError) {
+          return { entryId, ok: false as const, error: countError.message };
+        }
+
+        return { entryId, ok: true as const, count: count ?? 0 };
+      }),
+    );
+
+    const failed = countResults.find((result): result is { entryId: string; ok: false; error: string } => !result.ok);
+    if (failed) {
+      return { ok: false, error: failed.error };
     }
 
-    for (const step of stepRows) {
-      stepCountByEntryId.set(step.entry_id, (stepCountByEntryId.get(step.entry_id) ?? 0) + 1);
+    for (const result of countResults) {
+      if (result.ok) {
+        stepCountByEntryId.set(result.entryId, result.count);
+      }
     }
   }
 
