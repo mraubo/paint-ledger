@@ -159,7 +159,7 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 
 ### Entry photo storage (local)
 
-Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload UI is deferred to a later slice (S-05); until then, objects can be uploaded manually via Studio for verification. Replacing or deleting entries does not yet remove orphaned Storage objects.
+Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload via the app on **entry edit** (final result photo) and **steps** (optional per-step photos). Replacing a photo upserts at the fixed Storage path; removing a photo or deleting a step deletes the Storage object. Deleting a full entry does not yet remove orphaned Storage objects.
 
 | Kind  | Object key (relative to bucket)              | DB column                 |
 | ----- | -------------------------------------------- | ------------------------- |

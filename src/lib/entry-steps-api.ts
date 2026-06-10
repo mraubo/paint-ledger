@@ -19,6 +19,8 @@ export function stepsPagePath(entryId: string): string {
   return `/entries/${entryId}/steps`;
 }
 
+export const stepsListPath = stepsPagePath;
+
 export function stepEditPath(entryId: string, stepId: string): string {
   return `/entries/${entryId}/steps?edit=${stepId}`;
 }
@@ -80,12 +82,16 @@ export function parsePaintCreateRedirectTo(formData: FormData, entryId: string):
     return null;
   }
 
+  const stepsList = stepsPagePath(entryId);
+  if (redirectTo === stepsList) {
+    return redirectTo;
+  }
+
   if (!STEP_EDIT_REDIRECT_RE.test(redirectTo)) {
     return null;
   }
 
-  const entryPrefix = `/entries/${entryId}/steps`;
-  if (!redirectTo.startsWith(entryPrefix)) {
+  if (!redirectTo.startsWith(stepsList)) {
     return null;
   }
 

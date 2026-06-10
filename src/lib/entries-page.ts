@@ -1,17 +1,22 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import type { EntryBasicsFields } from "@/lib/entries-api";
+import { createSignedPhotoUrl, createSignedPhotoUrlMap } from "@/lib/entry-photos-storage";
+
+const SIGNED_PHOTO_URL_EXPIRY_SECONDS = 3600;
 
 export interface EntryListRow {
   id: string;
   title: string;
   status: Database["public"]["Enums"]["entry_status"];
   updated_at: string;
+  photo_url: string | null;
 }
 
 export interface EntryBasicsRow extends EntryBasicsFields {
   id: string;
   status: Database["public"]["Enums"]["entry_status"];
+  final_photo_path: string | null;
 }
 
 export type EntryListResult = { ok: true; entries: EntryListRow[] } | { ok: false; error: string };
@@ -19,20 +24,31 @@ export type EntryListResult = { ok: true; entries: EntryListRow[] } | { ok: fals
 export async function loadEntryList(supabase: SupabaseClient<Database>): Promise<EntryListResult> {
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, status, updated_at")
+    .select("id, title, status, updated_at, final_photo_path")
     .order("updated_at", { ascending: false });
 
   if (error) {
     return { ok: false, error: error.message };
   }
 
-  return { ok: true, entries: data };
+  const photoPaths = data.flatMap((row) => (row.final_photo_path ? [row.final_photo_path] : []));
+  const signedPhotoUrls = await createSignedPhotoUrlMap(supabase, photoPaths, SIGNED_PHOTO_URL_EXPIRY_SECONDS);
+
+  const entries = data.map((row) => ({
+    id: row.id,
+    title: row.title,
+    status: row.status,
+    updated_at: row.updated_at,
+    photo_url: row.final_photo_path ? (signedPhotoUrls.get(row.final_photo_path) ?? null) : null,
+  }));
+
+  return { ok: true, entries };
 }
 
 export async function loadEntryForEdit(supabase: SupabaseClient<Database>, id: string): Promise<EntryBasicsRow | null> {
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, description, model_info, model_origin_note, status")
+    .select("id, title, description, model_info, model_origin_note, status, final_photo_path")
     .eq("id", id)
     .maybeSingle();
 
@@ -41,6 +57,17 @@ export async function loadEntryForEdit(supabase: SupabaseClient<Database>, id: s
   }
 
   return data;
+}
+
+export async function resolveEntryFinalPhotoUrl(
+  supabase: SupabaseClient<Database>,
+  finalPhotoPath: string | null,
+): Promise<string | null> {
+  if (!finalPhotoPath) {
+    return null;
+  }
+
+  return createSignedPhotoUrl(supabase, finalPhotoPath, SIGNED_PHOTO_URL_EXPIRY_SECONDS);
 }
 
 export function formatEntryDate(iso: string): string {

@@ -1,14 +1,16 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import EntryBasicsForm from "@/components/entries/EntryBasicsForm";
+import EntryFinalPhotoForm from "@/components/entries/EntryFinalPhotoForm";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
-import { loadEntryForEdit, type EntryBasicsRow } from "@/lib/entries-page";
+import { loadEntryForEdit, resolveEntryFinalPhotoUrl, type EntryBasicsRow } from "@/lib/entries-page";
 
 const { id } = Astro.params;
 const notFoundUrl = `/entries?error=${encodeURIComponent("Entry not found")}`;
 
 let entry: EntryBasicsRow | null = null;
+let finalPhotoUrl: string | null = null;
 let redirectUrl: string | null = null;
 
 if (!id || !isValidEntryId(id)) {
@@ -21,6 +23,8 @@ if (!id || !isValidEntryId(id)) {
     entry = await loadEntryForEdit(supabase, id);
     if (!entry) {
       redirectUrl = notFoundUrl;
+    } else {
+      finalPhotoUrl = await resolveEntryFinalPhotoUrl(supabase, entry.final_photo_path);
     }
   }
 }
@@ -31,6 +35,8 @@ if (redirectUrl) {
 
 const error = Astro.url.searchParams.get("error");
 const showSavedBanner = Astro.url.searchParams.get("saved") === "1";
+const showFinalPhotoSavedBanner = Astro.url.searchParams.get("final_photo_saved") === "1";
+const showDraftFinalPhotoWarning = entry.status === "draft" && !entry.final_photo_path;
 
 const initialValues = {
   title: entry.title,
@@ -63,7 +69,31 @@ const initialValues = {
       )
     }
 
+    {
+      showFinalPhotoSavedBanner && (
+        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+          Final photo saved
+        </p>
+      )
+    }
+
     <EntryBasicsForm mode="edit" entryId={entry.id} initialValues={initialValues} serverError={error} client:load />
+
+    <section class="mt-10 border-t border-white/10 pt-8">
+      <h2 class="mb-1 text-lg font-semibold text-blue-100/90">Final result</h2>
+      <p class="mb-4 text-sm text-blue-100/60">Photo of the finished model for this entry.</p>
+
+      {
+        showDraftFinalPhotoWarning && (
+          <p class="mb-4 rounded-lg border border-amber-500/30 bg-amber-900/20 px-3 py-2 text-sm text-amber-200/90">
+            Add a final result photo before marking this entry ready.
+          </p>
+        )
+      }
+
+      <EntryFinalPhotoForm entryId={entry.id} initialPhotoUrl={finalPhotoUrl} serverError={error} client:load />
+    </section>
+
     <p class="mt-4 text-center text-sm text-blue-100/60">
       <a href={`/entries/${entry.id}/paints`} class="text-purple-300 hover:underline">Manage paints</a>
       <span class="mx-2 text-blue-100/30">·</span>

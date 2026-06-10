@@ -5,11 +5,11 @@ import { TextareaField } from "@/components/auth/TextareaField";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
 import { ColorField } from "@/components/entries/ColorField";
-import { stepEditPath } from "@/lib/entry-steps-api";
+import { stepEditPath, stepsPagePath } from "@/lib/entry-steps-api";
 
 interface EntryStepInlinePaintAddProps {
   entryId: string;
-  stepId: string;
+  stepId?: string;
   serverError?: string | null;
   defaultOpen?: boolean;
 }
@@ -42,8 +42,10 @@ export function EntryStepInlinePaintAdd({
     }
   }
 
+  const fieldPrefix = stepId ?? "add";
   const action = `/api/entries/${entryId}/paints`;
-  const redirectTo = stepEditPath(entryId, stepId);
+  const redirectTo = stepId ? stepEditPath(entryId, stepId) : stepsPagePath(entryId);
+
   return (
     <details
       className="group rounded-lg border border-white/10 bg-white/5"
@@ -70,7 +72,7 @@ export function EntryStepInlinePaintAdd({
         <input type="hidden" name="redirect_to" value={redirectTo} />
 
         <FormField
-          id={`inline-paint-name-${stepId}`}
+          id={`inline-paint-name-${fieldPrefix}`}
           name="name"
           label="Paint name"
           value={name}
@@ -84,7 +86,7 @@ export function EntryStepInlinePaintAdd({
         />
 
         <FormField
-          id={`inline-paint-brand-${stepId}`}
+          id={`inline-paint-brand-${fieldPrefix}`}
           name="brand"
           label="Brand"
           value={brand}
@@ -94,7 +96,7 @@ export function EntryStepInlinePaintAdd({
         />
 
         <TextareaField
-          id={`inline-paint-color-desc-${stepId}`}
+          id={`inline-paint-color-desc-${fieldPrefix}`}
           name="color_description"
           label="Color description"
           value={colorDescription}
@@ -105,7 +107,7 @@ export function EntryStepInlinePaintAdd({
         />
 
         <ColorField
-          id={`inline-paint-color-${stepId}`}
+          id={`inline-paint-color-${fieldPrefix}`}
           name="approximate_color"
           label="Approximate color"
           value={approximateColor}
