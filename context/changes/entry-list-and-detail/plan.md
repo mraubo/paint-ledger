@@ -323,9 +323,9 @@ Add step count badge and Ready badge on list rows; confirm list links target det
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint` — 42f721b
+- [x] 3.2 Build passes: `npm run build` — 42f721b
 
 #### Manual
 
-- [x] 3.3 List shows step count and Ready/Draft badges; links open detail
+- [x] 3.3 List shows step count and Ready/Draft badges; links open detail — 42f721b

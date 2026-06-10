@@ -1,7 +1,7 @@
 ---
 change_id: entry-list-and-detail
 title: Browse saved entries and open full detail recall (S-06)
-status: implementing
+status: implemented
 created: 2026-06-10
 updated: 2026-06-10
 archived_at: null
