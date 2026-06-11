@@ -277,26 +277,26 @@ No schema changes. Developers running `npm test` after this change need dev serv
 
 #### Automated
 
-- [x] 1.1 `npm test` passes
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npm run build` passes
+- [x] 1.1 `npm test` passes — 40ae974
+- [x] 1.2 `npm run lint` passes — 40ae974
+- [x] 1.3 `npm run build` passes — 40ae974
 
 #### Manual
 
-- [x] 1.4 `signInViaHttp` + authenticated `GET /entries` returns 200 with dev server running
+- [x] 1.4 `signInViaHttp` + authenticated `GET /entries` returns 200 with dev server running — 40ae974
 
 ### Phase 2: Route protection tests (Risk #3)
 
 #### Automated
 
-- [ ] 2.1 `npx supabase db reset` succeeds
-- [ ] 2.2 `npm test` passes with Supabase and `npm run dev` running
-- [ ] 2.3 `npm run lint` passes
-- [ ] 2.4 `npm run build` passes
+- [x] 2.1 `npx supabase db reset` succeeds
+- [x] 2.2 `npm test` passes with Supabase and `npm run dev` running
+- [x] 2.3 `npm run lint` passes
+- [x] 2.4 `npm run build` passes
 
 #### Manual
 
-- [ ] 2.5 Stopped dev server produces clear `requireDevServer` failure
+- [x] 2.5 Stopped dev server produces clear `requireDevServer` failure
 
 ### Phase 3: IDOR HTTP tests and cookbook (Risk #6)
 
