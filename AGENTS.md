@@ -43,7 +43,7 @@ Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `n
 
 ## Commits and pull requests
 
-Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target branch for CI is `master` (@.github/workflows/ci.yml); confirm your remote default before opening PRs.
+Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target branch for CI is `main` (@.github/workflows/ci.yml); confirm your remote default before opening PRs.
 
 **Tracking:** Scope work from @context/foundation/roadmap.md (slice IDs like `S-02`, change IDs like `entry-draft-and-origin`; plans live under `context/changes/<change-id>/`). Optional GitHub Issues on this repo for ad-hoc tasks. This project does not use Jira.
 
