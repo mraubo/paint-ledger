@@ -1,6 +1,25 @@
 const DEV_SERVER_MESSAGE = "Astro dev server is not reachable. Run: npm run dev (http://localhost:4321)";
+const LOCAL_APP_URL_MESSAGE =
+  "APP_URL must point at local dev server (localhost or 127.0.0.1). HTTP integration tests are local-only.";
+
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "host.docker.internal"]);
+
+function assertLocalAppUrl(url: string): void {
+  let hostname: string;
+
+  try {
+    hostname = new URL(url).hostname;
+  } catch {
+    throw new Error(LOCAL_APP_URL_MESSAGE);
+  }
+
+  if (!LOCAL_HOSTS.has(hostname)) {
+    throw new Error(LOCAL_APP_URL_MESSAGE);
+  }
+}
 
 export const APP_BASE_URL = process.env.APP_URL ?? "http://localhost:4321";
+assertLocalAppUrl(APP_BASE_URL);
 export const APP_ORIGIN = new URL(APP_BASE_URL).origin;
 
 function resolveUrl(path: string): string {
@@ -66,6 +85,15 @@ export async function signInViaHttp(email: string, password: string): Promise<st
     body: new URLSearchParams({ email, password }),
     redirect: "manual",
   });
+
+  if (![302, 303].includes(response.status)) {
+    throw new Error(`Sign-in via HTTP failed for ${email}: expected redirect, got ${response.status}`);
+  }
+
+  const location = response.headers.get("location");
+  if (!location || new URL(location, APP_BASE_URL).pathname !== "/entries") {
+    throw new Error(`Sign-in via HTTP failed for ${email}: unexpected Location ${location ?? "(missing)"}`);
+  }
 
   const cookie = cookieHeaderFromResponse(response);
   if (!cookie) {

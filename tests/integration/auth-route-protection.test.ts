@@ -43,12 +43,13 @@ function expectNoSuccessRedirect(response: Response, successPatterns: string[]):
   }
 }
 
-function expectRedirectDenial(response: Response): void {
-  expect([302, 303], `expected redirect denial, got ${response.status}`).toContain(response.status);
+function expectCrossUserRedirectDenial(response: Response): void {
+  expect([302, 303], `expected cross-user redirect denial, got ${response.status}`).toContain(response.status);
   const location = responseLocation(response);
-  const pathname = new URL(location || APP_BASE_URL, APP_BASE_URL).pathname;
-  const denied = pathname === "/auth/signin" || location.includes("error=");
-  expect(denied, `expected sign-in or error redirect, got ${location}`).toBe(true);
+  expect(location, "expected error= in redirect Location for cross-user denial").toContain("error=");
+  expect(new URL(location, APP_BASE_URL).pathname, "cross-user denial must not be unauthenticated sign-in").not.toBe(
+    "/auth/signin",
+  );
 }
 
 beforeAll(async () => {
@@ -75,6 +76,7 @@ describe("route protection (Risk #3)", () => {
   describe("authenticated as user A", () => {
     let userACookie: string;
 
+    // Fresh sign-in per test: Vitest runs files in parallel; reused cookies were flaky across workers.
     beforeEach(async () => {
       userACookie = await signInViaHttp(USER_A.email, USER_A.password);
     });
@@ -96,20 +98,14 @@ describe("route protection (Risk #3)", () => {
 describe("IDOR denial (Risk #6)", () => {
   let userBCookie: string;
 
+  // Fresh sign-in per test — see authenticated-as-user-A describe above.
   beforeEach(async () => {
     userBCookie = await signInViaHttp(USER_B.email, USER_B.password);
   });
 
   it("user B GET /entries/{ENTRY_A.id} does not expose user A entry", async () => {
     const response = await httpGet(`/entries/${ENTRY_A.id}`, userBCookie);
-
-    if (response.status === 200) {
-      const body = await response.text();
-      expect(body).not.toContain(ENTRY_A_TITLE);
-      return;
-    }
-
-    expectRedirectDenial(response);
+    expectCrossUserRedirectDenial(response);
   });
 
   it("user B POST /api/entries/{ENTRY_A.id} cannot update user A entry", async () => {
@@ -123,7 +119,7 @@ describe("IDOR denial (Risk #6)", () => {
     );
 
     expectNoSuccessRedirect(response, ["saved=1"]);
-    expectRedirectDenial(response);
+    expectCrossUserRedirectDenial(response);
 
     const client = createTestClient();
     await signInAs(client, USER_A.email, USER_A.password);
@@ -133,6 +129,11 @@ describe("IDOR denial (Risk #6)", () => {
   });
 
   it("user B POST /api/entries/{ENTRY_A.id}/paints cannot add paint to user A entry", async () => {
+    const client = createTestClient();
+    await signInAs(client, USER_A.email, USER_A.password);
+    const before = await client.from("entry_paints").select("id").eq("entry_id", ENTRY_A.id);
+    expect(before.error).toBeNull();
+
     const response = await httpPostForm(
       `/api/entries/${ENTRY_A.id}/paints`,
       {
@@ -145,13 +146,28 @@ describe("IDOR denial (Risk #6)", () => {
     );
 
     expectNoSuccessRedirect(response, ["added=1"]);
-    expectRedirectDenial(response);
+    expectCrossUserRedirectDenial(response);
+
+    const after = await client.from("entry_paints").select("id").eq("entry_id", ENTRY_A.id);
+    expect(after.error).toBeNull();
+    expect(after.data?.length).toBe(before.data?.length);
+    await client.auth.signOut();
   });
 
   it("user B POST /api/entries/{ENTRY_A.id}/status-change cannot change user A entry status", async () => {
+    const client = createTestClient();
+    await signInAs(client, USER_A.email, USER_A.password);
+    const before = await client.from("entries").select("status").eq("id", ENTRY_A.id).single();
+    expect(before.error).toBeNull();
+
     const response = await httpPostForm(`/api/entries/${ENTRY_A.id}/status-change`, { status: "draft" }, userBCookie);
 
     expectNoSuccessRedirect(response, ["status_changed="]);
-    expectRedirectDenial(response);
+    expectCrossUserRedirectDenial(response);
+
+    const after = await client.from("entries").select("status").eq("id", ENTRY_A.id).single();
+    expect(after.error).toBeNull();
+    expect(after.data?.status).toBe(before.data?.status);
+    await client.auth.signOut();
   });
 });
