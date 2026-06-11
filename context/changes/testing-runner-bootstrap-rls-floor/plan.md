@@ -304,23 +304,23 @@ RLS integration suite is small (dozen assertions); subquery policies acceptable 
 
 #### Automated
 
-- [x] 2.1 `npx supabase db reset` succeeds
-- [x] 2.2 `npm test` passes with local Supabase running
-- [x] 2.3 `npm run lint` passes
-- [x] 2.4 `npm run build` passes
+- [x] 2.1 `npx supabase db reset` succeeds — 448babd
+- [x] 2.2 `npm test` passes with local Supabase running — 448babd
+- [x] 2.3 `npm run lint` passes — 448babd
+- [x] 2.4 `npm run build` passes — 448babd
 
 #### Manual
 
-- [x] 2.5 Weakened SELECT policy causes `npm test` to fail; policy restored
+- [x] 2.5 Weakened SELECT policy causes `npm test` to fail; policy restored — 448babd
 
 ### Phase 3: Docs, AGENTS.md, and test-plan cookbook
 
 #### Automated
 
-- [ ] 3.1 `npm test` passes
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npm test` passes
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.4 AGENTS.md + test-plan §6 point to RLS integration pattern without repo search
+- [x] 3.4 AGENTS.md + test-plan §6 point to RLS integration pattern without repo search

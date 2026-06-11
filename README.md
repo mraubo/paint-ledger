@@ -64,7 +64,7 @@ cp .env.example .dev.vars
 npm run dev
 ```
 
-Scripts (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`) are defined in [package.json](package.json).
+Scripts (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`) are defined in [package.json](package.json).
 
 ## Supabase Configuration
 
@@ -135,6 +135,22 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 **Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
 
 For repeatable RLS and Storage policy checks, see the archived implementation plans in [context/archive/2026-06-08-paint-log-schema-rls/plan.md](context/archive/2026-06-08-paint-log-schema-rls/plan.md) and [context/archive/2026-06-08-photo-storage-buckets/plan.md](context/archive/2026-06-08-photo-storage-buckets/plan.md).
+
+### Integration tests (local)
+
+The Vitest suite proves owner-only RLS on all four paint-log tables using seed users A and B.
+
+**Prerequisites:** local Supabase running with migrations and seed applied (`npx supabase start && npx supabase db reset`). `SUPABASE_URL` and `SUPABASE_KEY` in `.env` must match the local stack.
+
+```bash
+npm test
+```
+
+Watch mode: `npm run test:watch`.
+
+The two-user contract is in [tests/integration/rls-isolation.test.ts](tests/integration/rls-isolation.test.ts). After migration or RLS changes, extend that file and re-run `db reset` + `npm test`. Cookbook patterns: [context/foundation/test-plan.md](context/foundation/test-plan.md) §6.
+
+CI runs lint and build only today; `npm test` in GitHub Actions is planned for test-plan rollout Phase 4.
 
 ### Entry photo storage (local)
 

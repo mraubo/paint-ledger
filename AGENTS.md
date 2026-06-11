@@ -24,9 +24,11 @@ Import via `@/*` alias (@tsconfig.json maps to `./src/*`).
 
 ## Build, test, and development
 
-Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
+Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
 
-No test suite yet. After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint` and `npm run build`.
+**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; helpers in @tests/helpers/supabase-client.ts and @tests/helpers/seed-fixtures.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
+
+After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm test` when local Supabase is running.
 
 ### Authenticated `curl` (local)
 
