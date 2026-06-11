@@ -1,7 +1,7 @@
 ---
 change_id: testing-auth-and-route-protection
 title: Auth and route protection (test rollout Phase 2)
-status: implementing
+status: implemented
 created: 2026-06-11
 updated: 2026-06-11
 archived_at: null

@@ -302,10 +302,10 @@ No schema changes. Developers running `npm test` after this change need dev serv
 
 #### Automated
 
-- [x] 3.1 `npm test` passes with Supabase and dev server running
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npm test` passes with Supabase and dev server running — f39b160
+- [x] 3.2 `npm run lint` passes — f39b160
+- [x] 3.3 `npm run build` passes — f39b160
 
 #### Manual
 
-- [x] 3.4 test-plan §6.4 documents HTTP pattern without repo search
+- [x] 3.4 test-plan §6.4 documents HTTP pattern without repo search — f39b160
