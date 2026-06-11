@@ -2,12 +2,14 @@
 -- Seeds a dev auth user plus one paint-log fixture for Studio inspection and RLS smoke tests.
 --
 -- Sign in locally with:
---   Email:    seed@paint-ledger.local
---   Password: seed-password-123
+--   User A — Email: seed@paint-ledger.local    Password: seed-password-123
+--   User B — Email: seed-b@paint-ledger.local  Password: seed-password-123  (no fixture rows; RLS cross-user tests)
 
 -- Fixed UUIDs keep fixture rows stable across `supabase db reset`.
--- seed user
+-- seed user A
 --   11111111-1111-4111-8111-111111111111
+-- seed user B
+--   55555555-5555-4555-8555-555555555555
 -- entry
 --   22222222-2222-4222-8222-222222222222
 -- paints
@@ -77,6 +79,75 @@ values (
   jsonb_build_object(
     'sub', '11111111-1111-4111-8111-111111111111',
     'email', 'seed@paint-ledger.local',
+    'email_verified', true,
+    'phone_verified', false
+  ),
+  'email',
+  now(),
+  now(),
+  now()
+);
+
+insert into auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  recovery_sent_at,
+  last_sign_in_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  email_change,
+  email_change_token_new,
+  recovery_token,
+  is_sso_user,
+  is_anonymous
+)
+values (
+  '00000000-0000-0000-0000-000000000000',
+  '55555555-5555-4555-8555-555555555555',
+  'authenticated',
+  'authenticated',
+  'seed-b@paint-ledger.local',
+  crypt('seed-password-123', gen_salt('bf')),
+  now(),
+  now(),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  '',
+  false,
+  false
+);
+
+insert into auth.identities (
+  id,
+  user_id,
+  provider_id,
+  identity_data,
+  provider,
+  last_sign_in_at,
+  created_at,
+  updated_at
+)
+values (
+  '55555555-5555-4555-8555-555555555555',
+  '55555555-5555-4555-8555-555555555555',
+  '55555555-5555-4555-8555-555555555555',
+  jsonb_build_object(
+    'sub', '55555555-5555-4555-8555-555555555555',
+    'email', 'seed-b@paint-ledger.local',
     'email_verified', true,
     'phone_verified', false
   ),

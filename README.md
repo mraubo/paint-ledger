@@ -21,18 +21,18 @@ The core philosophy behind our MVP is that a true painting recipe is more than j
 
 With Paint Ledger, you can finally close your scattered tabs and focus on what matters: bringing your miniatures to life.
 
-## Tech Stack
+## Documentation
 
-- [Astro](https://astro.build/) v6 - Modern web framework with server-first rendering
-- [React](https://react.dev/) v19 - UI library for interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4 - Utility-first CSS framework
-- [Supabase](https://supabase.com/) - Authentication and backend-as-a-service
-- [Cloudflare Workers](https://workers.cloudflare.com/) - Edge deployment runtime
+Astro 6 + React islands, Supabase, and Cloudflare Workers — stack details in [context/foundation/tech-stack.md](context/foundation/tech-stack.md).
+
+- Product: [context/foundation/prd.md](context/foundation/prd.md)
+- Roadmap: [context/foundation/roadmap.md](context/foundation/roadmap.md)
+- Deployment / ops: [context/foundation/infrastructure.md](context/foundation/infrastructure.md)
+- Agent / contributor rules: [AGENTS.md](AGENTS.md)
 
 ## Prerequisites
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
+- Node.js v26.1.0 (run `nvm use` — version is in `.nvmrc`)
 - npm (comes with Node.js)
 
 ## Getting Started
@@ -40,8 +40,8 @@ With Paint Ledger, you can finally close your scattered tabs and focus on what m
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
+git clone https://github.com/mraubo/paint-ledger.git
+cd paint-ledger
 ```
 
 2. Install dependencies:
@@ -64,28 +64,7 @@ cp .env.example .dev.vars
 npm run dev
 ```
 
-## Available Scripts
-
-- `npm run dev` - Start development server (Cloudflare workerd runtime)
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint with type-checked rules
-- `npm run lint:fix` - Auto-fix ESLint issues
-- `npm run format` - Run Prettier
-
-## Project Structure
-
-```md
-.
-├── src/
-│ ├── layouts/ # Astro layouts
-│ ├── pages/ # Astro pages
-│ │ └── api/ # API endpoints
-│ ├── components/ # UI components (Astro & React)
-│ └── assets/ # Static assets
-├── public/ # Public assets
-├── wrangler.jsonc # Cloudflare Workers config
-```
+Scripts (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`) are defined in [package.json](package.json).
 
 ## Supabase Configuration
 
@@ -140,14 +119,14 @@ npx supabase db reset
 
 This recreates the local database from migrations and runs `supabase/seed.sql`. The seed file is **local development only** — never run its `auth.users` inserts against production.
 
-**Seed user** (for Studio inspection and local sign-in):
+**Seed users** (for Studio inspection, local sign-in, and RLS tests):
 
-| Field    | Value                    |
-| -------- | ------------------------ |
-| Email    | `seed@paint-ledger.local` |
-| Password | `seed-password-123`      |
+| User   | Email                       | Password            | Fixture data        |
+| ------ | --------------------------- | ------------------- | ------------------- |
+| A      | `seed@paint-ledger.local`   | `seed-password-123` | One sample entry    |
+| B      | `seed-b@paint-ledger.local` | `seed-password-123` | None (empty account) |
 
-After schema changes, regenerate TypeScript types (includes photo path columns on `entries` and `steps`):
+After schema changes, regenerate TypeScript types:
 
 ```bash
 npx supabase gen types typescript --local > src/lib/database.types.ts
@@ -155,65 +134,34 @@ npx supabase gen types typescript --local > src/lib/database.types.ts
 
 **Remote / production:** apply migrations separately (`npx supabase db push` or the Supabase dashboard). Do not apply `seed.sql` to cloud projects.
 
-**RLS verification (local):** create a second account via `/auth/signup`, then confirm in Studio (or authenticated SQL) that each user sees only their own `entries` rows and cannot insert/update/delete another user's child rows. Cross-entry step↔paint pairings are also rejected by the `enforce_step_paint_same_entry` trigger.
+For repeatable RLS and Storage policy checks, see the archived implementation plans in [context/archive/2026-06-08-paint-log-schema-rls/plan.md](context/archive/2026-06-08-paint-log-schema-rls/plan.md) and [context/archive/2026-06-08-photo-storage-buckets/plan.md](context/archive/2026-06-08-photo-storage-buckets/plan.md).
+
+### Integration tests (local)
+
+The Vitest suite proves owner-only RLS on all four paint-log tables using seed users A and B.
+
+**Prerequisites:** local Supabase running with migrations and seed applied (`npx supabase start && npx supabase db reset`). `SUPABASE_URL` and `SUPABASE_KEY` in `.env` must match the local stack.
+
+```bash
+npm test
+```
+
+Watch mode: `npm run test:watch`.
+
+The two-user contract is in [tests/integration/rls-isolation.test.ts](tests/integration/rls-isolation.test.ts). After migration or RLS changes, extend that file and re-run `db reset` + `npm test`. Cookbook patterns: [context/foundation/test-plan.md](context/foundation/test-plan.md) §6.
+
+CI runs lint and build only today; `npm test` in GitHub Actions is planned for test-plan rollout Phase 4.
 
 ### Entry photo storage (local)
 
-Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload via the app on **entry edit** (final result photo) and **steps** (optional per-step photos). Replacing a photo upserts at the fixed Storage path; removing a photo or deleting a step deletes the Storage object. Deleting a full entry does not yet remove orphaned Storage objects.
+Step and final entry photos use a **private** Supabase Storage bucket named `entry-photos`. Upload via the app on **entry edit** (final result photo) and **steps** (optional per-step photos).
 
-| Kind  | Object key (relative to bucket)              | DB column                 |
-| ----- | -------------------------------------------- | ------------------------- |
-| Step  | `{user_id}/{entry_id}/steps/{step_id}`       | `steps.storage_path`      |
-| Final | `{user_id}/{entry_id}/final`                 | `entries.final_photo_path` |
+| Kind  | Object key (relative to bucket)        | DB column                  |
+| ----- | -------------------------------------- | -------------------------- |
+| Step  | `{user_id}/{entry_id}/steps/{step_id}` | `steps.storage_path`       |
+| Final | `{user_id}/{entry_id}/final`           | `entries.final_photo_path` |
 
-**Constraints:** JPEG, PNG, and WebP only; **4 MiB** per object. Paths are fixed (no file extension in the key) so S-05 can upsert over the same object.
-
-**Storage RLS verification (local):** repeatable two-user smoke test (no upload UI required). Uses the seed fixture UUIDs from `supabase/seed.sql`:
-
-| Fixture | UUID |
-| ------- | ---- |
-| Seed user | `11111111-1111-4111-8111-111111111111` |
-| Seed entry | `22222222-2222-4222-8222-222222222222` |
-| Seed step 1 | `44444444-4444-4444-8444-444444444441` |
-
-1. Reset and sign in as the seed user (`seed@paint-ledger.local` / `seed-password-123`):
-
-   ```bash
-   npx supabase db reset
-   npm run dev
-   ```
-
-2. **Step photo — seed user (allow):** In Studio → Storage → `entry-photos`, upload a small JPEG/PNG/WebP to:
-
-   `11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/steps/44444444-4444-4444-8444-444444444441`
-
-   Confirm download and list succeed for the seed user.
-
-3. **Upsert overwrite — seed user:** Upload a second image to the **same** step path (Studio replace, or `upsert: true` via the authenticated client). Confirm only one object remains at that key.
-
-4. **Second user setup:** Sign out, create a second account at `/auth/signup`, and create an entry with at least one step (note the new `user_id`, `entry_id`, and `step_id` from Studio or SQL).
-
-5. **Cross-user deny:** While signed in as the second user, attempt to upload to the seed user's step path (step 2). Confirm the upload is rejected. Attempt to download or list the seed user's object — confirm access is denied.
-
-6. **Own path allow — second user:** Upload to `{second_user_id}/{second_entry_id}/steps/{second_step_id}`. Confirm upload, download, and list succeed.
-
-7. **Final photo — repeat for both users:** Seed user uploads to `11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222/final` (success). Second user cannot upload to or read that path; second user can upload to `{second_user_id}/{second_entry_id}/final`.
-
-8. **Security advisors:**
-
-   ```bash
-   npx supabase db advisors --local
-   ```
-
-   Resolve any ERROR-level findings on `storage.objects` policies.
-
-9. Confirm migrations are applied:
-
-   ```bash
-   npx supabase migration list --local
-   ```
-
-   Both `paint_log_schema` and `entry_photo_storage` should show as applied locally.
+**Constraints:** JPEG, PNG, and WebP only; **4 MiB** per object.
 
 ### Using a cloud Supabase project instead
 
@@ -241,35 +189,32 @@ Users can then sign in immediately after sign-up without clicking a confirmation
 
 ### Auth routes
 
-| Route                 | Description                                                             |
-| --------------------- | ----------------------------------------------------------------------- |
-| `/auth/signin`        | Email/password sign-in form                                             |
-| `/auth/signup`        | Email/password sign-up form                                             |
-| `/auth/confirm-email` | Post-signup "check your inbox" page                                     |
-| `/entries`            | Protected app home (redirects to `/auth/signin` if unauthenticated)     |
+| Route                 | Description                                                         |
+| --------------------- | ------------------------------------------------------------------- |
+| `/auth/signin`        | Email/password sign-in form                                         |
+| `/auth/signup`        | Email/password sign-up form                                         |
+| `/auth/confirm-email` | Post-signup "check your inbox" page                                 |
+| `/entries`            | Protected app home (redirects to `/auth/signin` if unauthenticated) |
 
 Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication. Signed-in users who visit `/auth/signin` or `/auth/signup` are redirected to `/entries`.
 
 ## Deployment
 
-This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) via `@astrojs/cloudflare` (server output + static assets). Production auto-deploy on push to `master` is handled by **Cloudflare Workers Builds** (GitHub app); manual deploy remains available for hotfixes.
+This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) via `@astrojs/cloudflare` (server output + static assets). Production auto-deploy on push to `main` is handled by **Cloudflare Workers Builds** (GitHub app); manual deploy remains available for hotfixes. Full ops story: [context/foundation/infrastructure.md](context/foundation/infrastructure.md). Workers Builds setup: [context/archive/2026-05-26-deployment/deployment-plan.md](context/archive/2026-05-26-deployment/deployment-plan.md) (Phase 5).
+
+**Production URL:** `https://paint-ledger.mateusz-raubo.workers.dev`
 
 ### Secret surfaces
 
 Supabase credentials must stay in sync across three independent places. Use the **anon (public) key** only — never the `service_role` key in any of these.
 
-| Surface | Location | Purpose |
-| ------- | -------- | ------- |
-| Local | `.env` and `.dev.vars` | `npm run dev` / local SSR (`astro:env` + Wrangler workerd) |
-| GitHub Actions | Repository secrets `SUPABASE_URL`, `SUPABASE_KEY` | CI `npm run build` only |
-| Cloudflare Worker | `npx wrangler secret put` or dashboard → Variables and Secrets | **Runtime** on the deployed Worker |
+| Surface           | Location                                                      | Purpose                                                   |
+| ----------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
+| Local             | `.env` and `.dev.vars`                                        | `npm run dev` / local SSR (`astro:env` + Wrangler workerd) |
+| GitHub Actions    | Repository secrets `SUPABASE_URL`, `SUPABASE_KEY`             | CI `npm run build` only                                   |
+| Cloudflare Worker | `npx wrangler secret put` or dashboard → Variables and Secrets | **Runtime** on the deployed Worker                        |
 
-**Rotation checklist** (after regenerating keys in Supabase → Settings → API):
-
-1. Update `.env` and `.dev.vars` locally (same `SUPABASE_URL` + anon `SUPABASE_KEY`).
-2. Update GitHub repository secrets (`SUPABASE_URL`, `SUPABASE_KEY`).
-3. Update Cloudflare Worker secrets: `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY`.
-4. Redeploy: `npx wrangler deploy` or push to `master` (if Workers Builds is connected).
+After rotating keys in Supabase → Settings → API, update all three surfaces and redeploy. See [context/foundation/infrastructure.md](context/foundation/infrastructure.md) (Operational Story) for the full rotation checklist.
 
 ### Manual deploy
 
@@ -290,51 +235,20 @@ npx wrangler deploy
 
 5. Update Supabase **Authentication → URL configuration** (Site URL + Redirect URLs) to match the Worker hostname.
 
-**Current production URL:** `https://paint-ledger.mateusz-raubo.workers.dev`
+| Setting       | Value                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------- |
+| Site URL      | `https://paint-ledger.mateusz-raubo.workers.dev`                                       |
+| Redirect URLs | `https://paint-ledger.mateusz-raubo.workers.dev/**`, `http://localhost:4321/**`        |
 
-| Setting | Value |
-| ------- | ----- |
-| Site URL | `https://paint-ledger.mateusz-raubo.workers.dev` |
-| Redirect URLs | `https://paint-ledger.mateusz-raubo.workers.dev/**`, `http://localhost:4321/**` |
-
-### Rollback and operations
-
-| Command | Use |
-| ------- | --- |
-| `npx wrangler tail` | Live Worker logs after deploy |
-| `npx wrangler deployments list` | Version history |
-| `npx wrangler rollback` | Revert to the previous Worker deployment |
-
-**Worker rollback only reverts application code and static assets** on Cloudflare. It does **not** roll back Supabase data, Auth users, or schema changes. Treat database migrations as forward-only; use a staging Supabase project before risky schema work.
-
-Missing Worker secrets at runtime disable auth silently (`createClient()` returns `null`). After deploy, confirm sign-in works and protected routes redirect correctly.
+**Worker rollback** (`npx wrangler rollback`) reverts application code and static assets only — not Supabase data or schema. Tail live logs with `npx wrangler tail`. Missing Worker secrets at runtime disable auth silently; after deploy, confirm sign-in and protected routes work.
 
 ### Cloudflare Workers Builds (auto-deploy)
 
-After connecting the [Cloudflare Workers & Pages GitHub app](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/) and linking this repo to the `paint-ledger` Worker (**Settings → Builds**), use:
-
-| Setting | Value |
-| ------- | ----- |
-| Production branch | `master` |
-| Root directory | `/` |
-| Node version | `22` (matches GitHub Actions CI) |
-| Build command | `npm ci && npx astro sync && npm run build` |
-| Deploy command | `npx wrangler deploy` |
-
-**Environment variables** (two places — both required):
-
-| Where | Variables | Why |
-| ----- | --------- | --- |
-| Builds → **Build variables** | `SUPABASE_URL`, `SUPABASE_KEY` | `astro:env` at **build** time |
-| Worker → **Settings → Variables and Secrets** (encrypted) | `SUPABASE_URL`, `SUPABASE_KEY` | **Runtime** on the Worker (you may already have these from `wrangler secret put`) |
-
-Use the same cloud Supabase **anon** key as GitHub Actions secrets. Do not add a deploy step to GitHub Actions — Builds owns production deploy; CI stays lint + build only.
-
-**Verify:** push to `master` → build succeeds in Cloudflare dashboard → https://paint-ledger.mateusz-raubo.workers.dev still signs in.
+Connect the [Cloudflare Workers & Pages GitHub app](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/), link this repo to the `paint-ledger` Worker, and set production branch to `main`. Build: `npm ci && npx astro sync && npm run build`; deploy: `npx wrangler deploy`. Set `SUPABASE_URL` and `SUPABASE_KEY` in both Builds build variables and Worker encrypted secrets. CI does not deploy — Builds owns production deploy.
 
 ## CI
 
-GitHub Actions runs lint + build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs lint + build on every push and PR to `main`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
 
 ## License
 
