@@ -292,26 +292,26 @@ RLS integration suite is small (dozen assertions); subquery policies acceptable 
 
 #### Automated
 
-- [x] 1.1 `npm test` runs (Vitest discovers `tests/`)
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npm run build` passes
+- [x] 1.1 `npm test` runs (Vitest discovers `tests/`) — 0ae5a1d
+- [x] 1.2 `npm run lint` passes — 0ae5a1d
+- [x] 1.3 `npm run build` passes — 0ae5a1d
 
 #### Manual
 
-- [x] 1.4 `npm run test:watch` discovers test files under `tests/`
+- [x] 1.4 `npm run test:watch` discovers test files under `tests/` — 0ae5a1d
 
 ### Phase 2: Second seed user and RLS integration suite
 
 #### Automated
 
-- [ ] 2.1 `npx supabase db reset` succeeds
-- [ ] 2.2 `npm test` passes with local Supabase running
-- [ ] 2.3 `npm run lint` passes
-- [ ] 2.4 `npm run build` passes
+- [x] 2.1 `npx supabase db reset` succeeds
+- [x] 2.2 `npm test` passes with local Supabase running
+- [x] 2.3 `npm run lint` passes
+- [x] 2.4 `npm run build` passes
 
 #### Manual
 
-- [ ] 2.5 Weakened SELECT policy causes `npm test` to fail; policy restored
+- [x] 2.5 Weakened SELECT policy causes `npm test` to fail; policy restored
 
 ### Phase 3: Docs, AGENTS.md, and test-plan cookbook
 

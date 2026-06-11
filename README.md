@@ -119,12 +119,12 @@ npx supabase db reset
 
 This recreates the local database from migrations and runs `supabase/seed.sql`. The seed file is **local development only** — never run its `auth.users` inserts against production.
 
-**Seed user** (for Studio inspection and local sign-in):
+**Seed users** (for Studio inspection, local sign-in, and RLS tests):
 
-| Field    | Value                    |
-| -------- | ------------------------ |
-| Email    | `seed@paint-ledger.local` |
-| Password | `seed-password-123`      |
+| User   | Email                       | Password            | Fixture data        |
+| ------ | --------------------------- | ------------------- | ------------------- |
+| A      | `seed@paint-ledger.local`   | `seed-password-123` | One sample entry    |
+| B      | `seed-b@paint-ledger.local` | `seed-password-123` | None (empty account) |
 
 After schema changes, regenerate TypeScript types:
 

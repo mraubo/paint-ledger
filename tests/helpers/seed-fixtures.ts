@@ -8,7 +8,6 @@ export const USER_A = {
   id: "11111111-1111-4111-8111-111111111111",
 } as const;
 
-/** Seeded in Phase 2 — constants defined here for stable test imports. */
 export const USER_B = {
   email: "seed-b@paint-ledger.local",
   password: SEED_PASSWORD,
