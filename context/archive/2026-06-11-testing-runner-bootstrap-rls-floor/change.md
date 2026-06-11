@@ -1,10 +1,10 @@
 ---
 change_id: testing-runner-bootstrap-rls-floor
 title: Runner bootstrap and RLS floor (test rollout Phase 1)
-status: impl_reviewed
+status: archived
 created: 2026-06-11
 updated: 2026-06-11
-archived_at: null
+archived_at: 2026-06-11T17:46:05Z
 ---
 
 ## Notes
