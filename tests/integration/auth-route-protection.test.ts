@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { APP_BASE_URL, httpGet, httpPostForm, requireDevServer, signInViaHttp } from "../helpers/http-client";
-import { ENTRY_A, USER_A } from "../helpers/seed-fixtures";
-import { requireLocalSupabase } from "../helpers/supabase-client";
+import { ENTRY_A, USER_A, USER_B } from "../helpers/seed-fixtures";
+import { createTestClient, requireLocalSupabase, signInAs } from "../helpers/supabase-client";
 
 const ENTRY_A_TITLE = "Imperial Fist Intercessor";
 
@@ -24,6 +24,31 @@ function locationPath(response: Response): string {
 function expectRedirectToSignIn(response: Response): void {
   expect([302, 303], `expected redirect, got ${response.status}`).toContain(response.status);
   expect(locationPath(response)).toBe("/auth/signin");
+}
+
+function responseLocation(response: Response): string {
+  const location = response.headers.get("location");
+  if (!location) {
+    return "";
+  }
+
+  return new URL(location, APP_BASE_URL).href;
+}
+
+function expectNoSuccessRedirect(response: Response, successPatterns: string[]): void {
+  expect([302, 303], `expected redirect denial, got ${response.status}`).toContain(response.status);
+  const location = responseLocation(response);
+  for (const pattern of successPatterns) {
+    expect(location, `unexpected success redirect containing ${pattern}`).not.toContain(pattern);
+  }
+}
+
+function expectRedirectDenial(response: Response): void {
+  expect([302, 303], `expected redirect denial, got ${response.status}`).toContain(response.status);
+  const location = responseLocation(response);
+  const pathname = new URL(location || APP_BASE_URL, APP_BASE_URL).pathname;
+  const denied = pathname === "/auth/signin" || location.includes("error=");
+  expect(denied, `expected sign-in or error redirect, got ${location}`).toBe(true);
 }
 
 beforeAll(async () => {
@@ -65,5 +90,68 @@ describe("route protection (Risk #3)", () => {
       const body = await response.text();
       expect(body).toContain(ENTRY_A_TITLE);
     });
+  });
+});
+
+describe("IDOR denial (Risk #6)", () => {
+  let userBCookie: string;
+
+  beforeEach(async () => {
+    userBCookie = await signInViaHttp(USER_B.email, USER_B.password);
+  });
+
+  it("user B GET /entries/{ENTRY_A.id} does not expose user A entry", async () => {
+    const response = await httpGet(`/entries/${ENTRY_A.id}`, userBCookie);
+
+    if (response.status === 200) {
+      const body = await response.text();
+      expect(body).not.toContain(ENTRY_A_TITLE);
+      return;
+    }
+
+    expectRedirectDenial(response);
+  });
+
+  it("user B POST /api/entries/{ENTRY_A.id} cannot update user A entry", async () => {
+    const response = await httpPostForm(
+      `/api/entries/${ENTRY_A.id}`,
+      {
+        ...ENTRY_BASICS_FORM,
+        title: "Hacked by user B",
+      },
+      userBCookie,
+    );
+
+    expectNoSuccessRedirect(response, ["saved=1"]);
+    expectRedirectDenial(response);
+
+    const client = createTestClient();
+    await signInAs(client, USER_A.email, USER_A.password);
+    const { data } = await client.from("entries").select("title").eq("id", ENTRY_A.id).maybeSingle();
+    expect(data?.title).toBe(ENTRY_A_TITLE);
+    await client.auth.signOut();
+  });
+
+  it("user B POST /api/entries/{ENTRY_A.id}/paints cannot add paint to user A entry", async () => {
+    const response = await httpPostForm(
+      `/api/entries/${ENTRY_A.id}/paints`,
+      {
+        name: "Forbidden Paint",
+        brand: "Test",
+        color_description: "Should not land",
+        approximate_color: "#111111",
+      },
+      userBCookie,
+    );
+
+    expectNoSuccessRedirect(response, ["added=1"]);
+    expectRedirectDenial(response);
+  });
+
+  it("user B POST /api/entries/{ENTRY_A.id}/status-change cannot change user A entry status", async () => {
+    const response = await httpPostForm(`/api/entries/${ENTRY_A.id}/status-change`, { status: "draft" }, userBCookie);
+
+    expectNoSuccessRedirect(response, ["status_changed="]);
+    expectRedirectDenial(response);
   });
 });

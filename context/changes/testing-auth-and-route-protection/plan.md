@@ -289,23 +289,23 @@ No schema changes. Developers running `npm test` after this change need dev serv
 
 #### Automated
 
-- [x] 2.1 `npx supabase db reset` succeeds
-- [x] 2.2 `npm test` passes with Supabase and `npm run dev` running
-- [x] 2.3 `npm run lint` passes
-- [x] 2.4 `npm run build` passes
+- [x] 2.1 `npx supabase db reset` succeeds — 1d11efa
+- [x] 2.2 `npm test` passes with Supabase and `npm run dev` running — 1d11efa
+- [x] 2.3 `npm run lint` passes — 1d11efa
+- [x] 2.4 `npm run build` passes — 1d11efa
 
 #### Manual
 
-- [x] 2.5 Stopped dev server produces clear `requireDevServer` failure
+- [x] 2.5 Stopped dev server produces clear `requireDevServer` failure — 1d11efa
 
 ### Phase 3: IDOR HTTP tests and cookbook (Risk #6)
 
 #### Automated
 
-- [ ] 3.1 `npm test` passes with Supabase and dev server running
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npm test` passes with Supabase and dev server running
+- [x] 3.2 `npm run lint` passes
+- [x] 3.3 `npm run build` passes
 
 #### Manual
 
-- [ ] 3.4 test-plan §6.4 documents HTTP pattern without repo search
+- [x] 3.4 test-plan §6.4 documents HTTP pattern without repo search
