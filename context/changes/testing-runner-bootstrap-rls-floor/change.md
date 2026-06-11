@@ -1,7 +1,7 @@
 ---
 change_id: testing-runner-bootstrap-rls-floor
 title: Runner bootstrap and RLS floor (test rollout Phase 1)
-status: implementing
+status: implemented
 created: 2026-06-11
 updated: 2026-06-11
 archived_at: null

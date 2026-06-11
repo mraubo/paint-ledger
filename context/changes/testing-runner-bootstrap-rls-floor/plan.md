@@ -317,10 +317,10 @@ RLS integration suite is small (dozen assertions); subquery policies acceptable 
 
 #### Automated
 
-- [x] 3.1 `npm test` passes
-- [x] 3.2 `npm run lint` passes
-- [x] 3.3 `npm run build` passes
+- [x] 3.1 `npm test` passes — 814981d
+- [x] 3.2 `npm run lint` passes — 814981d
+- [x] 3.3 `npm run build` passes — 814981d
 
 #### Manual
 
-- [x] 3.4 AGENTS.md + test-plan §6 point to RLS integration pattern without repo search
+- [x] 3.4 AGENTS.md + test-plan §6 point to RLS integration pattern without repo search — 814981d
