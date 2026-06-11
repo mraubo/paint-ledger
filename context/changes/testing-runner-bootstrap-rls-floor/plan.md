@@ -99,7 +99,7 @@ Add Vitest, config with path aliases and env loading, `npm test` script, and a s
 **Contract**:
 
 - Export `createTestClient()` using `createClient<Database>` from `@supabase/supabase-js` with `Database` from `@/lib/database.types`.
-- Export `signInAs(email, password)` wrapping `auth.signInWithPassword`.
+- Export `signInAs(client, email, password)` wrapping `auth.signInWithPassword` (client-first for isolated dual-user sessions).
 - Export `requireLocalSupabase()` for `beforeAll`: if `SUPABASE_URL` / `SUPABASE_KEY` missing or auth health check fails, throw with message: run `npx supabase start && npx supabase db reset`.
 
 #### 4. Seed constants module

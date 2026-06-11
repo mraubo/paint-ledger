@@ -49,6 +49,13 @@ describe("RLS isolation (two seed users)", () => {
     expect(data).toBeNull();
   });
 
+  it("user B cannot enumerate user A's entries", async () => {
+    const { data, error } = await clientB.from("entries").select("id");
+
+    expect(error).toBeNull();
+    expect(data?.map((row) => row.id) ?? []).not.toContain(ENTRY_A.id);
+  });
+
   it("user B cannot update or delete user A's entry", async () => {
     const before = await readEntryAs(clientA, ENTRY_A.id);
     expect(before.data).not.toBeNull();
@@ -147,7 +154,8 @@ describe("RLS isolation (two seed users)", () => {
       })
       .select("id");
 
-    expect(error !== null || data.length === 0).toBe(true);
+    expect(error).not.toBeNull();
+    expect(data ?? []).toHaveLength(0);
   });
 
   it("user B cannot delete and renumber user A's steps via RPC", async () => {
