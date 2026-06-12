@@ -73,6 +73,11 @@ describe("route protection (Risk #3)", () => {
     expectRedirectToSignIn(response);
   });
 
+  it("unauthenticated POST /api/entries/{id}/delete redirects to sign-in", async () => {
+    const response = await httpPostForm(`/api/entries/${ENTRY_A.id}/delete`, {});
+    expectRedirectToSignIn(response);
+  });
+
   describe("authenticated as user A", () => {
     let userACookie: string;
 
@@ -151,6 +156,26 @@ describe("IDOR denial (Risk #6)", () => {
     const after = await client.from("entry_paints").select("id").eq("entry_id", ENTRY_A.id);
     expect(after.error).toBeNull();
     expect(after.data?.length).toBe(before.data?.length);
+    await client.auth.signOut();
+  });
+
+  it("user B POST /api/entries/{ENTRY_A.id}/delete cannot delete user A entry", async () => {
+    const client = createTestClient();
+    await signInAs(client, USER_A.email, USER_A.password);
+    const before = await client.from("entries").select("id").eq("id", ENTRY_A.id).maybeSingle();
+    expect(before.error).toBeNull();
+    expect(before.data?.id).toBe(ENTRY_A.id);
+    await client.auth.signOut();
+
+    const response = await httpPostForm(`/api/entries/${ENTRY_A.id}/delete`, {}, userBCookie);
+
+    expectNoSuccessRedirect(response, ["deleted="]);
+    expectCrossUserRedirectDenial(response);
+
+    await signInAs(client, USER_A.email, USER_A.password);
+    const after = await client.from("entries").select("id").eq("id", ENTRY_A.id).maybeSingle();
+    expect(after.error).toBeNull();
+    expect(after.data?.id).toBe(ENTRY_A.id);
     await client.auth.signOut();
   });
 

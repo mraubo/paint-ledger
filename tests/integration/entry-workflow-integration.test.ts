@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import { deleteEntryWithPhotos } from "@/lib/entry-delete";
 import { loadEntryForEdit, resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
 import { loadEntryPaints } from "@/lib/entry-paints-page";
 import { buildFinalPhotoPath, buildStepPhotoPath, ENTRY_PHOTOS_BUCKET } from "@/lib/entry-photos-api";
@@ -561,5 +562,86 @@ describe("mutation survivors (Stryker hardening)", () => {
       .update({ description: "Layer Imperial Fist over armor plates" })
       .eq("id", STEPS_A.layer)
       .eq("entry_id", ENTRY_A.id);
+  });
+});
+
+describe("entry delete cascade", () => {
+  let ephemeralEntryId: string;
+
+  beforeAll(async () => {
+    const { data: entry, error: entryError } = await clientA
+      .from("entries")
+      .insert({
+        user_id: USER_A.id,
+        title: "Ephemeral entry to delete",
+        description: "Delete cascade test",
+        model_info: "Test model",
+        model_origin_note: "Test origin",
+        status: "draft",
+      })
+      .select("id")
+      .single();
+
+    if (entryError) {
+      throw new Error(`Failed to create ephemeral delete entry: ${entryError.message}`);
+    }
+
+    ephemeralEntryId = entry.id;
+
+    const { error: paintError } = await clientA.from("entry_paints").insert({
+      entry_id: ephemeralEntryId,
+      name: "Delete test paint",
+      brand: "Test",
+      color_description: "Cascade cleanup",
+      approximate_color: "#445566",
+    });
+
+    if (paintError) {
+      throw new Error(`Failed to create ephemeral delete paint: ${paintError.message}`);
+    }
+
+    const { error: stepError } = await clientA.from("steps").insert({
+      entry_id: ephemeralEntryId,
+      position: 1,
+      description: "Delete test step",
+    });
+
+    if (stepError) {
+      throw new Error(`Failed to create ephemeral delete step: ${stepError.message}`);
+    }
+  });
+
+  it("deleteEntryWithPhotos removes entry and cascades child rows", async () => {
+    const result = await deleteEntryWithPhotos(clientA, USER_A.id, ephemeralEntryId);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+
+    expect(result.title).toBe("Ephemeral entry to delete");
+
+    const { data: entry, error: entryError } = await clientA
+      .from("entries")
+      .select("id")
+      .eq("id", ephemeralEntryId)
+      .maybeSingle();
+    expect(entryError).toBeNull();
+    expect(entry).toBeNull();
+
+    const { data: paints, error: paintsError } = await clientA
+      .from("entry_paints")
+      .select("id")
+      .eq("entry_id", ephemeralEntryId);
+    expect(paintsError).toBeNull();
+    expect(paints).toHaveLength(0);
+
+    const { data: steps, error: stepsError } = await clientA
+      .from("steps")
+      .select("id")
+      .eq("entry_id", ephemeralEntryId);
+    expect(stepsError).toBeNull();
+    expect(steps).toHaveLength(0);
+
+    ephemeralEntryId = "";
   });
 });

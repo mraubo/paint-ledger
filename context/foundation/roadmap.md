@@ -3,7 +3,7 @@ project: "Paint Ledger"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-06-10
+updated: 2026-06-12
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -39,6 +39,7 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 | S-04 | steps-with-paint-cards | add ordered steps, assign paints from the entry list, and see paint cards on steps | S-03 | FR-006, FR-007, FR-008 | done |
 | S-05 | entry-step-and-final-photos | attach one optional photo per step and at least one final model photo | S-04, F-02 | FR-009, FR-010 | done |
 | S-06 | entry-list-and-detail | browse saved entries in a simple list and open full detail recall | S-05 | FR-011, FR-012, US-01 | done |
+| S-07 | entry-delete | permanently delete an entry and its photos from edit or list | S-06 | FR-013 | planned |
 
 ## Streams
 
@@ -164,6 +165,18 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** North star / validation milestone — proves primary Success Criteria (add complete entry, reopen without external notes). List stays minimal (no search/filter per Non-Goals).
 - **Status:** done
 
+### S-07: Entry delete
+
+- **Outcome:** user can permanently delete an entry and its associated paints, steps, and photos from the edit page or entry list.
+- **Change ID:** entry-delete
+- **PRD refs:** FR-013
+- **Prerequisites:** S-06
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Storage cleanup must run before DB delete (Storage RLS requires entry/step rows to exist); best-effort photo removal with proceed-on-failure matches step-delete behavior.
+- **Status:** planned
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID | GitHub | Suggested issue title | Ready for `/10x-plan` | Notes |
@@ -176,6 +189,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-04 | steps-with-paint-cards | [#7](https://github.com/mraubo/paint-ledger/issues/7) | Ordered steps with paint assignment and cards | no | After S-03 |
 | S-05 | entry-step-and-final-photos | [#8](https://github.com/mraubo/paint-ledger/issues/8) | Step and final photo upload | no | After F-02 and S-04 |
 | S-06 | entry-list-and-detail | [#9](https://github.com/mraubo/paint-ledger/issues/9) | Entry list and full detail recall (US-01) | no | North star; after S-05 |
+| S-07 | entry-delete | — | Permanently delete entry and photos | yes | After S-06; app-layer storage cleanup before DB delete |
 
 ## Open Roadmap Questions
 

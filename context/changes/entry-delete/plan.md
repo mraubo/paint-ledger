@@ -280,25 +280,25 @@ No schema migration. Existing entries are unaffected until user deletes them. Or
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
-- [x] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint` — 57c3c86
+- [x] 2.2 Build passes: `npm run build` — 57c3c86
 
 #### Manual
 
-- [x] 2.3 Delete from edit page shows title banner and removes entry from list
-- [x] 2.4 Delete from list row shows title banner and removes entry
-- [x] 2.5 Confirm cancel leaves entry intact
-- [x] 2.6 Ready entry with full recipe deletes from both placements
+- [x] 2.3 Delete from edit page shows title banner and removes entry from list — 57c3c86
+- [x] 2.4 Delete from list row shows title banner and removes entry — 57c3c86
+- [x] 2.5 Confirm cancel leaves entry intact — 57c3c86
+- [x] 2.6 Ready entry with full recipe deletes from both placements — 57c3c86
 
 ### Phase 3: Tests and foundation docs
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Integration tests pass: `npx supabase start && npx supabase db reset && npm test`
-- [ ] 3.3 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Integration tests pass: `npx supabase start && npx supabase db reset && npm test`
+- [x] 3.3 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 3.4 Local CI-equivalent run completes green
-- [ ] 3.5 PRD FR-013 and roadmap S-07 entries are correct
+- [x] 3.4 Local CI-equivalent run completes green
+- [x] 3.5 PRD FR-013 and roadmap S-07 entries are correct
