@@ -31,3 +31,6 @@ pnpm-debug.log*
 .agents/**/10x-*
 .cursor/**/10x-*
 .cookies
+
+# stryker temp files
+.stryker-tmp

@@ -1,12 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { loadEntryForEdit, resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
 import { loadEntryPaints } from "@/lib/entry-paints-page";
 import { buildFinalPhotoPath, buildStepPhotoPath, ENTRY_PHOTOS_BUCKET } from "@/lib/entry-photos-api";
-import { createSignedPhotoUrl, uploadEntryPhoto } from "@/lib/entry-photos-storage";
-import { updateStepWithAssignments } from "@/lib/entry-steps-mutations";
+import {
+  createSignedPhotoUrl,
+  createSignedPhotoUrlMap,
+  uploadEntryPhoto,
+} from "@/lib/entry-photos-storage";
+import { syncStepPaintAssignments, updateStepWithAssignments } from "@/lib/entry-steps-mutations";
 import { loadEntrySteps } from "@/lib/entry-steps-page";
 import { createMinimalPngFile } from "../helpers/test-image";
 import { ENTRY_A, PAINTS_A, STEPS_A, USER_A, USER_B } from "../helpers/seed-fixtures";
@@ -445,5 +449,122 @@ describe("detail loader completeness (Risk #5)", () => {
 
     const primeStep = stepsResult.steps.find((step) => step.id === STEPS_A.prime);
     expect(primeStep?.photo_url).not.toBeNull();
+  });
+});
+
+describe("mutation survivors (Stryker hardening)", () => {
+  const malformedEntryId = "not-a-valid-entry-id";
+
+  it("returns null from loadEntryForEdit when the entry does not exist", async () => {
+    const entry = await loadEntryForEdit(clientA, randomUUID());
+    expect(entry).toBeNull();
+  });
+
+  it("returns null from loadEntryForEdit when the entry id is malformed", async () => {
+    const entry = await loadEntryForEdit(clientA, malformedEntryId);
+    expect(entry).toBeNull();
+  });
+
+  it("returns an error from loadEntryPaints when the entry id is malformed", async () => {
+    const paintsResult = await loadEntryPaints(clientA, malformedEntryId);
+    expect(paintsResult.ok).toBe(false);
+    if (paintsResult.ok) {
+      return;
+    }
+    expect(paintsResult.error.length).toBeGreaterThan(0);
+  });
+
+  it("returns an error from updateStepWithAssignments when palette load fails", async () => {
+    const result = await updateStepWithAssignments(
+      clientA,
+      malformedEntryId,
+      STEPS_A.layer,
+      "Should not persist",
+      [PAINTS_A.wraithbone],
+    );
+
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.length).toBeGreaterThan(0);
+  });
+
+  it("returns an error from syncStepPaintAssignments when palette load fails", async () => {
+    const result = await syncStepPaintAssignments(clientA, malformedEntryId, STEPS_A.layer, [
+      PAINTS_A.wraithbone,
+    ]);
+
+    expect(result.ok).toBe(false);
+    if (result.ok) {
+      return;
+    }
+    expect(result.error.length).toBeGreaterThan(0);
+  });
+
+  it("stores uploaded photos in the entry-photos bucket", async () => {
+    const path = buildStepPhotoPath(USER_A.id, ENTRY_A.id, STEPS_A.layer);
+    const file = createMinimalPngFile("bucket-check.png");
+
+    const uploadResult = await uploadEntryPhoto(clientA, path, file);
+    expect(uploadResult.ok).toBe(true);
+    uploadedPhotoPaths.push(path);
+
+    const { data, error } = await clientA.storage.from(ENTRY_PHOTOS_BUCKET).download(path);
+    expect(error).toBeNull();
+    expect(data).not.toBeNull();
+  });
+
+  it("returns an empty map from createSignedPhotoUrlMap for no paths", async () => {
+    const urlMap = await createSignedPhotoUrlMap(clientA, [], 3600);
+    expect(urlMap.size).toBe(0);
+  });
+
+  it("resolves only accessible paths in a mixed signed URL batch", async () => {
+    const ownedPath = buildStepPhotoPath(USER_A.id, ENTRY_A.id, STEPS_A.prime);
+    const missingPath = buildStepPhotoPath(USER_A.id, ENTRY_A.id, randomUUID());
+    const file = createMinimalPngFile("batch-owned.png");
+
+    const uploadResult = await uploadEntryPhoto(clientA, ownedPath, file);
+    expect(uploadResult.ok).toBe(true);
+    uploadedPhotoPaths.push(ownedPath);
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const urlMap = await createSignedPhotoUrlMap(clientA, [ownedPath, missingPath], 3600);
+
+    expect(urlMap.get(ownedPath)).toMatch(/^https?:\/\//);
+    expect(urlMap.has(missingPath)).toBe(false);
+    expect(warnSpy).toHaveBeenCalled();
+
+    warnSpy.mockRestore();
+  });
+
+  it("sorts multiple assigned paints by name on a step", async () => {
+    const result = await updateStepWithAssignments(
+      clientA,
+      ENTRY_A.id,
+      STEPS_A.layer,
+      "Layer both paints",
+      [PAINTS_A.imperialFist, PAINTS_A.wraithbone],
+    );
+
+    expect(result.ok).toBe(true);
+
+    const stepsResult = await loadEntrySteps(clientA, ENTRY_A.id);
+    expect(stepsResult.ok).toBe(true);
+    if (!stepsResult.ok) {
+      return;
+    }
+
+    const layerStep = stepsResult.steps.find((step) => step.id === STEPS_A.layer);
+    expect(layerStep?.assigned_paints.map((paint) => paint.name)).toEqual(["Imperial Fist", "Wraithbone"]);
+
+    await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
+    await clientA
+      .from("steps")
+      .update({ description: "Layer Imperial Fist over armor plates" })
+      .eq("id", STEPS_A.layer)
+      .eq("entry_id", ENTRY_A.id);
   });
 });

@@ -58,3 +58,11 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 **After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
 
 PRs should pass GitHub Actions lint and build. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
+
+## Mutation testing
+
+Repo uses Stryker for selective mutation testing on risk-critical modules.
+Run it only for code covered by the current change or a risk from test-plan.md,
+prefer narrowed scope with --mutate "path/to/file.ts:start-end", and do not chase
+100% mutation score. Survived mutants should be reviewed one by one: add an
+assertion only when the mutant represents a user-visible or business-relevant bug.
