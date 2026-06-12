@@ -2,8 +2,12 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
+import { resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
+import { buildFinalPhotoPath, buildStepPhotoPath, ENTRY_PHOTOS_BUCKET } from "@/lib/entry-photos-api";
+import { createSignedPhotoUrl, uploadEntryPhoto } from "@/lib/entry-photos-storage";
 import { updateStepWithAssignments } from "@/lib/entry-steps-mutations";
 import { loadEntrySteps } from "@/lib/entry-steps-page";
+import { createMinimalPngFile } from "../helpers/test-image";
 import { ENTRY_A, PAINTS_A, STEPS_A, USER_A, USER_B } from "../helpers/seed-fixtures";
 import { createTestClient, requireLocalSupabase, signInAs } from "../helpers/supabase-client";
 
@@ -15,18 +19,57 @@ let clientB: Client;
 let entryBId: string;
 let entryBPaintId: string;
 
+const uploadedPhotoPaths: string[] = [];
+
 async function assignmentsForStep(client: Client, stepId: string) {
   return client.from("step_paint_assignments").select("entry_paint_id").eq("step_id", stepId);
 }
 
+async function persistStepPhotoPath(client: Client, entryId: string, stepId: string, path: string) {
+  const { error } = await client.from("steps").update({ storage_path: path }).eq("id", stepId).eq("entry_id", entryId);
+
+  if (error) {
+    throw new Error(`Failed to persist step photo path: ${error.message}`);
+  }
+}
+
+async function persistFinalPhotoPath(client: Client, entryId: string, path: string) {
+  const { error } = await client.from("entries").update({ final_photo_path: path }).eq("id", entryId);
+
+  if (error) {
+    throw new Error(`Failed to persist final photo path: ${error.message}`);
+  }
+}
+
+async function clearStepPhoto(client: Client, entryId: string, stepId: string) {
+  await client.from("steps").update({ storage_path: null }).eq("id", stepId).eq("entry_id", entryId);
+}
+
+async function clearFinalPhoto(client: Client, entryId: string) {
+  await client.from("entries").update({ final_photo_path: null }).eq("id", entryId);
+}
+
+beforeAll(async () => {
+  await requireLocalSupabase();
+  clientA = createTestClient();
+  clientB = createTestClient();
+  await signInAs(clientA, USER_A.email, USER_A.password);
+  await signInAs(clientB, USER_B.email, USER_B.password);
+});
+
+afterAll(async () => {
+  if (uploadedPhotoPaths.length > 0) {
+    await clientA.storage.from(ENTRY_PHOTOS_BUCKET).remove(uploadedPhotoPaths);
+  }
+
+  await clearStepPhoto(clientA, ENTRY_A.id, STEPS_A.prime);
+  await clearFinalPhoto(clientA, ENTRY_A.id);
+  await clientA.auth.signOut();
+  await clientB.auth.signOut();
+});
+
 describe("paint assignment invariant (Risk #2)", () => {
   beforeAll(async () => {
-    await requireLocalSupabase();
-    clientA = createTestClient();
-    clientB = createTestClient();
-    await signInAs(clientA, USER_A.email, USER_A.password);
-    await signInAs(clientB, USER_B.email, USER_B.password);
-
     const { data: entry, error: entryError } = await clientA
       .from("entries")
       .insert({
@@ -71,8 +114,6 @@ describe("paint assignment invariant (Risk #2)", () => {
     }
 
     await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
-    await clientA.auth.signOut();
-    await clientB.auth.signOut();
   });
 
   it("does not retain a bogus paint id after RPC sync", async () => {
@@ -175,5 +216,92 @@ describe("paint assignment invariant (Risk #2)", () => {
 
     await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
     await clientA.from("entry_paints").delete().eq("id", newPaint.id);
+  });
+});
+
+describe("photo recall (Risk #4)", () => {
+  it("resolves a fetchable signed URL for an owner-uploaded step photo", async () => {
+    const path = buildStepPhotoPath(USER_A.id, ENTRY_A.id, STEPS_A.prime);
+    const file = createMinimalPngFile();
+
+    const uploadResult = await uploadEntryPhoto(clientA, path, file);
+    expect(uploadResult.ok).toBe(true);
+    uploadedPhotoPaths.push(path);
+
+    await persistStepPhotoPath(clientA, ENTRY_A.id, STEPS_A.prime, path);
+
+    const { data: stepRow, error: stepError } = await clientA
+      .from("steps")
+      .select("storage_path")
+      .eq("id", STEPS_A.prime)
+      .eq("entry_id", ENTRY_A.id)
+      .single();
+
+    expect(stepError).toBeNull();
+    expect(stepRow.storage_path).toBe(path);
+
+    const signedUrl = await createSignedPhotoUrl(clientA, path, 3600);
+    expect(signedUrl).not.toBeNull();
+    if (!signedUrl) {
+      return;
+    }
+
+    const response = await fetch(signedUrl);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type") ?? "").toMatch(/^image\//);
+
+    const stepsResult = await loadEntrySteps(clientA, ENTRY_A.id);
+    expect(stepsResult.ok).toBe(true);
+    if (!stepsResult.ok) {
+      return;
+    }
+
+    const primeStep = stepsResult.steps.find((step) => step.id === STEPS_A.prime);
+    expect(primeStep?.photo_url).not.toBeNull();
+  });
+
+  it("resolves a fetchable signed URL for an owner-uploaded final photo", async () => {
+    const path = buildFinalPhotoPath(USER_A.id, ENTRY_A.id);
+    const file = createMinimalPngFile("final.png");
+
+    const uploadResult = await uploadEntryPhoto(clientA, path, file);
+    expect(uploadResult.ok).toBe(true);
+    uploadedPhotoPaths.push(path);
+
+    await persistFinalPhotoPath(clientA, ENTRY_A.id, path);
+
+    const { data: entryRow, error: entryError } = await clientA
+      .from("entries")
+      .select("final_photo_path")
+      .eq("id", ENTRY_A.id)
+      .single();
+
+    expect(entryError).toBeNull();
+    expect(entryRow.final_photo_path).toBe(path);
+
+    const signedUrl = await resolveEntryFinalPhotoUrl(clientA, path);
+    expect(signedUrl).not.toBeNull();
+    if (!signedUrl) {
+      return;
+    }
+
+    const response = await fetch(signedUrl);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type") ?? "").toMatch(/^image\//);
+  });
+
+  it("denies non-owner signed URL and download for another user's photo path", async () => {
+    const path = buildStepPhotoPath(USER_A.id, ENTRY_A.id, STEPS_A.layer);
+    const file = createMinimalPngFile("foreign.png");
+
+    const uploadResult = await uploadEntryPhoto(clientA, path, file);
+    expect(uploadResult.ok).toBe(true);
+    uploadedPhotoPaths.push(path);
+
+    const signedUrl = await createSignedPhotoUrl(clientB, path, 3600);
+    expect(signedUrl).toBeNull();
+
+    const { error: downloadError } = await clientB.storage.from(ENTRY_PHOTOS_BUCKET).download(path);
+    expect(downloadError).not.toBeNull();
   });
 });

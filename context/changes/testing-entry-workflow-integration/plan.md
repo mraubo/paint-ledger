@@ -296,14 +296,14 @@ No schema changes. Developers gain a third integration file; full `npm test` sti
 
 #### Automated
 
-- [x] 1.1 `npx supabase db reset` succeeds
-- [x] 1.2 `npm test` passes with local Supabase only
-- [x] 1.3 `npm run lint` passes
-- [x] 1.4 `npm run build` passes
+- [x] 1.1 `npx supabase db reset` succeeds — 1d0ec87
+- [x] 1.2 `npm test` passes with local Supabase only — 1d0ec87
+- [x] 1.3 `npm run lint` passes — 1d0ec87
+- [x] 1.4 `npm run build` passes — 1d0ec87
 
 #### Manual
 
-- [x] 1.5 (none — N/A for this phase)
+- [x] 1.5 (none — N/A for this phase) — 1d0ec87
 
 ### Phase 2: Photo recall path (Risk #4)
 
