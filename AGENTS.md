@@ -43,7 +43,7 @@ curl -b "${SB_COOKIE_KEY}=${SB_COOKIE_VALUE}" http://localhost:4321/...
 
 ## Coding style
 
-Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `npm run format` / `npm run lint`). React/Astro lint rules: @eslint.config.js (unused vars: `_` prefix). Do not use `set:html` for dynamic or user-supplied HTML; use Astro components. Use `set:html` only for trusted static markup already in the repo. shadcn-style UI: `src/components/ui/` (@components.json).
+Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `npm run format` / `npm run lint`). When manually fixing lint issues, run `npm run lint:fix` first to apply ESLint autofixes before hand-editing. React/Astro lint rules: @eslint.config.js (unused vars: `_` prefix). Do not use `set:html` for dynamic or user-supplied HTML; use Astro components. Use `set:html` only for trusted static markup already in the repo. shadcn-style UI: `src/components/ui/` (@components.json).
 
 ## Commits and pull requests
 
