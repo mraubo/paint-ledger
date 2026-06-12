@@ -13,6 +13,8 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: "node",
+      // Integration suites share mutable seed data (ENTRY_A); run files sequentially.
+      fileParallelism: false,
       include: ["tests/**/*.test.ts"],
       env: {
         SUPABASE_URL: env.SUPABASE_URL,

@@ -43,11 +43,19 @@ async function persistFinalPhotoPath(client: Client, entryId: string, path: stri
 }
 
 async function clearStepPhoto(client: Client, entryId: string, stepId: string) {
-  await client.from("steps").update({ storage_path: null }).eq("id", stepId).eq("entry_id", entryId);
+  const { error } = await client.from("steps").update({ storage_path: null }).eq("id", stepId).eq("entry_id", entryId);
+
+  if (error) {
+    throw new Error(`Failed to clear step photo path: ${error.message}`);
+  }
 }
 
 async function clearFinalPhoto(client: Client, entryId: string) {
-  await client.from("entries").update({ final_photo_path: null }).eq("id", entryId);
+  const { error } = await client.from("entries").update({ final_photo_path: null }).eq("id", entryId);
+
+  if (error) {
+    throw new Error(`Failed to clear final photo path: ${error.message}`);
+  }
 }
 
 beforeAll(async () => {
@@ -60,7 +68,11 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (uploadedPhotoPaths.length > 0) {
-    await clientA.storage.from(ENTRY_PHOTOS_BUCKET).remove(uploadedPhotoPaths);
+    const { error } = await clientA.storage.from(ENTRY_PHOTOS_BUCKET).remove(uploadedPhotoPaths);
+
+    if (error) {
+      throw new Error(`Failed to remove uploaded test photos: ${error.message}`);
+    }
   }
 
   await clearStepPhoto(clientA, ENTRY_A.id, STEPS_A.prime);
@@ -111,15 +123,31 @@ describe("paint assignment invariant (Risk #2)", () => {
 
   afterAll(async () => {
     if (entryBId) {
-      await clientA.from("entries").delete().eq("id", entryBId);
+      const { error: deleteEntryError } = await clientA.from("entries").delete().eq("id", entryBId);
+
+      if (deleteEntryError) {
+        throw new Error(`Failed to delete ephemeral entry B: ${deleteEntryError.message}`);
+      }
     }
 
-    await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
-    await clientA
+    const { error: deleteAssignmentsError } = await clientA
+      .from("step_paint_assignments")
+      .delete()
+      .eq("step_id", STEPS_A.layer);
+
+    if (deleteAssignmentsError) {
+      throw new Error(`Failed to reset step assignments: ${deleteAssignmentsError.message}`);
+    }
+
+    const { error: resetStepError } = await clientA
       .from("steps")
       .update({ description: "Layer Imperial Fist over armor plates" })
       .eq("id", STEPS_A.layer)
       .eq("entry_id", ENTRY_A.id);
+
+    if (resetStepError) {
+      throw new Error(`Failed to reset step description: ${resetStepError.message}`);
+    }
   });
 
   it("does not retain a bogus paint id after RPC sync", async () => {
@@ -146,6 +174,23 @@ describe("paint assignment invariant (Risk #2)", () => {
     });
 
     expect(error).toBeNull();
+
+    const { data, error: readError } = await assignmentsForStep(clientA, STEPS_A.layer);
+    expect(readError).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+    expect(data?.some((row) => row.entry_paint_id === entryBPaintId)).toBe(false);
+  });
+
+  it("does not link a paint from another entry via updateStepWithAssignments", async () => {
+    const result = await updateStepWithAssignments(
+      clientA,
+      ENTRY_A.id,
+      STEPS_A.layer,
+      "Layer Imperial Fist over armor plates",
+      [entryBPaintId],
+    );
+
+    expect(result.ok).toBe(true);
 
     const { data, error: readError } = await assignmentsForStep(clientA, STEPS_A.layer);
     expect(readError).toBeNull();
@@ -188,40 +233,48 @@ describe("paint assignment invariant (Risk #2)", () => {
   });
 
   it("keeps inline-added palette paints assignable to a step", async () => {
-    const { data: newPaint, error: insertError } = await clientA
-      .from("entry_paints")
-      .insert({
-        entry_id: ENTRY_A.id,
-        name: "Workflow inline paint",
-        brand: "Test",
-        color_description: "Added in integration test",
-        approximate_color: "#AABBCC",
-      })
-      .select("id")
-      .single();
+    let newPaintId: string | null = null;
 
-    expect(insertError).toBeNull();
-    expect(newPaint).not.toBeNull();
-    if (!newPaint) {
-      return;
+    try {
+      const { data: newPaint, error: insertError } = await clientA
+        .from("entry_paints")
+        .insert({
+          entry_id: ENTRY_A.id,
+          name: "Workflow inline paint",
+          brand: "Test",
+          color_description: "Added in integration test",
+          approximate_color: "#AABBCC",
+        })
+        .select("id")
+        .single();
+
+      expect(insertError).toBeNull();
+      expect(newPaint).not.toBeNull();
+      if (!newPaint) {
+        return;
+      }
+
+      newPaintId = newPaint.id;
+
+      const result = await updateStepWithAssignments(
+        clientA,
+        ENTRY_A.id,
+        STEPS_A.layer,
+        "Layer with inline-added paint",
+        [newPaint.id],
+      );
+
+      expect(result.ok).toBe(true);
+
+      const { data, error } = await assignmentsForStep(clientA, STEPS_A.layer);
+      expect(error).toBeNull();
+      expect(data?.map((row) => row.entry_paint_id)).toContain(newPaint.id);
+    } finally {
+      if (newPaintId) {
+        await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
+        await clientA.from("entry_paints").delete().eq("id", newPaintId);
+      }
     }
-
-    const result = await updateStepWithAssignments(
-      clientA,
-      ENTRY_A.id,
-      STEPS_A.layer,
-      "Layer with inline-added paint",
-      [newPaint.id],
-    );
-
-    expect(result.ok).toBe(true);
-
-    const { data, error } = await assignmentsForStep(clientA, STEPS_A.layer);
-    expect(error).toBeNull();
-    expect(data?.map((row) => row.entry_paint_id)).toContain(newPaint.id);
-
-    await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
-    await clientA.from("entry_paints").delete().eq("id", newPaint.id);
   });
 });
 
@@ -309,6 +362,11 @@ describe("photo recall (Risk #4)", () => {
 
     const { error: downloadError } = await clientB.storage.from(ENTRY_PHOTOS_BUCKET).download(path);
     expect(downloadError).not.toBeNull();
+  });
+
+  afterAll(async () => {
+    await clearStepPhoto(clientA, ENTRY_A.id, STEPS_A.prime);
+    await clearFinalPhoto(clientA, ENTRY_A.id);
   });
 });
 
