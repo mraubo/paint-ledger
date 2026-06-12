@@ -210,7 +210,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-- **S-06: user can browse saved entries in a simple list and open a detail view showing model info, origin note, paint list, ordered steps with assigned paint cards, step photos, and final photo — completing US-01 end-to-end.** — Archived 2026-06-10 → `context/archive/2026-06-10-entry-list-and-detail/`. Lesson: —.
+- **S-07: user can permanently delete an entry and its associated paints, steps, and photos from the edit page or entry list.** — Archived 2026-06-12 → `context/archive/2026-06-12-entry-delete/`. Lesson: —.
 - **S-05: user can attach up to one optional photo per tutorial step and at least one final model photo in a separate result area.** — Archived 2026-06-09 → `context/archive/2026-06-09-entry-step-and-final-photos/`. Lesson: —.
 - **S-04: user can add ordered tutorial steps with descriptions, assign paints from the entry list (including inline add to the list), and see paint name and approximate color on each step.** — Archived 2026-06-09 → `context/archive/2026-06-09-steps-with-paint-cards/`. Lesson: —.
 - **S-03: user can define an entry-level paint list with name, brand, color description, and approximate color from a picker.** — Archived 2026-06-09 → `context/archive/2026-06-08-entry-paint-palette/`. Lesson: —.
