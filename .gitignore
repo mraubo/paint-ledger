@@ -34,3 +34,4 @@ pnpm-debug.log*
 
 # stryker temp files
 .stryker-tmp
+reports/mutation
