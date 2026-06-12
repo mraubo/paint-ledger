@@ -294,11 +294,11 @@ No schema migration. Existing entries are unaffected until user deletes them. Or
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Integration tests pass: `npx supabase start && npx supabase db reset && npm test`
-- [x] 3.3 Build passes: `npm run build`
+- [x] 3.1 Linting passes: `npm run lint` — b201e9f
+- [x] 3.2 Integration tests pass: `npx supabase start && npx supabase db reset && npm test` — b201e9f
+- [x] 3.3 Build passes: `npm run build` — b201e9f
 
 #### Manual
 
-- [x] 3.4 Local CI-equivalent run completes green
-- [x] 3.5 PRD FR-013 and roadmap S-07 entries are correct
+- [x] 3.4 Local CI-equivalent run completes green — b201e9f
+- [x] 3.5 PRD FR-013 and roadmap S-07 entries are correct — b201e9f
