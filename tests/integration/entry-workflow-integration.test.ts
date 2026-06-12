@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
-import { resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
+import { loadEntryForEdit, resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
+import { loadEntryPaints } from "@/lib/entry-paints-page";
 import { buildFinalPhotoPath, buildStepPhotoPath, ENTRY_PHOTOS_BUCKET } from "@/lib/entry-photos-api";
 import { createSignedPhotoUrl, uploadEntryPhoto } from "@/lib/entry-photos-storage";
 import { updateStepWithAssignments } from "@/lib/entry-steps-mutations";
@@ -114,6 +115,11 @@ describe("paint assignment invariant (Risk #2)", () => {
     }
 
     await clientA.from("step_paint_assignments").delete().eq("step_id", STEPS_A.layer);
+    await clientA
+      .from("steps")
+      .update({ description: "Layer Imperial Fist over armor plates" })
+      .eq("id", STEPS_A.layer)
+      .eq("entry_id", ENTRY_A.id);
   });
 
   it("does not retain a bogus paint id after RPC sync", async () => {
@@ -303,5 +309,83 @@ describe("photo recall (Risk #4)", () => {
 
     const { error: downloadError } = await clientB.storage.from(ENTRY_PHOTOS_BUCKET).download(path);
     expect(downloadError).not.toBeNull();
+  });
+});
+
+describe("detail loader completeness (Risk #5)", () => {
+  it("loads entry basics matching seed oracle", async () => {
+    const entry = await loadEntryForEdit(clientA, ENTRY_A.id);
+
+    expect(entry).not.toBeNull();
+    expect(entry).toMatchObject({
+      title: "Imperial Fist Intercessor",
+      model_info: "Space Marine Intercessor",
+      model_origin_note: "Indomitus box set",
+      status: "ready",
+    });
+  });
+
+  it("loads paint palette matching seed oracle", async () => {
+    const paintsResult = await loadEntryPaints(clientA, ENTRY_A.id);
+
+    expect(paintsResult.ok).toBe(true);
+    if (!paintsResult.ok) {
+      return;
+    }
+
+    expect(paintsResult.paints).toHaveLength(2);
+    expect(paintsResult.paints.map((paint) => paint.name)).toEqual(["Imperial Fist", "Wraithbone"]);
+    expect(paintsResult.paints.map((paint) => paint.id)).toEqual(
+      expect.arrayContaining([PAINTS_A.imperialFist, PAINTS_A.wraithbone]),
+    );
+  });
+
+  it("loads ordered steps with recipe assignments matching seed oracle", async () => {
+    const stepsResult = await loadEntrySteps(clientA, ENTRY_A.id);
+
+    expect(stepsResult.ok).toBe(true);
+    if (!stepsResult.ok) {
+      return;
+    }
+
+    expect(stepsResult.steps.map((step) => step.position)).toEqual([1, 2]);
+
+    const primeStep = stepsResult.steps.find((step) => step.id === STEPS_A.prime);
+    const layerStep = stepsResult.steps.find((step) => step.id === STEPS_A.layer);
+
+    expect(primeStep?.description).toBe("Spray prime with Wraithbone");
+    expect(primeStep?.assigned_paints.map((paint) => paint.id)).toContain(PAINTS_A.wraithbone);
+
+    expect(layerStep?.description).toBe("Layer Imperial Fist over armor plates");
+    expect(layerStep?.assigned_paints).toHaveLength(0);
+  });
+
+  it("includes step and final photo URLs when storage paths are set", async () => {
+    const stepPath = buildStepPhotoPath(USER_A.id, ENTRY_A.id, STEPS_A.prime);
+    const finalPath = buildFinalPhotoPath(USER_A.id, ENTRY_A.id);
+
+    const stepUpload = await uploadEntryPhoto(clientA, stepPath, createMinimalPngFile());
+    const finalUpload = await uploadEntryPhoto(clientA, finalPath, createMinimalPngFile("detail-final.png"));
+    expect(stepUpload.ok).toBe(true);
+    expect(finalUpload.ok).toBe(true);
+    uploadedPhotoPaths.push(stepPath, finalPath);
+
+    await persistStepPhotoPath(clientA, ENTRY_A.id, STEPS_A.prime, stepPath);
+    await persistFinalPhotoPath(clientA, ENTRY_A.id, finalPath);
+
+    const entry = await loadEntryForEdit(clientA, ENTRY_A.id);
+    expect(entry?.final_photo_path).toBe(finalPath);
+
+    const finalPhotoUrl = await resolveEntryFinalPhotoUrl(clientA, entry?.final_photo_path ?? null);
+    expect(finalPhotoUrl).not.toBeNull();
+
+    const stepsResult = await loadEntrySteps(clientA, ENTRY_A.id);
+    expect(stepsResult.ok).toBe(true);
+    if (!stepsResult.ok) {
+      return;
+    }
+
+    const primeStep = stepsResult.steps.find((step) => step.id === STEPS_A.prime);
+    expect(primeStep?.photo_url).not.toBeNull();
   });
 });
