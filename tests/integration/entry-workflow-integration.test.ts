@@ -5,11 +5,7 @@ import type { Database } from "@/lib/database.types";
 import { loadEntryForEdit, resolveEntryFinalPhotoUrl } from "@/lib/entries-page";
 import { loadEntryPaints } from "@/lib/entry-paints-page";
 import { buildFinalPhotoPath, buildStepPhotoPath, ENTRY_PHOTOS_BUCKET } from "@/lib/entry-photos-api";
-import {
-  createSignedPhotoUrl,
-  createSignedPhotoUrlMap,
-  uploadEntryPhoto,
-} from "@/lib/entry-photos-storage";
+import { createSignedPhotoUrl, createSignedPhotoUrlMap, uploadEntryPhoto } from "@/lib/entry-photos-storage";
 import { syncStepPaintAssignments, updateStepWithAssignments } from "@/lib/entry-steps-mutations";
 import { loadEntrySteps } from "@/lib/entry-steps-page";
 import { createMinimalPngFile } from "../helpers/test-image";
@@ -475,13 +471,9 @@ describe("mutation survivors (Stryker hardening)", () => {
   });
 
   it("returns an error from updateStepWithAssignments when palette load fails", async () => {
-    const result = await updateStepWithAssignments(
-      clientA,
-      malformedEntryId,
-      STEPS_A.layer,
-      "Should not persist",
-      [PAINTS_A.wraithbone],
-    );
+    const result = await updateStepWithAssignments(clientA, malformedEntryId, STEPS_A.layer, "Should not persist", [
+      PAINTS_A.wraithbone,
+    ]);
 
     expect(result.ok).toBe(false);
     if (result.ok) {
@@ -491,9 +483,7 @@ describe("mutation survivors (Stryker hardening)", () => {
   });
 
   it("returns an error from syncStepPaintAssignments when palette load fails", async () => {
-    const result = await syncStepPaintAssignments(clientA, malformedEntryId, STEPS_A.layer, [
-      PAINTS_A.wraithbone,
-    ]);
+    const result = await syncStepPaintAssignments(clientA, malformedEntryId, STEPS_A.layer, [PAINTS_A.wraithbone]);
 
     expect(result.ok).toBe(false);
     if (result.ok) {
@@ -529,7 +519,7 @@ describe("mutation survivors (Stryker hardening)", () => {
     expect(uploadResult.ok).toBe(true);
     uploadedPhotoPaths.push(ownedPath);
 
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
 
     const urlMap = await createSignedPhotoUrlMap(clientA, [ownedPath, missingPath], 3600);
 
@@ -541,13 +531,10 @@ describe("mutation survivors (Stryker hardening)", () => {
   });
 
   it("sorts multiple assigned paints by name on a step", async () => {
-    const result = await updateStepWithAssignments(
-      clientA,
-      ENTRY_A.id,
-      STEPS_A.layer,
-      "Layer both paints",
-      [PAINTS_A.imperialFist, PAINTS_A.wraithbone],
-    );
+    const result = await updateStepWithAssignments(clientA, ENTRY_A.id, STEPS_A.layer, "Layer both paints", [
+      PAINTS_A.imperialFist,
+      PAINTS_A.wraithbone,
+    ]);
 
     expect(result.ok).toBe(true);
 

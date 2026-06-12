@@ -11,7 +11,26 @@ import tseslint from "typescript-eslint";
 
 const gitignorePath = path.resolve(import.meta.dirname, ".gitignore");
 
+const sharedTypeScriptRules = {
+  "no-console": "warn",
+  "no-unused-vars": "off",
+  "@typescript-eslint/no-unused-vars": [
+    "error",
+    {
+      argsIgnorePattern: "^_",
+      varsIgnorePattern: "^_",
+      caughtErrorsIgnorePattern: "^_",
+      destructuredArrayIgnorePattern: "^_",
+      ignoreRestSiblings: true,
+    },
+  ],
+  "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
+  "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: { attributes: false } }],
+};
+
+// projectService is for TS/JS only — astro-eslint-parser does not support it.
 const baseConfig = tseslint.config({
+  files: ["**/*.{js,jsx,ts,tsx}"],
   extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
   languageOptions: {
     parserOptions: {
@@ -19,22 +38,7 @@ const baseConfig = tseslint.config({
       tsconfigRootDir: import.meta.dirname,
     },
   },
-  rules: {
-    "no-console": "warn",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        caughtErrorsIgnorePattern: "^_",
-        destructuredArrayIgnorePattern: "^_",
-        ignoreRestSiblings: true,
-      },
-    ],
-    "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
-    "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: { attributes: false } }],
-  },
+  rules: sharedTypeScriptRules,
 });
 
 const reactConfig = tseslint.config({
