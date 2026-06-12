@@ -39,7 +39,7 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 | S-04 | steps-with-paint-cards | add ordered steps, assign paints from the entry list, and see paint cards on steps | S-03 | FR-006, FR-007, FR-008 | done |
 | S-05 | entry-step-and-final-photos | attach one optional photo per step and at least one final model photo | S-04, F-02 | FR-009, FR-010 | done |
 | S-06 | entry-list-and-detail | browse saved entries in a simple list and open full detail recall | S-05 | FR-011, FR-012, US-01 | done |
-| S-07 | entry-delete | permanently delete an entry and its photos from edit or list | S-06 | FR-013 | planned |
+| S-07 | entry-delete | permanently delete an entry and its photos from edit or list | S-06 | FR-013 | done |
 
 ## Streams
 
@@ -175,7 +175,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Storage cleanup must run before DB delete (Storage RLS requires entry/step rows to exist); best-effort photo removal with proceed-on-failure matches step-delete behavior.
-- **Status:** planned
+- **Status:** done
 
 ## Backlog Handoff
 

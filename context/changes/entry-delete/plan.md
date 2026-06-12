@@ -260,6 +260,14 @@ No schema migration. Existing entries are unaffected until user deletes them. Or
 - Step delete + storage: `src/pages/api/entries/[id]/steps/[stepId]/delete.ts`
 - Storage helper: `src/lib/entry-photos-storage.ts`
 
+## Addendum (2026-06-12): List row actions menu
+
+Phase 2 list delete was implemented as `EntryListActionsMenu` (`src/components/entries/EntryListActionsMenu.tsx`) — a kebab dropdown with Edit + Delete — instead of the originally planned inline red Delete button in the badge cluster.
+
+**Rationale:** Reduces visual clutter on dense list rows; Edit shortcut is co-located with Delete. Delete still uses POST + native `confirm()` + same API route.
+
+**Scope impact:** One new React island on the list page (`client:load`). Plan-brief "no new components" note applies to confirmation UX only; this component is an accepted UX deviation documented here.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands.

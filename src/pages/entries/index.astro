@@ -18,10 +18,10 @@ const MAX_DELETED_TITLE_LENGTH = 200;
 const deletedRaw = Astro.url.searchParams.get("deleted");
 let deletedTitle: string | null = null;
 if (deletedRaw) {
-  const decoded = decodeURIComponent(deletedRaw).trim();
-  if (decoded) {
+  const trimmed = deletedRaw.trim();
+  if (trimmed) {
     deletedTitle =
-      decoded.length > MAX_DELETED_TITLE_LENGTH ? `${decoded.slice(0, MAX_DELETED_TITLE_LENGTH)}…` : decoded;
+      trimmed.length > MAX_DELETED_TITLE_LENGTH ? `${trimmed.slice(0, MAX_DELETED_TITLE_LENGTH)}…` : trimmed;
   }
 }
 const showDeletedBanner = Boolean(deletedTitle);
