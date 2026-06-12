@@ -57,6 +57,10 @@ if (redirectUrl) {
   return Astro.redirect(redirectUrl);
 }
 
+if (!entry) {
+  return Astro.redirect(notFoundUrl);
+}
+
 const loaderError = paintsError ?? stepsError;
 const hasDescription = entry.description.trim().length > 0;
 const hasModelInfo = entry.model_info.trim().length > 0;

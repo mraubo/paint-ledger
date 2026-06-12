@@ -26,7 +26,7 @@ Import via `@/*` alias (@tsconfig.json maps to `./src/*`).
 
 Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
 
-**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts (requires `npm run dev` on port 4321 in a second terminal). Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
+**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; entry workflow integration in @tests/integration/entry-workflow-integration.test.ts requires local Supabase only; HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts also need `npm run dev` on port 4321 in a second terminal. Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts, @tests/helpers/test-image.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
 
 After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm test` when local Supabase is running and (for HTTP tests) the dev server is up.
 
@@ -58,3 +58,11 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 **After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
 
 PRs should pass GitHub Actions lint and build. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
+
+## Mutation testing
+
+Repo uses Stryker for selective mutation testing on risk-critical modules.
+Run it only for code covered by the current change or a risk from test-plan.md,
+prefer narrowed scope with --mutate "path/to/file.ts:start-end", and do not chase
+100% mutation score. Survived mutants should be reviewed one by one: add an
+assertion only when the mutant represents a user-visible or business-relevant bug.
