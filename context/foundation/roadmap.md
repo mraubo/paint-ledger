@@ -3,7 +3,7 @@ project: "Paint Ledger"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-06-11
+updated: 2026-06-10
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -39,7 +39,6 @@ Powiązanie z celem **speed**: nie odkładamy listy i podglądu na koniec poza �
 | S-04 | steps-with-paint-cards | add ordered steps, assign paints from the entry list, and see paint cards on steps | S-03 | FR-006, FR-007, FR-008 | done |
 | S-05 | entry-step-and-final-photos | attach one optional photo per step and at least one final model photo | S-04, F-02 | FR-009, FR-010 | done |
 | S-06 | entry-list-and-detail | browse saved entries in a simple list and open full detail recall | S-05 | FR-011, FR-012, US-01 | done |
-| S-07 | entry-delete | delete an owned entry and all nested recipe data including stored photos | S-06, F-02 | FR-013, FR-002 | not started |
 
 ## Streams
 
@@ -49,7 +48,7 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 |---|---|---|---|
 | A | Konto | `S-01` | Auth scaffold present; extend protected routes for future entry pages. Parallel with `F-01`. |
 | B | Fundament danych i mediów | `F-01` → `F-02` | Unblocks all entry persistence and photo upload (`S-05`). |
-| C | Przepis paint log | `S-02` → `S-03` → `S-04` → `S-05` → `S-06` → `S-07` | Joins Stream B after `F-01`; `S-05` joins Stream B at `F-02`. North star at `S-06`; `S-07` completes entry-level CRUD. |
+| C | Przepis paint log | `S-02` → `S-03` → `S-04` → `S-05` → `S-06` | Joins Stream B after `F-01`; `S-05` joins Stream B at `F-02`. North star at `S-06`. |
 
 ## Baseline
 
@@ -70,7 +69,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Outcome:** (foundation) Postgres tables for entries, entry paints, and ordered steps exist with owner-only row-level security.
 - **Change ID:** paint-log-schema-rls
 - **PRD refs:** FR-002, Business Logic, NFR (private-by-default entries)
-- **Unlocks:** S-02, S-03, S-04, S-05, S-06, S-07
+- **Unlocks:** S-02, S-03, S-04, S-05, S-06
 - **Prerequisites:** —
 - **Parallel with:** S-01
 - **Blockers:** —
@@ -165,18 +164,6 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** North star / validation milestone — proves primary Success Criteria (add complete entry, reopen without external notes). List stays minimal (no search/filter per Non-Goals).
 - **Status:** done
 
-### S-07: Entry delete
-
-- **Outcome:** user can permanently delete an owned paint log entry from the list or edit flow; nested paints, steps, and assignments are removed via cascade, and step/final photos are cleared from storage.
-- **Change ID:** entry-delete
-- **PRD refs:** FR-013, FR-002
-- **Prerequisites:** S-06, F-02
-- **Parallel with:** —
-- **Blockers:** —
-- **Unknowns:** —
-- **Risk:** Orphaned storage objects if delete succeeds in Postgres but photo cleanup fails — mirror best-effort cleanup pattern from step/paint delete handlers; entry row cascade already exists from F-01.
-- **Status:** not started
-
 ## Backlog Handoff
 
 | Roadmap ID | Change ID | GitHub | Suggested issue title | Ready for `/10x-plan` | Notes |
@@ -189,7 +176,6 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-04 | steps-with-paint-cards | [#7](https://github.com/mraubo/paint-ledger/issues/7) | Ordered steps with paint assignment and cards | no | After S-03 |
 | S-05 | entry-step-and-final-photos | [#8](https://github.com/mraubo/paint-ledger/issues/8) | Step and final photo upload | no | After F-02 and S-04 |
 | S-06 | entry-list-and-detail | [#9](https://github.com/mraubo/paint-ledger/issues/9) | Entry list and full detail recall (US-01) | no | North star; after S-05 |
-| S-07 | entry-delete | — | Delete owned entry with nested data and photo cleanup | yes | After S-06 and F-02; completes entry CRUD |
 
 ## Open Roadmap Questions
 
