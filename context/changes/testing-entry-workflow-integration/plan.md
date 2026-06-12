@@ -320,21 +320,21 @@ No schema changes. Developers gain a third integration file; full `npm test` sti
 
 #### Automated
 
-- [ ] 3.1 `npm test` passes with local Supabase only
-- [ ] 3.2 `npm run lint` passes
-- [ ] 3.3 `npm run build` passes
+- [x] 3.1 `npm test` passes with local Supabase only — e5b73d9
+- [x] 3.2 `npm run lint` passes — e5b73d9
+- [x] 3.3 `npm run build` passes — e5b73d9
 
 #### Manual
 
-- [ ] 3.4 (none — N/A for this phase)
+- [x] 3.4 (none — N/A for this phase) — e5b73d9
 
 ### Phase 4: Cookbook and test-plan documentation
 
 #### Automated
 
-- [ ] 4.1 `npm test` full suite passes
-- [ ] 4.2 `npm run lint` passes
+- [x] 4.1 `npm test` full suite passes
+- [x] 4.2 `npm run lint` passes
 
 #### Manual
 
-- [ ] 4.3 test-plan §6.6 Phase 3 note is sufficient for contributor onboarding
+- [x] 4.3 test-plan §6.6 Phase 3 note is sufficient for contributor onboarding

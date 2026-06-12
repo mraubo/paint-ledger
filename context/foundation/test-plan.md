@@ -69,7 +69,7 @@ orchestrator updates Status as artifacts appear on disk.
 |---|------------|-------------------|---------------|------------|--------|---------------|
 | 1 | Runner bootstrap + RLS floor | Install Vitest; prove owner-only isolation and migration/RLS smoke with two users | #1, #7 | integration + SQL smoke | complete | testing-runner-bootstrap-rls-floor |
 | 2 | Auth and route protection | Prove protected prefixes, session shape, and IDOR rejection on entry APIs | #3, #6 | integration (HTTP + cookies) | complete | testing-auth-and-route-protection |
-| 3 | Entry workflow integration | Paint invariant, photo recall path, detail loader completeness | #2, #4, #5 | integration | planned | testing-entry-workflow-integration |
+| 3 | Entry workflow integration | Paint invariant, photo recall path, detail loader completeness | #2, #4, #5 | integration | complete | testing-entry-workflow-integration |
 | 4 | Quality-gates wiring | `npm test` in CI; document cookbook patterns | cross-cutting | CI gate | not started | — |
 
 ## 4. Stack
@@ -128,7 +128,7 @@ This rollout is **integration-first** — RLS and auth boundaries are covered be
 
 **Run:** `npx supabase start && npx supabase db reset`, then `npm test` (or `npm run test:watch`).
 
-**Pattern:** sign in as seed user A or B, assert observable outcomes (empty data, errors, or unchanged rows) — not policy SQL text. Reference: `tests/integration/rls-isolation.test.ts`.
+**Pattern:** sign in as seed user A or B, assert observable outcomes (empty data, errors, or unchanged rows) — not policy SQL text. Reference: `tests/integration/rls-isolation.test.ts`. Entry workflow coverage (paint invariant, Storage recall, detail loaders): `tests/integration/entry-workflow-integration.test.ts` with `tests/helpers/test-image.ts` for minimal PNG uploads — Supabase only, no dev server.
 
 ### 6.3 Adding an e2e test
 
@@ -166,6 +166,8 @@ Keep fixture UUIDs in `tests/helpers/seed-fixtures.ts` in sync with `supabase/se
 **Phase 1 (Runner bootstrap + RLS floor):** Vitest harness, second seed user (`seed-b@paint-ledger.local`), and `tests/integration/rls-isolation.test.ts` — automated two-user RLS smoke on `entries`, `entry_paints`, `steps`, `step_paint_assignments` plus one negative `delete_step_and_renumber` RPC case. Risks #1 and #7.
 
 **Phase 2 (Auth and route protection):** `tests/helpers/http-client.ts` and `tests/integration/auth-route-protection.test.ts` — HTTP tests against `npm run dev`: unauthenticated protected-prefix redirect, authenticated owner access, and user B cross-user redirect denial on representative entry API/page paths. Risks #3 and #6.
+
+**Phase 3 (Entry workflow integration):** `tests/integration/entry-workflow-integration.test.ts` and `tests/helpers/test-image.ts` — Supabase-client integration only (`npx supabase start && npx supabase db reset`, then `npm test`; no `npm run dev`). Risks #2, #4, #5: assert `step_paint_assignments` rows (not UI checkboxes) for paint-list invariant; real `entry-photos` Storage upload + signed URL + `fetch` for recall (do not mock Storage); import `loadEntryForEdit`, `loadEntryPaints`, `loadEntrySteps`, `resolveEntryFinalPhotoUrl` for recipe completeness against `supabase/seed.sql` (no HTML snapshots). Anti-patterns: redirect-only upload proof, mirroring `filterValidPaintIds` in expected values.
 
 ## 7. What We Deliberately Don't Test
 
