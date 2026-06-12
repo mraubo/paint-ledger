@@ -268,27 +268,27 @@ No schema migration. Existing entries are unaffected until user deletes them. Or
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Build passes: `npm run build`
+- [x] 1.1 Linting passes: `npm run lint` — 39a4591
+- [x] 1.2 Build passes: `npm run build` — 39a4591
 
 #### Manual
 
-- [x] 1.3 Authenticated curl POST deletes entry and redirects with `deleted` param
-- [x] 1.4 Entry with photos: storage objects removed on successful delete
+- [x] 1.3 Authenticated curl POST deletes entry and redirects with `deleted` param — 39a4591
+- [x] 1.4 Entry with photos: storage objects removed on successful delete — 39a4591
 
 ### Phase 2: Delete UI on edit page and list
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
-- [ ] 2.2 Build passes: `npm run build`
+- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.2 Build passes: `npm run build`
 
 #### Manual
 
-- [ ] 2.3 Delete from edit page shows title banner and removes entry from list
-- [ ] 2.4 Delete from list row shows title banner and removes entry
-- [ ] 2.5 Confirm cancel leaves entry intact
-- [ ] 2.6 Ready entry with full recipe deletes from both placements
+- [x] 2.3 Delete from edit page shows title banner and removes entry from list
+- [x] 2.4 Delete from list row shows title banner and removes entry
+- [x] 2.5 Confirm cancel leaves entry intact
+- [x] 2.6 Ready entry with full recipe deletes from both placements
 
 ### Phase 3: Tests and foundation docs
 

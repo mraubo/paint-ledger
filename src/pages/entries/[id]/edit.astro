@@ -180,6 +180,21 @@ const initialValues = {
       }
     </section>
 
+    <section class="mt-10 border-t border-white/10 pt-8">
+      <h2 class="mb-1 text-lg font-semibold text-red-200/90">Danger zone</h2>
+      <p class="mb-4 text-sm text-blue-100/60">
+        Permanently delete this entry and all of its paints, steps, and photos. This cannot be undone.
+      </p>
+      <form method="POST" action={`/api/entries/${entry.id}/delete`} onsubmit="return confirm('Delete this entry?')">
+        <button
+          type="submit"
+          class="inline-flex items-center rounded-lg border border-red-400/30 px-4 py-2 text-sm font-medium text-red-200/90 transition-colors hover:bg-red-900/20"
+        >
+          Delete entry
+        </button>
+      </form>
+    </section>
+
     <p class="mt-4 text-center text-sm text-blue-100/60">
       <a href={`/entries/${entry.id}`} class="text-purple-300 hover:underline">View entry</a>
       <span class="mx-2 text-blue-100/30">·</span>
