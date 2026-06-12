@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-deprecated -- tseslint.config() is the only way to use extends; core defineConfig has incompatible API */
-import { includeIgnoreFile } from "@eslint/config-helpers";
+import { defineConfig, includeIgnoreFile } from "@eslint/config-helpers";
 import eslint from "@eslint/js";
 import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
 import eslintPluginAstro from "eslint-plugin-astro";
@@ -29,7 +28,7 @@ const sharedTypeScriptRules = {
 };
 
 // projectService is for TS/JS only — astro-eslint-parser does not support it.
-const baseConfig = tseslint.config({
+const baseConfig = defineConfig({
   files: ["**/*.{js,jsx,ts,tsx}"],
   extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
   languageOptions: {
@@ -41,7 +40,7 @@ const baseConfig = tseslint.config({
   rules: sharedTypeScriptRules,
 });
 
-const reactConfig = tseslint.config({
+const reactConfig = defineConfig({
   files: ["**/*.{js,jsx,ts,tsx}"],
   extends: [pluginReact.configs.flat.recommended],
   languageOptions: {
@@ -63,7 +62,7 @@ const reactConfig = tseslint.config({
   },
 });
 
-const astroConfig = tseslint.config({
+const astroConfig = defineConfig({
   files: ["**/*.astro"],
   rules: {
     "astro/no-set-html-directive": "error",
@@ -74,7 +73,7 @@ const astroConfig = tseslint.config({
   },
 });
 
-export default tseslint.config(
+export default defineConfig(
   includeIgnoreFile(gitignorePath),
   { ignores: ["src/lib/database.types.ts"] },
   baseConfig,

@@ -33,6 +33,10 @@ if (redirectUrl) {
   return Astro.redirect(redirectUrl);
 }
 
+if (!entry) {
+  return Astro.redirect(notFoundUrl);
+}
+
 const error = Astro.url.searchParams.get("error");
 const statusError = Astro.url.searchParams.get("status_error");
 const showSavedBanner = Astro.url.searchParams.get("saved") === "1";

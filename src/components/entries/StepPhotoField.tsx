@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ImageIcon } from "lucide-react";
 import { REMOVE_STEP_PHOTO_FIELD, STEP_PHOTO_FIELD } from "@/lib/entry-photos-api";
 

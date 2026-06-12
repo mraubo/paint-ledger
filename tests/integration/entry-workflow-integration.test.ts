@@ -297,6 +297,10 @@ describe("photo recall (Risk #4)", () => {
       .single();
 
     expect(stepError).toBeNull();
+    expect(stepRow).not.toBeNull();
+    if (!stepRow) {
+      return;
+    }
     expect(stepRow.storage_path).toBe(path);
 
     const signedUrl = await createSignedPhotoUrl(clientA, path, 3600);
@@ -336,6 +340,10 @@ describe("photo recall (Risk #4)", () => {
       .single();
 
     expect(entryError).toBeNull();
+    expect(entryRow).not.toBeNull();
+    if (!entryRow) {
+      return;
+    }
     expect(entryRow.final_photo_path).toBe(path);
 
     const signedUrl = await resolveEntryFinalPhotoUrl(clientA, path);
