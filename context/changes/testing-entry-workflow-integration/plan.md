@@ -332,9 +332,9 @@ No schema changes. Developers gain a third integration file; full `npm test` sti
 
 #### Automated
 
-- [x] 4.1 `npm test` full suite passes
-- [x] 4.2 `npm run lint` passes
+- [x] 4.1 `npm test` full suite passes — 0fa8b5c
+- [x] 4.2 `npm run lint` passes — 0fa8b5c
 
 #### Manual
 
-- [x] 4.3 test-plan §6.6 Phase 3 note is sufficient for contributor onboarding
+- [x] 4.3 test-plan §6.6 Phase 3 note is sufficient for contributor onboarding — 0fa8b5c

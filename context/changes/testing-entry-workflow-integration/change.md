@@ -1,7 +1,7 @@
 ---
 change_id: testing-entry-workflow-integration
 title: Entry workflow integration tests for paint invariant, photo recall, and detail completeness
-status: implementing
+status: implemented
 created: 2026-06-12
 updated: 2026-06-12
 archived_at: null
