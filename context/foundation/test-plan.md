@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-06-11
+> Last updated: 2026-06-11 (§6.4 Phase 2 HTTP cookbook)
 
 ## 1. Strategy
 
@@ -44,7 +44,7 @@ research's job, see §1 principle #3).
 | 3 | Logged-in owner cannot reach `/entries/**` or APIs return 401/403 incorrectly after auth/middleware change | High | Medium | PRD FR-001; AGENTS.md PROTECTED_ROUTES rule; hot-spot dirs `src/middleware/`, `src/pages/api/auth/` |
 | 4 | Photo upload reports success but detail recall shows broken/missing image (storage policy or signed URL path) | Medium | Medium | PRD FR-009/FR-010; archive F-02 outcome; hot-spot dir `src/pages/api/entries/` |
 | 5 | Detail view omits or misorders recipe data — user cannot reconstruct the paint log without external notes | High | Medium | PRD US-01 + Success Criteria; roadmap north star S-06; hot-spot dir `src/pages/entries/` (11 commits/30d) |
-| 6 | Authenticated user manipulates another user's `entry_id` via API (IDOR) — not just "not logged in" | High | Medium | PRD Access Control; abuse lens; hot-spot dir `src/pages/api/entries/` |
+| 6 | Authenticated user manipulates another user's `entry_id` via API and receives a success redirect or sees another user's data — not just "not logged in" | High | Medium | PRD Access Control; abuse lens; hot-spot dir `src/pages/api/entries/`; Phase 2 research (redirect contract) |
 | 7 | Migration applies without error but RLS policies are wrong — cross-user leak appears only with a second account | High | Medium | interview Q3; hot-spot dir `supabase/migrations/` (5 commits/30d) |
 
 ### Risk Response Guidance
@@ -56,7 +56,7 @@ research's job, see §1 principle #3).
 | #3 | Unauthenticated request to protected prefix redirects; authenticated session returns 200 | "Auth API works, so all routes are covered" | `PROTECTED_ROUTES` list; which routes are outside middleware | Integration (HTTP against dev server + cookie fixture) | Testing sign-in form only, not protected entry routes |
 | #4 | After upload, detail recall resolves a viewable image for the owner; non-owner cannot access | "Upload returned 200" | Storage bucket policies; signed URL generation; path scoping to entry | Integration (Storage + one read path) | Mocking entire Supabase Storage stack |
 | #5 | Complete entry detail shows model info, origin, paints, ordered steps with cards, step photos, final photo | "List page loads" | SSR loader composition; empty-section omission rules; status gates | Integration (loaders) + optional e2e for one golden path | Snapshot of HTML without asserting recipe completeness |
-| #6 | API rejects cross-user `entry_id` with 403/404, not 200 with data | "RLS handles it" (without verifying API error shape) | Each mutating route's ownership check; error responses | Integration (two-user HTTP) | Only testing unauthenticated case |
+| #6 | Cross-user `entry_id` request gets redirect denial (sign-in or not-found error URL), never a success redirect; no persisted mutation | "RLS handles it" (without verifying app redirect shape) | Redirect-based API contract (not HTTP 403/404); per-handler ownership checks; `Origin` on POST | Integration (two-user HTTP) | Asserting HTTP 403/404; only testing unauthenticated case |
 | #7 | After `db reset`, RLS smoke passes for two seed users on all four tables | "Migration applied" | Migration SQL; seed users; which operations each policy allows | SQL/integration against local Supabase | Running migration once as superuser only |
 
 ## 3. Phased Rollout
@@ -67,8 +67,8 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|------------|-------------------|---------------|------------|--------|---------------|
-| 1 | Runner bootstrap + RLS floor | Install Vitest; prove owner-only isolation and migration/RLS smoke with two users | #1, #7 | integration + SQL smoke | shipped | testing-runner-bootstrap-rls-floor |
-| 2 | Auth and route protection | Prove protected prefixes, session shape, and IDOR rejection on entry APIs | #3, #6 | integration (HTTP + cookies) | not started | — |
+| 1 | Runner bootstrap + RLS floor | Install Vitest; prove owner-only isolation and migration/RLS smoke with two users | #1, #7 | integration + SQL smoke | complete | testing-runner-bootstrap-rls-floor |
+| 2 | Auth and route protection | Prove protected prefixes, session shape, and IDOR rejection on entry APIs | #3, #6 | integration (HTTP + cookies) | complete | testing-auth-and-route-protection |
 | 3 | Entry workflow integration | Paint invariant, photo recall path, detail loader completeness | #2, #4, #5 | integration | not started | — |
 | 4 | Quality-gates wiring | `npm test` in CI; document cookbook patterns | cross-cutting | CI gate | not started | — |
 
@@ -136,7 +136,20 @@ TBD — see §3 Phase 3 if a golden recall path warrants e2e after integration.
 
 ### 6.4 Adding a test for a new API endpoint
 
-TBD — see §3 Phase 2 for protected-route and IDOR HTTP integration pattern.
+**Location:** extend [tests/integration/auth-route-protection.test.ts](../../tests/integration/auth-route-protection.test.ts) (or add a sibling under `tests/integration/` if the surface is unrelated to entry auth).
+
+**Helpers:** [tests/helpers/http-client.ts](../../tests/helpers/http-client.ts) (`requireDevServer`, `signInViaHttp`, `httpGet`, `httpPostForm`); fixture users in [tests/helpers/seed-fixtures.ts](../../tests/helpers/seed-fixtures.ts).
+
+**Prerequisites:** `npx supabase start && npx supabase db reset`, then `npm run dev` on port 4321, then `npm test`.
+
+**Pattern:**
+
+1. Register new protected prefixes in `PROTECTED_ROUTES` when adding pages or `/api/entries/*` routes.
+2. Unauthenticated case: assert `302`/`303` redirect to `/auth/signin` (not HTTP 401).
+3. Authenticated cross-user case: sign in as user B via `signInViaHttp`, call the route with user A's `entry_id`; assert redirect denial (`error=` query or sign-in), never success redirects (`saved=1`, `added=1`, etc.).
+4. On `POST`, always send `Origin: http://localhost:4321` (Astro CSRF) — `httpPostForm` does this.
+
+Entry APIs use redirect-based errors, not 403/404 JSON. See Risk #6 in §2.
 
 ### 6.5 Adding a test for a new RLS policy or migration
 
@@ -151,6 +164,8 @@ Keep fixture UUIDs in `tests/helpers/seed-fixtures.ts` in sync with `supabase/se
 ### 6.6 Per-rollout-phase notes
 
 **Phase 1 (Runner bootstrap + RLS floor):** Vitest harness, second seed user (`seed-b@paint-ledger.local`), and `tests/integration/rls-isolation.test.ts` — automated two-user RLS smoke on `entries`, `entry_paints`, `steps`, `step_paint_assignments` plus one negative `delete_step_and_renumber` RPC case. Risks #1 and #7.
+
+**Phase 2 (Auth and route protection):** `tests/helpers/http-client.ts` and `tests/integration/auth-route-protection.test.ts` — HTTP tests against `npm run dev`: unauthenticated protected-prefix redirect, authenticated owner access, and user B cross-user redirect denial on representative entry API/page paths. Risks #3 and #6.
 
 ## 7. What We Deliberately Don't Test
 

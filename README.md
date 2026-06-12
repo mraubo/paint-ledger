@@ -138,9 +138,15 @@ For repeatable RLS and Storage policy checks, see the archived implementation pl
 
 ### Integration tests (local)
 
-The Vitest suite proves owner-only RLS on all four paint-log tables using seed users A and B.
+The Vitest suite includes:
 
-**Prerequisites:** local Supabase running with migrations and seed applied (`npx supabase start && npx supabase db reset`). `SUPABASE_URL` and `SUPABASE_KEY` in `.env` must match the local stack.
+- **RLS isolation** — owner-only access on all four paint-log tables ([tests/integration/rls-isolation.test.ts](tests/integration/rls-isolation.test.ts))
+- **HTTP auth + IDOR** — middleware redirects and cross-user API denial ([tests/integration/auth-route-protection.test.ts](tests/integration/auth-route-protection.test.ts))
+
+**Prerequisites:**
+
+1. Local Supabase with migrations and seed (`npx supabase start && npx supabase db reset`). `SUPABASE_URL` and `SUPABASE_KEY` in `.env` must match the local stack.
+2. Astro dev server for HTTP tests: `npm run dev` (default `http://localhost:4321`) in a second terminal.
 
 ```bash
 npm test
@@ -148,7 +154,7 @@ npm test
 
 Watch mode: `npm run test:watch`.
 
-The two-user contract is in [tests/integration/rls-isolation.test.ts](tests/integration/rls-isolation.test.ts). After migration or RLS changes, extend that file and re-run `db reset` + `npm test`. Cookbook patterns: [context/foundation/test-plan.md](context/foundation/test-plan.md) §6.
+After migration or RLS changes, extend `rls-isolation.test.ts` and re-run `db reset` + `npm test`. After auth or route-handler changes, extend `auth-route-protection.test.ts` (dev server must be running). Cookbook patterns: [context/foundation/test-plan.md](context/foundation/test-plan.md) §6.
 
 CI runs lint and build only today; `npm test` in GitHub Actions is planned for test-plan rollout Phase 4.
 

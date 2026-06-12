@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
       env: {
         SUPABASE_URL: env.SUPABASE_URL,
         SUPABASE_KEY: env.SUPABASE_KEY,
+        APP_URL: env.APP_URL || "http://localhost:4321",
       },
     },
   };

@@ -26,9 +26,11 @@ Import via `@/*` alias (@tsconfig.json maps to `./src/*`).
 
 Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
 
-**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; helpers in @tests/helpers/supabase-client.ts and @tests/helpers/seed-fixtures.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
+**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts (requires `npm run dev` on port 4321 in a second terminal). Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
 
-After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm test` when local Supabase is running.
+After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm test` when local Supabase is running and (for HTTP tests) the dev server is up.
+
+When curl-testing form `POST` APIs locally, send `-H "Origin: http://localhost:4321"` (see @context/foundation/lessons.md).
 
 ### Authenticated `curl` (local)
 
