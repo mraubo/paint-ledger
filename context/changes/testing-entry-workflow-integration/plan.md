@@ -309,12 +309,12 @@ No schema changes. Developers gain a third integration file; full `npm test` sti
 
 #### Automated
 
-- [ ] 2.1 `npm test` passes with local Supabase only
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npm test` passes with local Supabase only — ec02f75
+- [x] 2.2 `npm run lint` passes — ec02f75
 
 #### Manual
 
-- [ ] 2.3 (none — N/A for this phase)
+- [x] 2.3 (none — N/A for this phase) — ec02f75
 
 ### Phase 3: Detail loader completeness (Risk #5)
 
