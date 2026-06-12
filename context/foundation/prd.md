@@ -79,6 +79,8 @@ Paint Ledger ma rozwiązać ten problem prostym, uporządkowanym paint logiem: j
   > Socrates: Counter-argument considered: entry type and status can be unclear without a larger workflow. Resolution: entry type removed from MVP; status stays because draft -> ready/published is useful and simple.
 - FR-004: User can record model origin as a custom note, such as STL source, shop, producer, link, or where to find files on disk. Priority: must-have
   > Socrates: Counter-argument considered: structured origin fields may create too much form overhead. Resolution: MVP uses one custom origin note instead of separate producer/shop/link/source fields.
+- FR-013: User can delete a paint log entry they own. Deletion removes the entry and all nested recipe data (paint list, ordered steps, paint assignments) and clears associated step and final photos from storage. Priority: must-have
+  > Socrates: Counter-argument considered: accidental delete could lose a completed recipe. Resolution: require an explicit confirmation step before delete; no soft-delete or undo in MVP.
 
 ### Paints
 
@@ -112,14 +114,14 @@ Paint Ledger ma rozwiązać ten problem prostym, uporządkowanym paint logiem: j
 
 ## Business Logic
 
-Paint Ledger treats a paint log entry as the source of truth for its own painting recipe: paints assigned to steps must belong to the entry-level paint list, missing paints added during step writing become part of that list, and entries move through a simple draft -> ready/published workflow.
+Paint Ledger treats a paint log entry as the source of truth for its own painting recipe: paints assigned to steps must belong to the entry-level paint list, missing paints added during step writing become part of that list, entries move through a simple draft -> ready/published workflow, and deleting an entry removes its nested recipe data and stored photos after explicit confirmation.
 
 Inputs visible to the user are the entry's basic information, custom origin note, paint list, ordered step descriptions, optional step photos, assigned paints, and final model photo. The output is one coherent paint log entry that can be reopened later to reconstruct what was painted, which paints were used, and in what order.
 
 ## Access Control
 
 - **MVP:** Logowanie wymagane.
-- **Izolacja danych:** Zalogowany użytkownik widzi i edytuje tylko wpisy utworzone przez siebie.
+- **Izolacja danych:** Zalogowany użytkownik widzi, edytuje i usuwa tylko wpisy utworzone przez siebie.
 - **Role:** Brak ról w MVP; model dostępu jest płaski.
 
 ## Non-Goals
