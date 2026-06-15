@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-06-11 (§6.4 Phase 2 HTTP cookbook)
+> Last updated: 2026-06-15 (S-07 entry delete refresh — Risk #8, delete cookbook)
 
 ## 1. Strategy
 
@@ -46,6 +46,7 @@ research's job, see §1 principle #3).
 | 5 | Detail view omits or misorders recipe data — user cannot reconstruct the paint log without external notes | High | Medium | PRD US-01 + Success Criteria; roadmap north star S-06; hot-spot dir `src/pages/entries/` (11 commits/30d) |
 | 6 | Authenticated user manipulates another user's `entry_id` via API and receives a success redirect or sees another user's data — not just "not logged in" | High | Medium | PRD Access Control; abuse lens; hot-spot dir `src/pages/api/entries/`; Phase 2 research (redirect contract) |
 | 7 | Migration applies without error but RLS policies are wrong — cross-user leak appears only with a second account | High | Medium | interview Q3; hot-spot dir `supabase/migrations/` (5 commits/30d) |
+| 8 | After owner deletes an entry, child paints, steps, or step_paint_assignments still exist in DB | High | Medium | PRD FR-013; roadmap S-07 archive risk note; refresh interview (cascade gaps worry); hot-spot dir `src/lib/` |
 
 ### Risk Response Guidance
 
@@ -58,6 +59,7 @@ research's job, see §1 principle #3).
 | #5 | Complete entry detail shows model info, origin, paints, ordered steps with cards, step photos, final photo | "List page loads" | SSR loader composition; empty-section omission rules; status gates | Integration (loaders) + optional e2e for one golden path | Snapshot of HTML without asserting recipe completeness |
 | #6 | Cross-user `entry_id` request gets redirect denial (sign-in or not-found error URL), never a success redirect; no persisted mutation | "RLS handles it" (without verifying app redirect shape) | Redirect-based API contract (not HTTP 403/404); per-handler ownership checks; `Origin` on POST | Integration (two-user HTTP) | Asserting HTTP 403/404; only testing unauthenticated case |
 | #7 | After `db reset`, RLS smoke passes for two seed users on all four tables | "Migration applied" | Migration SQL; seed users; which operations each policy allows | SQL/integration against local Supabase | Running migration once as superuser only |
+| #8 | After owner delete, zero rows in `entry_paints`, `steps`, and `step_paint_assignments` for the deleted entry | "CASCADE exists so no test needed" | FK CASCADE chain; `deleteEntryWithPhotos` single-row delete; junction has no direct `entry_id` | Integration (extend workflow test) | Asserting only `entries` row is null; skipping junction table |
 
 ## 3. Phased Rollout
 
@@ -102,11 +104,13 @@ phase lands; before that, the gate is `planned`.
 | Gate | Where | Required? | Catches |
 |------|-------|-----------|---------|
 | lint + typecheck | local + CI | required | syntactic / type drift |
-| unit + integration | local + CI | required after §3 Phase 4 | logic regressions, RLS, auth |
+| unit + integration | local + CI | required | logic regressions, RLS, auth, delete cascade |
 | e2e on critical flows | CI on PR | planned — optional after Phase 3 | broken critical user paths |
-| post-edit hook | local (agent loop) | not planned | — |
+| post-edit hook | local (agent loop) | wired — `.cursor/hooks.json` `afterFileEdit` | ESLint auto-fix on agent `Write`/`StrReplace` edits |
 | visual diff (deterministic) | CI on PR | not planned | — |
 | pre-prod smoke | between merge + prod | optional | environment-specific failures |
+
+**post-edit hook:** `.cursor/hooks.json` registers `afterFileEdit` on agent `Write`/`StrReplace` — runs `npx eslint --fix --quiet` on the edited file (5s timeout). Complements `npm run lint` locally and in CI; does not run typecheck or tests.
 
 ## 6. Cookbook Patterns
 
@@ -151,6 +155,14 @@ TBD — see §3 Phase 3 if a golden recall path warrants e2e after integration.
 
 Entry APIs use redirect-based errors, not 403/404 JSON. See Risk #6 in §2.
 
+**Delete endpoint (`POST /api/entries/{id}/delete`):**
+
+1. Unauthenticated: extend `auth-route-protection.test.ts` — assert `302`/`303` redirect to `/auth/signin`.
+2. Cross-user (Risk #6): sign in as user B, POST with user A's `entry_id`; assert redirect denial with `error=` query, never `deleted=` success redirect; verify user A's entry still exists.
+3. Owner cascade (Risk #8): extend `entry-workflow-integration.test.ts` — call `deleteEntryWithPhotos` directly; fixture must include `entry_paints`, `steps`, and at least one `step_paint_assignments` row; after delete assert zero rows in all child tables including junction rows queried by `step_id`.
+4. Success redirect contract: `deleted=` query param carries entry title (from pre-delete row, not client input); denial uses `error=`.
+5. On `POST`, always send `Origin: http://localhost:4321` when using HTTP helpers.
+
 ### 6.5 Adding a test for a new RLS policy or migration
 
 After changing RLS policies or seed fixtures:
@@ -169,6 +181,8 @@ Keep fixture UUIDs in `tests/helpers/seed-fixtures.ts` in sync with `supabase/se
 
 **Phase 3 (Entry workflow integration):** `tests/integration/entry-workflow-integration.test.ts` and `tests/helpers/test-image.ts` — Supabase-client integration only (`npx supabase start && npx supabase db reset`, then `npm test`; no `npm run dev`). Risks #2, #4, #5: assert `step_paint_assignments` rows (not UI checkboxes) for paint-list invariant; real `entry-photos` Storage upload + signed URL + `fetch` for recall (do not mock Storage); import `loadEntryForEdit`, `loadEntryPaints`, `loadEntrySteps`, `resolveEntryFinalPhotoUrl` for recipe completeness against `supabase/seed.sql` (no HTML snapshots). Anti-patterns: redirect-only upload proof, mirroring `filterValidPaintIds` in expected values.
 
+**S-07 (Entry delete refresh):** `entry-workflow-integration.test.ts` delete cascade block proves owner delete removes `entries`, `entry_paints`, `steps`, and `step_paint_assignments` (Risk #8). `auth-route-protection.test.ts` covers unauthenticated and cross-user delete denial via HTTP (Risk #6). Owner success at integration layer uses direct `deleteEntryWithPhotos` call, not HTTP happy-path.
+
 ## 7. What We Deliberately Don't Test
 
 Exclusions agreed during the rollout (Phase 2 interview, Q5). Future
@@ -180,8 +194,8 @@ contributors should respect these unless the underlying assumption changes.
 
 ## 8. Freshness Ledger
 
-- Strategy (§1–§5) last reviewed: 2026-06-11
-- Stack versions last verified: 2026-06-11
+- Strategy (§1–§5) last reviewed: 2026-06-15 (S-07 entry delete refresh — Risk #8)
+- Stack versions last verified: 2026-06-15
 - AI-native tool references last verified: 2026-06-10
 
 Refresh (`/10x-test-plan --refresh`) when:

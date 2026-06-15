@@ -288,23 +288,23 @@ No schema or data migration. CI uses fresh `db reset` per run — no production 
 
 #### Automated
 
-- [x] 1.1 Linting passes: `npm run lint`
-- [x] 1.2 Supabase-only delete cascade test passes: `npx supabase start && npx supabase db reset && npx vitest run tests/integration/entry-workflow-integration.test.ts -t "entry delete cascade"`
+- [x] 1.1 Linting passes: `npm run lint` — fe657e9
+- [x] 1.2 Supabase-only delete cascade test passes: `npx supabase start && npx supabase db reset && npx vitest run tests/integration/entry-workflow-integration.test.ts -t "entry delete cascade"` — fe657e9
 
 #### Manual
 
-- [x] 1.3 Ephemeral fixture uses same-entry paint/step/assignment; no seed fixture pollution
+- [x] 1.3 Ephemeral fixture uses same-entry paint/step/assignment; no seed fixture pollution — fe657e9
 
 ### Phase 2: Refresh test-plan.md
 
 #### Automated
 
-- [ ] 2.1 Linting passes: `npm run lint`
+- [x] 2.1 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.2 §2 Risk #8 and response guidance added without file anchors
-- [ ] 2.3 §6.4 delete cookbook and §6.6 S-07 note match shipped behavior
+- [x] 2.2 §2 Risk #8 and response guidance added without file anchors
+- [x] 2.3 §6.4 delete cookbook and §6.6 S-07 note match shipped behavior
 
 ### Phase 3: Wire Phase 4 CI + Contributor Docs
 
