@@ -286,12 +286,12 @@ Make Playwright CI run real e2e tests against local Supabase + dev server, and d
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run test:e2e` — both `seed.spec.ts` and `entry-workflow.spec.ts` pass
+- [x] 2.1 `npm run lint` passes — 07aea76
+- [x] 2.2 `npm run test:e2e` — both `seed.spec.ts` and `entry-workflow.spec.ts` pass — 07aea76
 
 #### Manual
 
-- [x] 2.3 Run spec headed once to confirm forms hydrate and dialogs fire
+- [x] 2.3 Run spec headed once to confirm forms hydrate and dialogs fire — 07aea76
 
 ### Phase 3: CI wiring and test-plan documentation
 
