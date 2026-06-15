@@ -54,7 +54,7 @@
 - **Location**: N/A (Progress 3.2, 3.4)
 - **Detail**: Progress marks 3.2 (Playwright GH Actions passes on PR) and 3.4 (CI logs show Supabase + dev server + both specs) as complete with SHA `07aea76`, but `e2e-green-path` has no `gh run` history and `playwright.yml` is not on `main` yet. Local `npm run test:e2e` passes; CI gate is unverified.
 - **Fix**: Push branch and open PR; confirm `playwright.yml` job green before merging. Update Progress 3.2/3.4 SHAs only after CI evidence.
-- **Decision**: FIXED — push branch + open PR to verify CI (pending workflow run)
+- **Decision**: FIXED — PR #21 green: `ci` + `test` (Playwright) + Workers Builds all SUCCESS
 
 ### F3 — webServer may start dev server with empty Supabase env
 
