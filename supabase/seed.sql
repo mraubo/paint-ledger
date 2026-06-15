@@ -1,5 +1,5 @@
 -- LOCAL DEVELOPMENT ONLY — do not run against production.
--- Seeds a dev auth user plus one paint-log fixture for Studio inspection and RLS smoke tests.
+-- Seeds dev auth users plus paint-log fixtures for Studio inspection and RLS smoke tests.
 --
 -- Sign in locally with:
 --   User A — Email: seed@paint-ledger.local    Password: seed-password-123
@@ -10,8 +10,11 @@
 --   11111111-1111-4111-8111-111111111111
 -- seed user B
 --   55555555-5555-4555-8555-555555555555
--- entry
+-- entries (user A)
 --   22222222-2222-4222-8222-222222222222
+--   22222222-2222-4222-8222-222222222301
+--   22222222-2222-4222-8222-222222222302
+--   22222222-2222-4222-8222-222222222303
 -- paints
 --   33333333-3333-4333-8333-333333333331
 --   33333333-3333-4333-8333-333333333332
@@ -166,15 +169,43 @@ insert into public.entries (
   model_origin_note,
   status
 )
-values (
-  '22222222-2222-4222-8222-222222222222',
-  '11111111-1111-4111-8111-111111111111',
-  'Imperial Fist Intercessor',
-  'Base yellow recipe with Agrax wash and edge highlights.',
-  'Space Marine Intercessor',
-  'Indomitus box set',
-  'ready'
-);
+values
+  (
+    '22222222-2222-4222-8222-222222222222',
+    '11111111-1111-4111-8111-111111111111',
+    'Imperial Fist Intercessor',
+    'Base yellow recipe with Agrax wash and edge highlights.',
+    'Space Marine Intercessor',
+    'Indomitus box set',
+    'ready'
+  ),
+  (
+    '22222222-2222-4222-8222-222222222301',
+    '11111111-1111-4111-8111-111111111111',
+    'Ultramarines Captain',
+    'Macragge Blue base with Altdorf Guard Blue highlights.',
+    'Space Marine Captain',
+    'Heroes of the Chapter',
+    'ready'
+  ),
+  (
+    '22222222-2222-4222-8222-222222222302',
+    '11111111-1111-4111-8111-111111111111',
+    'Necron Warriors',
+    'Leadbelcher drybrush with Nuln Oil recesses — still WIP on bases.',
+    'Necron Warriors',
+    'Starter Set',
+    'draft'
+  ),
+  (
+    '22222222-2222-4222-8222-222222222303',
+    '11111111-1111-4111-8111-111111111111',
+    'Ork Boyz Mob',
+    'Goblin Green skin recipe with Biel-Tan Green shading.',
+    'Ork Boyz',
+    'Combat Patrol',
+    'draft'
+  );
 
 insert into public.entry_paints (
   id,

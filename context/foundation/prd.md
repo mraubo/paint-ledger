@@ -104,6 +104,7 @@ Paint Ledger ma rozwiązać ten problem prostym, uporządkowanym paint logiem: j
   > Socrates: Counter-argument considered: no counter-argument; this is the main recall surface for the product.
 - FR-012: User can browse saved entries in a simple list. Priority: must-have
   > Socrates: Counter-argument considered: at low entry counts the list can remain minimal. Resolution: keep a simple list without advanced filtering or search.
+- FR-013: User can permanently delete entries they created, including associated paints, steps, and photos. Priority: must-have
 
 ## Non-Functional Requirements
 

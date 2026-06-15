@@ -1,5 +1,6 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
+import EntryListActionsMenu from "@/components/entries/EntryListActionsMenu";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
 import { formatEntryDate, formatStepCount, loadEntryList } from "@/lib/entries-page";
@@ -12,6 +13,18 @@ const listError = listResult.ok ? null : listResult.error;
 const createdParam = Astro.url.searchParams.get("created");
 const showCreatedBanner = Boolean(createdParam && isValidEntryId(createdParam));
 const error = Astro.url.searchParams.get("error");
+
+const MAX_DELETED_TITLE_LENGTH = 200;
+const deletedRaw = Astro.url.searchParams.get("deleted");
+let deletedTitle: string | null = null;
+if (deletedRaw) {
+  const trimmed = deletedRaw.trim();
+  if (trimmed) {
+    deletedTitle =
+      trimmed.length > MAX_DELETED_TITLE_LENGTH ? `${trimmed.slice(0, MAX_DELETED_TITLE_LENGTH)}…` : trimmed;
+  }
+}
+const showDeletedBanner = Boolean(deletedTitle);
 ---
 
 <AppLayout title="Entries">
@@ -32,6 +45,14 @@ const error = Astro.url.searchParams.get("error");
       showCreatedBanner && (
         <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
           Entry created
+        </p>
+      )
+    }
+
+    {
+      showDeletedBanner && deletedTitle && (
+        <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+          "{deletedTitle}" deleted
         </p>
       )
     }
@@ -97,6 +118,7 @@ const error = Astro.url.searchParams.get("error");
                     Ready
                   </span>
                 )}
+                <EntryListActionsMenu entryId={entry.id} client:load />
               </div>
             </li>
           ))}
