@@ -5,7 +5,7 @@
 
 ## What & Why
 
-Paint Ledger needs a Playwright e2e test that proves the critical browser path — create entry, add paint, add step, remove step — because integration tests validate DB/loaders but skip Astro forms, React islands, redirects, and native confirm dialogs. The Playwright scaffold is partially configured but runs the wrong specs in CI.
+Paint Ledger needs a Playwright e2e test that proves the critical browser path — create entry, add paint, add step, remove step, delete entire entry — because integration tests validate DB/loaders but skip Astro forms, React islands, redirects, and native confirm dialogs. The Playwright scaffold is partially configured but runs the wrong specs in CI.
 
 ## Starting Point
 
@@ -21,7 +21,7 @@ Paint Ledger needs a Playwright e2e test that proves the critical browser path �
 | -------- | ------ | --- | ------ |
 | CI scope | Separate `playwright.yml` with Supabase + dev server | PRs catch broken browser paths without merging into ci.yml | Plan |
 | Photo upload | Defer | Integration owns Risk #4; avoids multipart flakiness | Plan |
-| Test structure | New `entry-workflow.spec.ts`; keep `seed.spec.ts` | Focused green path; delete entry stays separate | Plan |
+| Test structure | New `entry-workflow.spec.ts`; keep `seed.spec.ts` | Workflow covers full path including entry delete; seed isolates create/reload persistence | Plan |
 | Assertions | Banners + URL params only | Fastest, least brittle; integration owns recipe oracle | Plan |
 | Test directory | `tests/e2e/` | Aligns with `tests/integration/` layout | Plan |
 | Auth | Per-test UI sign-in | Matches prototype; no globalSetup yet | Research |
@@ -30,7 +30,7 @@ Paint Ledger needs a Playwright e2e test that proves the critical browser path �
 
 **In scope:** Harness fix (`testDir`, `webServer`, `test:e2e`), shared `signInAsUserA` helper, `entry-workflow.spec.ts`, CI workflow update, test-plan §6.3 + AGENTS.md.
 
-**Out of scope:** Photo upload e2e, detail page assertions, entry delete in workflow spec, `data-testid` additions, DB assertions in e2e, merging into `ci.yml`.
+**Out of scope:** Photo upload e2e, detail page assertions, DB cascade assertions in e2e, `data-testid` additions, merging into `ci.yml`.
 
 ## Architecture / Approach
 
@@ -52,7 +52,7 @@ Single Playwright project (Chromium). Specs sign in via UI using seed user `USER
 
 - Astro dev in CI requires both `.env` and `.dev.vars` — plan writes both from `supabase status` output.
 - React island hydration depends on Vite paths being served correctly in dev (see `lessons.md` wrangler rule — verify if e2e fails mysteriously).
-- Two e2e specs creating ephemeral entries may leave list clutter in local DB (cosmetic; reset clears).
+- Two e2e specs create ephemeral entries but delete them in-test (workflow and seed); `db reset` still recommended between local runs.
 
 ## Success Criteria (Summary)
 

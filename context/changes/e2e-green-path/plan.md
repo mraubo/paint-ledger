@@ -35,8 +35,8 @@ Add a Playwright e2e test that proves the browser green path — sign in, create
 
 After this change:
 
-- `tests/e2e/entry-workflow.spec.ts` runs the green path: sign-in → create entry → add paint → add step → remove step.
-- `tests/e2e/seed.spec.ts` remains for create/reload/delete entry (refactored to use shared sign-in helper).
+- `tests/e2e/entry-workflow.spec.ts` runs the green path: sign-in → create entry → add paint → add step → remove step → **delete entire entry** (cleanup).
+- `tests/e2e/seed.spec.ts` remains for create/reload/**delete entry** persistence check (refactored to use shared sign-in helper).
 - `playwright.config.ts` points at `tests/e2e/`, includes `webServer` for `npm run dev`, and passes Supabase env to the dev server.
 - `npm run test:e2e` runs Playwright locally (documented prerequisites: Supabase reset + env).
 - `.github/workflows/playwright.yml` starts Supabase, writes `.env`/`.dev.vars`, installs browsers, runs real e2e tests on PR/push.
@@ -52,7 +52,7 @@ After this change:
 
 - Photo upload in browser (Risk #4 deferred — integration owns Storage recall).
 - Detail page recipe assertions (banners and URL params only per plan decision).
-- Entry delete in the workflow spec (stays in `seed.spec.ts`).
+- Entry delete cascade assertions (integration owns Risk #8 DB oracle).
 - `globalSetup` / `storageState` auth optimization (per-test UI sign-in matches existing prototype).
 - Duplicating DB/RPC paint invariant or delete-cascade oracles (integration layer).
 - Merging Playwright into `ci.yml` (separate `playwright.yml` workflow per decision).
@@ -138,7 +138,7 @@ Point Playwright at the real test directory, add npm script and `webServer`, rem
 
 ### Overview
 
-Add `entry-workflow.spec.ts` covering create entry → add paint → add step → remove step with banner and URL assertions only.
+Add `entry-workflow.spec.ts` covering create entry → add paint → add step → remove step → delete entire entry with banner and URL assertions only.
 
 ### Changes Required:
 
@@ -156,6 +156,7 @@ Add `entry-workflow.spec.ts` covering create entry → add paint → add step �
 4. Fills **Paint name** with a unique string; clicks **Add paint**; asserts `toHaveURL(/added=1/)` and **Paint added** visible.
 5. Clicks **Manage steps** link; fills **Step description**; checks paint checkbox by paint name; clicks **Add step**; asserts `toHaveURL(/added=1/)` and **Step added** visible.
 6. Registers dialog handler; scopes to step `listitem` containing the step description; clicks **Delete**; asserts `toHaveURL(/deleted=1/)` and **Step deleted** visible.
+7. Navigates to `/entries`; scopes to entry `listitem` containing the entry title; registers dialog handler; opens **Entry actions** → **Delete**; asserts `toHaveURL(/deleted=/)` and `"{entryTitle}" deleted` visible; asserts entry link is gone from the list.
 
 Use role locators per `research.md` selector table. Do not assert detail page content or DB state.
 
@@ -231,7 +232,7 @@ Make Playwright CI run real e2e tests against local Supabase + dev server, and d
 
 ### E2E tests:
 
-- `entry-workflow.spec.ts` — green path (create → paint → step → remove)
+- `entry-workflow.spec.ts` — green path (create → paint → step → remove step → delete entry)
 - `seed.spec.ts` — create persistence + entry delete (existing, refactored)
 
 ### What integration still owns:
@@ -285,21 +286,21 @@ Make Playwright CI run real e2e tests against local Supabase + dev server, and d
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npm run test:e2e` — both `seed.spec.ts` and `entry-workflow.spec.ts` pass
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npm run test:e2e` — both `seed.spec.ts` and `entry-workflow.spec.ts` pass
 
 #### Manual
 
-- [ ] 2.3 Run spec headed once to confirm forms hydrate and dialogs fire
+- [x] 2.3 Run spec headed once to confirm forms hydrate and dialogs fire
 
 ### Phase 3: CI wiring and test-plan documentation
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 Playwright GitHub Actions workflow passes on PR
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 Playwright GitHub Actions workflow passes on PR
 
 #### Manual
 
-- [ ] 3.3 Updated §6.3 is sufficient for a new contributor to add an e2e spec
-- [ ] 3.4 CI job logs show Supabase start, dev server, and both e2e specs passing
+- [x] 3.3 Updated §6.3 is sufficient for a new contributor to add an e2e spec
+- [x] 3.4 CI job logs show Supabase start, dev server, and both e2e specs passing

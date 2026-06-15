@@ -24,9 +24,9 @@ Import via `@/*` alias (@tsconfig.json maps to `./src/*`).
 
 ## Build, test, and development
 
-Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:integration`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
+Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:integration`, `test:e2e`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
 
-**Tests:** Run `npx supabase start && npx supabase db reset` before tests. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). **CI** runs `npm run test:integration` only (Supabase-local subset; no dev server) — see @.github/workflows/ci.yml. **Local full suite:** `npm test` runs all integration files including HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts, which also require `npm run dev` on port 4321 in a second terminal. Supabase-only files: @tests/integration/rls-isolation.test.ts and @tests/integration/entry-workflow-integration.test.ts. Prerequisites per area: @context/foundation/test-plan.md §6.2 (Supabase only) vs §6.4 (Supabase + dev server). Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts, @tests/helpers/test-image.ts.
+**Tests:** Run `npx supabase start && npx supabase db reset` before tests. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). **CI** runs `npm run test:integration` only (Supabase-local subset; no dev server) — see @.github/workflows/ci.yml. **E2E:** `npm run test:e2e` runs Playwright specs under `tests/e2e/`; prerequisites: Supabase reset, `.env` with local Supabase URL/key, Playwright browsers (`npx playwright install`). CI runs e2e via @.github/workflows/playwright.yml (local Supabase in Actions + `webServer` dev server). See @context/foundation/test-plan.md §6.3. **Local full suite:** `npm test` runs all integration files including HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts, which also require `npm run dev` on port 4321 in a second terminal. Supabase-only files: @tests/integration/rls-isolation.test.ts and @tests/integration/entry-workflow-integration.test.ts. Prerequisites per area: @context/foundation/test-plan.md §6.2 (Supabase only) vs §6.4 (Supabase + dev server). Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts, @tests/helpers/test-image.ts; e2e sign-in: @tests/e2e/helpers/sign-in.ts.
 
 After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm run test:integration` when local Supabase is running; use `npm test` when also exercising HTTP tests with the dev server up.
 
@@ -67,7 +67,7 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 
 **After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
 
-PRs should pass GitHub Actions lint, build, and integration tests. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
+PRs should pass GitHub Actions lint, build, integration tests, and Playwright e2e. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
 
 ## Mutation testing
 

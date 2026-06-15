@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-06-15 (S-07 entry delete refresh — Risk #8, delete cookbook)
+> Last updated: 2026-06-15 (e2e-green-path — Playwright CI + §6.3 cookbook)
 
 ## 1. Strategy
 
@@ -85,7 +85,7 @@ plus the MCP/tools actually exposed in the current session.
 |-------|------|---------|-------|
 | unit + integration | Vitest | ^3.2.6 | wired locally; `npm test`; Vite-native fit for Astro toolchain |
 | API mocking | MSW | TBD | none yet — prefer real local Supabase over mocks for RLS tests |
-| e2e | Playwright | — | none yet; defer until integration proves critical paths |
+| e2e | Playwright | ^1.61.0 | `npm run test:e2e`; `tests/e2e/`; CI via `.github/workflows/playwright.yml` |
 | accessibility | — | — | none yet |
 | lint + typecheck | ESLint + `astro check` | current | wired in CI today |
 
@@ -105,7 +105,7 @@ phase lands; before that, the gate is `planned`.
 |------|-------|-----------|---------|
 | lint + typecheck | local + CI | required | syntactic / type drift |
 | unit + integration | local + CI | required | logic regressions, RLS, auth, delete cascade |
-| e2e on critical flows | CI on PR | planned — optional after Phase 3 | broken critical user paths |
+| e2e on critical flows | CI on PR | required — `.github/workflows/playwright.yml` | broken critical user paths (forms, redirects, confirm dialogs) |
 | post-edit hook | local (agent loop) | wired — `.cursor/hooks.json` `afterFileEdit` | ESLint auto-fix on agent `Write`/`StrReplace` edits |
 | visual diff (deterministic) | CI on PR | not planned | — |
 | pre-prod smoke | between merge + prod | optional | environment-specific failures |
@@ -136,7 +136,44 @@ This rollout is **integration-first** — RLS and auth boundaries are covered be
 
 ### 6.3 Adding an e2e test
 
-TBD — see §3 Phase 3 if a golden recall path warrants e2e after integration.
+**Location:** `tests/e2e/<feature>.spec.ts`
+
+**Run:** `npm run test:e2e` (alias for `playwright test`). `playwright.config.ts` starts `npm run dev` via `webServer` when the dev server is not already running locally.
+
+**Prerequisites:**
+
+1. `npx supabase start && npx supabase db reset`
+2. `.env` (and `.dev.vars` for Cloudflare local dev) with `SUPABASE_URL` and `SUPABASE_KEY` from `supabase status`
+3. Playwright browsers: `npx playwright install` (first time only)
+
+CI mirrors this in `.github/workflows/playwright.yml` — local Supabase in Actions, no GitHub Supabase secrets required for e2e.
+
+**Helpers:** `tests/e2e/helpers/sign-in.ts` (`signInAsUserA`); seed credentials in `tests/helpers/seed-fixtures.ts` (`USER_A`).
+
+**Existing specs:**
+
+- `tests/e2e/entry-workflow.spec.ts` — browser green path: create entry → add paint → add step → remove step → delete entry
+- `tests/e2e/seed.spec.ts` — create entry, reload persistence, delete entry
+
+**What e2e proves vs integration:**
+
+- E2e covers the **browser slice** of risks #2 and #5: React island hydration, form POST, redirect query params (`created=`, `added=`, `deleted=`), flash banners, native `confirm()` dialogs, and paint-checkbox wiring on the steps form.
+- Integration still owns DB/RPC oracles (#2 paint invariant rows), Storage recall (#4), loader recipe completeness (#5), and delete cascade (#8). Do not duplicate those assertions in e2e.
+
+**Pattern:**
+
+1. Call `signInAsUserA(page)` — uses `pressSequentially` on email (React controlled inputs).
+2. Create ephemeral data with timestamped titles (`E2E Workflow ${Date.now()}`).
+3. Assert success via URL query params and flash banner text, not HTML snapshots.
+4. For native `confirm()` (step delete, entry delete): register `page.once("dialog", async (dialog) => dialog.accept())` **before** the click that opens the dialog; scope **Delete** to the correct `listitem` row.
+5. Delete entire entries created in the spec (cleanup) — see `entry-workflow.spec.ts` final step and `seed.spec.ts`.
+
+**Anti-patterns:**
+
+- Asserting `step_paint_assignments` rows or signed URL fetch in e2e (integration layer).
+- Using `getByLabel("Password")` when a **Show password** toggle is present — use `getByRole("textbox", { name: "Password" })`.
+- Using `fill()` on React controlled fields without verifying state synced — prefer `click()` + `pressSequentially()` when client validation fails mysteriously.
+- Running e2e specs in parallel against the same seed user without `workers: 1` on CI (already set in `playwright.config.ts`).
 
 ### 6.4 Adding a test for a new API endpoint
 
@@ -183,6 +220,8 @@ Keep fixture UUIDs in `tests/helpers/seed-fixtures.ts` in sync with `supabase/se
 
 **S-07 (Entry delete refresh):** `entry-workflow-integration.test.ts` delete cascade block proves owner delete removes `entries`, `entry_paints`, `steps`, and `step_paint_assignments` (Risk #8). `auth-route-protection.test.ts` covers unauthenticated and cross-user delete denial via HTTP (Risk #6). Owner success at integration layer uses direct `deleteEntryWithPhotos` call, not HTTP happy-path.
 
+**E2E green path (`e2e-green-path`):** `tests/e2e/entry-workflow.spec.ts` and `tests/e2e/seed.spec.ts` — Playwright browser tests for form flows, redirects, banners, and confirm dialogs. CI: `.github/workflows/playwright.yml`. Risks #2/#5 browser slice only; cascade (#8) stays in integration.
+
 ## 7. What We Deliberately Don't Test
 
 Exclusions agreed during the rollout (Phase 2 interview, Q5). Future
@@ -194,8 +233,8 @@ contributors should respect these unless the underlying assumption changes.
 
 ## 8. Freshness Ledger
 
-- Strategy (§1–§5) last reviewed: 2026-06-15 (S-07 entry delete refresh — Risk #8)
-- Stack versions last verified: 2026-06-15
+- Strategy (§1–§5) last reviewed: 2026-06-15 (e2e-green-path — Playwright CI)
+- Stack versions last verified: 2026-06-15 (Playwright ^1.61.0)
 - AI-native tool references last verified: 2026-06-10
 
 Refresh (`/10x-test-plan --refresh`) when:
