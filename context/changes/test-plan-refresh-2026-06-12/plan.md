@@ -310,12 +310,12 @@ No schema or data migration. CI uses fresh `db reset` per run — no production 
 
 #### Automated
 
-- [x] 3.1 Linting passes: `npm run lint`
-- [x] 3.2 Build passes: `npm run build`
-- [x] 3.3 Local integration suite passes: `npx supabase start && npx supabase db reset && npm run test:integration`
+- [x] 3.1 Linting passes: `npm run lint` — aa941f4
+- [x] 3.2 Build passes: `npm run build` — aa941f4
+- [x] 3.3 Local integration suite passes: `npx supabase start && npx supabase db reset && npm run test:integration` — aa941f4
 
 #### Manual
 
-- [x] 3.4 CI exports anon key; `test:integration` excludes HTTP suite only
-- [x] 3.5 AGENTS.md documents CI vs local full suite
-- [x] 3.6 §3 Phase 4 marked `complete` with change folder `test-plan-refresh-2026-06-12`
+- [x] 3.4 CI exports anon key; `test:integration` excludes HTTP suite only — aa941f4
+- [x] 3.5 AGENTS.md documents CI vs local full suite — aa941f4
+- [x] 3.6 §3 Phase 4 marked `complete` with change folder `test-plan-refresh-2026-06-12` — aa941f4
