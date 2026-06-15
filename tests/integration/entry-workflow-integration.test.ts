@@ -567,6 +567,8 @@ describe("mutation survivors (Stryker hardening)", () => {
 
 describe("entry delete cascade", () => {
   let ephemeralEntryId: string;
+  let ephemeralPaintId: string;
+  let ephemeralStepId: string;
 
   beforeAll(async () => {
     const { data: entry, error: entryError } = await clientA
@@ -588,26 +590,47 @@ describe("entry delete cascade", () => {
 
     ephemeralEntryId = entry.id;
 
-    const { error: paintError } = await clientA.from("entry_paints").insert({
-      entry_id: ephemeralEntryId,
-      name: "Delete test paint",
-      brand: "Test",
-      color_description: "Cascade cleanup",
-      approximate_color: "#445566",
-    });
+    const { data: paint, error: paintError } = await clientA
+      .from("entry_paints")
+      .insert({
+        entry_id: ephemeralEntryId,
+        name: "Delete test paint",
+        brand: "Test",
+        color_description: "Cascade cleanup",
+        approximate_color: "#445566",
+      })
+      .select("id")
+      .single();
 
     if (paintError) {
       throw new Error(`Failed to create ephemeral delete paint: ${paintError.message}`);
     }
 
-    const { error: stepError } = await clientA.from("steps").insert({
-      entry_id: ephemeralEntryId,
-      position: 1,
-      description: "Delete test step",
-    });
+    ephemeralPaintId = paint.id;
+
+    const { data: step, error: stepError } = await clientA
+      .from("steps")
+      .insert({
+        entry_id: ephemeralEntryId,
+        position: 1,
+        description: "Delete test step",
+      })
+      .select("id")
+      .single();
 
     if (stepError) {
       throw new Error(`Failed to create ephemeral delete step: ${stepError.message}`);
+    }
+
+    ephemeralStepId = step.id;
+
+    const { error: assignmentError } = await clientA.from("step_paint_assignments").insert({
+      step_id: ephemeralStepId,
+      entry_paint_id: ephemeralPaintId,
+    });
+
+    if (assignmentError) {
+      throw new Error(`Failed to create ephemeral step paint assignment: ${assignmentError.message}`);
     }
   });
 
@@ -641,6 +664,10 @@ describe("entry delete cascade", () => {
       .eq("entry_id", ephemeralEntryId);
     expect(stepsError).toBeNull();
     expect(steps).toHaveLength(0);
+
+    const { data: assignments, error: assignmentsError } = await assignmentsForStep(clientA, ephemeralStepId);
+    expect(assignmentsError).toBeNull();
+    expect(assignments ?? []).toHaveLength(0);
 
     ephemeralEntryId = "";
   });
