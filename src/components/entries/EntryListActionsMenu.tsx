@@ -59,21 +59,16 @@ export default function EntryListActionsMenu({ entryId }: EntryListActionsMenuPr
           >
             Edit
           </a>
-          <form
-            method="POST"
-            action={`/api/entries/${entryId}/delete`}
-            onSubmit={(event) => {
-              if (!confirm("Delete this entry?")) {
-                event.preventDefault();
-                return;
-              }
-              setOpen(false);
-            }}
-          >
+          <form method="POST" action={`/api/entries/${entryId}/delete`}>
             <button
               type="submit"
               role="menuitem"
               className="block w-full px-3 py-2 text-left text-sm text-red-200/90 transition-colors hover:bg-red-900/20"
+              onClick={(event) => {
+                if (!confirm("Delete this entry?")) {
+                  event.preventDefault();
+                }
+              }}
             >
               Delete
             </button>

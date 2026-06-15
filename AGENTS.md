@@ -41,6 +41,16 @@ source .cookies
 curl -b "${SB_COOKIE_KEY}=${SB_COOKIE_VALUE}" http://localhost:4321/...
 ```
 
+### Playwright CLI (agent auth)
+
+For browser automation with `playwright-cli` on authenticated pages, use `auth.json` at the repo root (gitignored; session storage state maintained by the developer — do not commit or recreate it). Load before navigating protected routes:
+
+```bash
+playwright-cli state-load auth.json
+```
+
+Requires `npm run dev` on port 4321. If auth fails (expired session), ask the developer to refresh `auth.json`; do not generate it yourself.
+
 ## Coding style
 
 Formatting and TypeScript strictness: @tsconfig.json + @.prettierrc.json (run `npm run format` / `npm run lint`). When manually fixing lint issues, run `npm run lint:fix` first to apply ESLint autofixes before hand-editing. React/Astro lint rules: @eslint.config.js (unused vars: `_` prefix). Do not use `set:html` for dynamic or user-supplied HTML; use Astro components. Use `set:html` only for trusted static markup already in the repo. shadcn-style UI: `src/components/ui/` (@components.json).
