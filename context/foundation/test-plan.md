@@ -72,7 +72,7 @@ orchestrator updates Status as artifacts appear on disk.
 | 1 | Runner bootstrap + RLS floor | Install Vitest; prove owner-only isolation and migration/RLS smoke with two users | #1, #7 | integration + SQL smoke | complete | testing-runner-bootstrap-rls-floor |
 | 2 | Auth and route protection | Prove protected prefixes, session shape, and IDOR rejection on entry APIs | #3, #6 | integration (HTTP + cookies) | complete | testing-auth-and-route-protection |
 | 3 | Entry workflow integration | Paint invariant, photo recall path, detail loader completeness | #2, #4, #5 | integration | complete | testing-entry-workflow-integration |
-| 4 | Quality-gates wiring | `npm test` in CI; document cookbook patterns | cross-cutting | CI gate | not started | — |
+| 4 | Quality-gates wiring | `npm test` in CI; document cookbook patterns | cross-cutting | complete | test-plan-refresh-2026-06-12 |
 
 ## 4. Stack
 

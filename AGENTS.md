@@ -8,7 +8,7 @@ Paint Ledger logs hobby paint workflows (models, recipes, steps, photos). Astro 
 - Copy env from @.env.example to `.env` for Supabase and `.dev.vars` for Cloudflare local dev (see @README.md).
 - Register new authenticated pages by adding their path prefix to `PROTECTED_ROUTES` in @src/middleware.ts.
 - Do not delete or relocate the `context/` tree; it holds foundation docs and change logs for this project.
-- Run `npm run lint` before pushing; CI also runs `npx astro sync` then `npm run build` with Supabase secrets set (@.github/workflows/ci.yml).
+- Run `npm run lint` before pushing; CI also runs `npx astro sync`, `npm run build`, and `npm run test:integration` with local Supabase (@.github/workflows/ci.yml).
 - Do not commit directly to `main`. All work goes on a dedicated feature branch; open a PR into `main` when ready. Before committing, confirm the current branch is not `main` (`git branch --show-current`). If you are on `main`, create and switch to a feature branch first.
 
 ## Project structure
@@ -24,11 +24,11 @@ Import via `@/*` alias (@tsconfig.json maps to `./src/*`).
 
 ## Build, test, and development
 
-Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
+Scripts: @package.json (`dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `test`, `test:integration`, `test:watch`). Local setup and env: @README.md. Use Node per @.nvmrc. Husky pre-commit: lint-staged on `*.{ts,tsx,astro}`, Prettier on `*.{json,css,md}` (@package.json).
 
-**Tests:** Run `npx supabase start && npx supabase db reset` before `npm test`. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). The RLS floor lives in @tests/integration/rls-isolation.test.ts; entry workflow integration in @tests/integration/entry-workflow-integration.test.ts requires local Supabase only; HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts also need `npm run dev` on port 4321 in a second terminal. Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts, @tests/helpers/test-image.ts. CI test wiring is rollout Phase 4 (@context/foundation/test-plan.md §3).
+**Tests:** Run `npx supabase start && npx supabase db reset` before tests. Integration tests load `SUPABASE_URL` and `SUPABASE_KEY` from `.env` via `vitest.config.ts` (not `astro:env`). **CI** runs `npm run test:integration` only (Supabase-local subset; no dev server) — see @.github/workflows/ci.yml. **Local full suite:** `npm test` runs all integration files including HTTP auth/IDOR tests in @tests/integration/auth-route-protection.test.ts, which also require `npm run dev` on port 4321 in a second terminal. Supabase-only files: @tests/integration/rls-isolation.test.ts and @tests/integration/entry-workflow-integration.test.ts. Prerequisites per area: @context/foundation/test-plan.md §6.2 (Supabase only) vs §6.4 (Supabase + dev server). Helpers: @tests/helpers/supabase-client.ts, @tests/helpers/http-client.ts, @tests/helpers/seed-fixtures.ts, @tests/helpers/test-image.ts.
 
-After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm test` when local Supabase is running and (for HTTP tests) the dev server is up.
+After auth or routing changes, for each prefix in `PROTECTED_ROUTES` (@src/middleware.ts): unauthenticated request must redirect; authenticated session must return 200 on the protected page. Otherwise validate with `npm run lint`, `npm run build`, and `npm run test:integration` when local Supabase is running; use `npm test` when also exercising HTTP tests with the dev server up.
 
 When curl-testing form `POST` APIs locally, send `-H "Origin: http://localhost:4321"` (see @context/foundation/lessons.md).
 
@@ -57,7 +57,7 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 
 **After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
 
-PRs should pass GitHub Actions lint and build. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
+PRs should pass GitHub Actions lint, build, and integration tests. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
 
 ## Mutation testing
 

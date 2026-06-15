@@ -299,23 +299,23 @@ No schema or data migration. CI uses fresh `db reset` per run — no production 
 
 #### Automated
 
-- [x] 2.1 Linting passes: `npm run lint`
+- [x] 2.1 Linting passes: `npm run lint` — 763b4a7
 
 #### Manual
 
-- [x] 2.2 §2 Risk #8 and response guidance added without file anchors
-- [x] 2.3 §6.4 delete cookbook and §6.6 S-07 note match shipped behavior
+- [x] 2.2 §2 Risk #8 and response guidance added without file anchors — 763b4a7
+- [x] 2.3 §6.4 delete cookbook and §6.6 S-07 note match shipped behavior — 763b4a7
 
 ### Phase 3: Wire Phase 4 CI + Contributor Docs
 
 #### Automated
 
-- [ ] 3.1 Linting passes: `npm run lint`
-- [ ] 3.2 Build passes: `npm run build`
-- [ ] 3.3 Local integration suite passes: `npx supabase start && npx supabase db reset && npm run test:integration`
+- [x] 3.1 Linting passes: `npm run lint`
+- [x] 3.2 Build passes: `npm run build`
+- [x] 3.3 Local integration suite passes: `npx supabase start && npx supabase db reset && npm run test:integration`
 
 #### Manual
 
-- [ ] 3.4 CI exports anon key; `test:integration` excludes HTTP suite only
-- [ ] 3.5 AGENTS.md documents CI vs local full suite
-- [ ] 3.6 §3 Phase 4 marked `complete` with change folder `test-plan-refresh-2026-06-12`
+- [x] 3.4 CI exports anon key; `test:integration` excludes HTTP suite only
+- [x] 3.5 AGENTS.md documents CI vs local full suite
+- [x] 3.6 §3 Phase 4 marked `complete` with change folder `test-plan-refresh-2026-06-12`

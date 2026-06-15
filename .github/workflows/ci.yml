@@ -22,3 +22,12 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      - uses: supabase/setup-cli@v2
+      - name: Start local Supabase and run integration tests
+        run: |
+          supabase start
+          supabase db reset --yes
+          eval "$(supabase status -o env)"
+          echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "SUPABASE_KEY=${ANON_KEY}" >> "$GITHUB_ENV"
+          npm run test:integration
