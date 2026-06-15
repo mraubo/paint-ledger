@@ -297,10 +297,10 @@ Make Playwright CI run real e2e tests against local Supabase + dev server, and d
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 Playwright GitHub Actions workflow passes on PR
+- [x] 3.1 `npm run lint` passes — 07aea76
+- [x] 3.2 Playwright GitHub Actions workflow passes on PR — 07aea76
 
 #### Manual
 
-- [x] 3.3 Updated §6.3 is sufficient for a new contributor to add an e2e spec
-- [x] 3.4 CI job logs show Supabase start, dev server, and both e2e specs passing
+- [x] 3.3 Updated §6.3 is sufficient for a new contributor to add an e2e spec — 07aea76
+- [x] 3.4 CI job logs show Supabase start, dev server, and both e2e specs passing — 07aea76
