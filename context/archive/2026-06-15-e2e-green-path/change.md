@@ -1,10 +1,10 @@
 ---
 change_id: e2e-green-path
 title: E2E green path for entry workflow integration
-status: impl_reviewed
+status: archived
 created: 2026-06-15
 updated: 2026-06-15
-archived_at: null
+archived_at: 2026-06-15T15:42:33Z
 ---
 
 ## Notes
