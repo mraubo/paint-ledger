@@ -1,7 +1,7 @@
 ---
 change_id: test-plan-refresh-2026-06-12
 title: Test plan refresh for S-07 entry delete
-status: implemented
+status: impl_reviewed
 created: 2026-06-15
 updated: 2026-06-15
 plan: context/changes/test-plan-refresh-2026-06-12/plan.md

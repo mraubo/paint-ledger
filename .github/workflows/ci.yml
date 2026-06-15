@@ -28,6 +28,6 @@ jobs:
           supabase start
           supabase db reset --yes
           eval "$(supabase status -o env)"
-          echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
-          echo "SUPABASE_KEY=${ANON_KEY}" >> "$GITHUB_ENV"
+          export SUPABASE_URL="$API_URL"
+          export SUPABASE_KEY="$ANON_KEY"
           npm run test:integration

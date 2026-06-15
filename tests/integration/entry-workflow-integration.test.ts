@@ -671,4 +671,14 @@ describe("entry delete cascade", () => {
 
     ephemeralEntryId = "";
   });
+
+  afterAll(async () => {
+    if (ephemeralEntryId) {
+      const { error: deleteEntryError } = await clientA.from("entries").delete().eq("id", ephemeralEntryId);
+
+      if (deleteEntryError) {
+        throw new Error(`Failed to delete ephemeral delete entry: ${deleteEntryError.message}`);
+      }
+    }
+  });
 });
