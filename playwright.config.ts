@@ -1,12 +1,9 @@
+import { loadEnv } from "vite";
 import { defineConfig, devices } from "@playwright/test";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const env = loadEnv("development", process.cwd(), "");
+const supabaseUrl = env.SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = env.SUPABASE_KEY || process.env.SUPABASE_KEY;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -77,8 +74,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      SUPABASE_URL: process.env.SUPABASE_URL ?? "",
-      SUPABASE_KEY: process.env.SUPABASE_KEY ?? "",
+      ...(supabaseUrl ? { SUPABASE_URL: supabaseUrl } : {}),
+      ...(supabaseKey ? { SUPABASE_KEY: supabaseKey } : {}),
     },
   },
 });

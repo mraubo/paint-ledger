@@ -68,7 +68,9 @@ Three phases: (1) fix harness and shared helpers, (2) implement the green-path s
 
 **Entry ID after create:** Parse `created` query param from `/entries?created={uuid}` after create submit. Navigate directly to `/entries/{id}/paints` (acceptable — this spec targets form flows, not list→detail navigation).
 
-**Ambiguous buttons:** On the steps page, an inline **Add paint** form coexists with the add-step form. This spec adds paint on the paints page first, then navigates via **Manage steps** footer link (`src/pages/entries/[id]/paints.astro:192-193`) to avoid clicking the wrong **Add paint** button.
+**Ambiguous buttons:** On the steps page, an inline **Add paint** form coexists with the add-step form. This spec adds paint on the paints page first, then navigates to the steps page to avoid clicking the wrong **Add paint** button.
+
+**Steps navigation:** The plan originally specified clicking the **Manage steps** footer link from the paints page. The implementation uses `page.goto(\`/entries/{id}/steps\`)` instead — the Astro dev toolbar intercepts footer link clicks in local dev (Playwright click timeout). Direct navigation preserves the form-flow risk coverage without toolbar flake.
 
 ## Phase 1: Playwright harness and shared helpers
 
@@ -274,13 +276,13 @@ Make Playwright CI run real e2e tests against local Supabase + dev server, and d
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes — a67c7c9
-- [x] 1.2 `npm run test:e2e` discovers specs under `tests/e2e/` — a67c7c9
+- [x] 1.1 `npm run lint` passes — b3a568f
+- [x] 1.2 `npm run test:e2e` discovers specs under `tests/e2e/` — b3a568f
 
 #### Manual
 
-- [x] 1.3 `npx playwright test --list` shows `seed.spec.ts` — a67c7c9
-- [x] 1.4 `webServer` starts dev server when not already running locally — a67c7c9
+- [x] 1.3 `npx playwright test --list` shows `seed.spec.ts` — b3a568f
+- [x] 1.4 `webServer` starts dev server when not already running locally — b3a568f
 
 ### Phase 2: Entry workflow green-path spec
 

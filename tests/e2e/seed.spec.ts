@@ -28,6 +28,7 @@ test("created entry persists after reload and can be deleted", async ({ page }) 
   await row.getByRole("button", { name: "Entry actions" }).click();
   await expect(row.getByRole("menuitem", { name: "Delete" })).toBeVisible();
   await row.getByRole("menuitem", { name: "Delete" }).click();
+  await expect(page).toHaveURL(/deleted=/);
   await expect(page.getByText(`"${entryTitle}" deleted`)).toBeVisible();
   await expect(page.getByRole("link", { name: entryTitle })).not.toBeVisible();
 });
