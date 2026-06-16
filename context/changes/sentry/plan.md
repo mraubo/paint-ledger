@@ -350,12 +350,12 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npm run build` succeeds with prod guard on verify route
+- [x] 3.1 `npm run lint` passes — a484035
+- [x] 3.2 `npm run build` succeeds with prod guard on verify route — a484035
 
 #### Manual
 
-- [x] 3.3 Local `SENTRY_DEBUG=1` test button sends event to Sentry
+- [x] 3.3 Local `SENTRY_DEBUG=1` test button sends event to Sentry — a484035
 - [ ] 3.4 Local without `SENTRY_DEBUG` sends no events from normal browsing
 - [ ] 3.5 Production `/dev/sentry-test` is not exposed
 

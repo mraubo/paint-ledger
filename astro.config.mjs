@@ -24,6 +24,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      dedupe: ["react", "react-dom", "@sentry/astro", "@sentry/browser", "@sentry/core", "@sentry/cloudflare"],
+    },
   },
   adapter: cloudflare(),
   env: {

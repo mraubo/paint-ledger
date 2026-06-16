@@ -14,6 +14,7 @@ function sentryOptions(env: SentryEnv) {
   return {
     dsn,
     enabled: Boolean(dsn) && (isProd || debugEnabled),
+    environment: isProd ? "production" : "development",
     dataCollection: { userInfo: false, httpBodies: [] },
     integrations: [Sentry.captureConsoleIntegration({ levels: ["warn", "error"] })],
     enableLogs: true,

@@ -1,12 +1,14 @@
 import * as Sentry from "@sentry/astro";
+import { SENTRY_DSN, SENTRY_DEBUG } from "astro:env/client";
 
-const dsn = typeof import.meta.env.SENTRY_DSN === "string" ? import.meta.env.SENTRY_DSN : undefined;
 const isDev = import.meta.env.DEV;
-const debugEnabled = import.meta.env.SENTRY_DEBUG === "1";
+const debugEnabled = SENTRY_DEBUG === "1";
 
 Sentry.init({
-  dsn,
-  enabled: Boolean(dsn) && (!isDev || debugEnabled),
+  dsn: SENTRY_DSN,
+  tunnel: "/api/sentry-tunnel",
+  enabled: Boolean(SENTRY_DSN) && (!isDev || debugEnabled),
+  environment: isDev ? "development" : "production",
   dataCollection: { userInfo: false, httpBodies: [] },
   integrations: [Sentry.browserTracingIntegration()],
   enableLogs: true,
