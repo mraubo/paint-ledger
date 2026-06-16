@@ -363,9 +363,9 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 
 #### Automated
 
-- [x] 4.1 `npm run lint` passes
+- [x] 4.1 `npm run lint` passes — a88ad6d
 
 #### Manual
 
-- [x] 4.2 README alone is sufficient for Sentry setup
-- [x] 4.3 AGENTS.md rule matches implemented gating
+- [x] 4.2 README alone is sufficient for Sentry setup — a88ad6d
+- [x] 4.3 AGENTS.md rule matches implemented gating — a88ad6d
