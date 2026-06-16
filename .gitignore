@@ -35,3 +35,14 @@ pnpm-debug.log*
 # stryker temp files
 .stryker-tmp
 reports/mutation
+
+# playwrite CLI
+.playwright-cli
+auth.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
