@@ -1,7 +1,7 @@
 {
   "name": "paint-ledger",
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": "@astrojs/cloudflare/entrypoints/server",
+  "main": "./sentry.server.config.ts",
   "compatibility_date": "2026-05-08",
   "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
   "assets": {
@@ -14,6 +14,8 @@
       "!/@*",
       "!/node_modules/*",
       "!/src/*",
+      "!/sentry.client.config.js",
+      "!/sentry.client.config.ts",
       "!/*.svg",
       "!/*.png",
       "!/*.ico",
