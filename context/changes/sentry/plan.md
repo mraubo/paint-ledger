@@ -337,25 +337,25 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 
 #### Automated
 
-- [x] 2.1 `npm run build` succeeds in CI once `SENTRY_AUTH_TOKEN` GitHub secret is configured
-- [x] 2.2 `npm run lint` still passes
+- [x] 2.1 `npm run build` succeeds in CI once `SENTRY_AUTH_TOKEN` GitHub secret is configured — f511e1b
+- [x] 2.2 `npm run lint` still passes — f511e1b
 
 #### Manual
 
-- [x] 2.3 Local `.env` and `.dev.vars` populated with Sentry vars
-- [x] 2.4 Cloudflare Builds and Worker secrets configured for Sentry
+- [x] 2.3 Local `.env` and `.dev.vars` populated with Sentry vars — f511e1b
+- [x] 2.4 Cloudflare Builds and Worker secrets configured for Sentry — f511e1b
 - [ ] 2.5 Source maps appear in Sentry Releases after production build/deploy
 
 ### Phase 3: Dev Verify Route
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npm run build` succeeds with prod guard on verify route
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npm run build` succeeds with prod guard on verify route
 
 #### Manual
 
-- [ ] 3.3 Local `SENTRY_DEBUG=1` test button sends event to Sentry
+- [x] 3.3 Local `SENTRY_DEBUG=1` test button sends event to Sentry
 - [ ] 3.4 Local without `SENTRY_DEBUG` sends no events from normal browsing
 - [ ] 3.5 Production `/dev/sentry-test` is not exposed
 
