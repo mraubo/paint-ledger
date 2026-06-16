@@ -323,27 +323,27 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 
 #### Automated
 
-- [x] 1.1 `npx astro sync` completes without errors
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npm run build` passes with Supabase and `SENTRY_AUTH_TOKEN` env set
+- [x] 1.1 `npx astro sync` completes without errors — 5834575
+- [x] 1.2 `npm run lint` passes — 5834575
+- [x] 1.3 `npm run build` passes with Supabase and `SENTRY_AUTH_TOKEN` env set — 5834575
 
 #### Manual
 
-- [x] 1.4 `npm run dev` starts without Worker entry errors
-- [x] 1.5 `npm run preview` serves pages after build
-- [x] 1.6 No regression on `/entries` auth redirect or sign-in flow
+- [x] 1.4 `npm run dev` starts without Worker entry errors — 5834575
+- [x] 1.5 `npm run preview` serves pages after build — 5834575
+- [x] 1.6 No regression on `/entries` auth redirect or sign-in flow — 5834575
 
 ### Phase 2: Env & CI Secrets
 
 #### Automated
 
-- [ ] 2.1 `npm run build` succeeds in CI once `SENTRY_AUTH_TOKEN` GitHub secret is configured
-- [ ] 2.2 `npm run lint` still passes
+- [x] 2.1 `npm run build` succeeds in CI once `SENTRY_AUTH_TOKEN` GitHub secret is configured
+- [x] 2.2 `npm run lint` still passes
 
 #### Manual
 
-- [ ] 2.3 Local `.env` and `.dev.vars` populated with Sentry vars
-- [ ] 2.4 Cloudflare Builds and Worker secrets configured for Sentry
+- [x] 2.3 Local `.env` and `.dev.vars` populated with Sentry vars
+- [x] 2.4 Cloudflare Builds and Worker secrets configured for Sentry
 - [ ] 2.5 Source maps appear in Sentry Releases after production build/deploy
 
 ### Phase 3: Dev Verify Route
