@@ -222,15 +222,38 @@ Supabase credentials must stay in sync across three independent places. Use the 
 
 After rotating keys in Supabase → Settings → API, update all three surfaces and redeploy. See [context/foundation/infrastructure.md](context/foundation/infrastructure.md) (Operational Story) for the full rotation checklist.
 
+### Sentry observability
+
+Paint Ledger uses [@sentry/astro](https://docs.sentry.io/platforms/javascript/guides/astro/) with a Cloudflare Worker entry (`sentry.server.config.ts`) for server-side capture. Production sends errors, 10% performance traces, and structured logs when `SENTRY_DSN` is set. Local dev sends events **only** when `SENTRY_DEBUG=1`.
+
+| Variable            | When needed | Surfaces                                                                 |
+| ------------------- | ----------- | ------------------------------------------------------------------------ |
+| `SENTRY_AUTH_TOKEN` | Build-time  | Local `.env`; GitHub secret; Cloudflare Builds build variable            |
+| `SENTRY_DSN`        | Runtime + client bundle | Local `.env` and `.dev.vars`; Worker encrypted secret; Cloudflare Builds build variable (client SDK at build) |
+| `SENTRY_DEBUG`      | Local only  | `.env` and `.dev.vars` — set to `1` to send events from `npm run dev`    |
+
+**Local setup:** copy placeholders from `.env.example` into both `.env` and `.dev.vars`. Keep `SENTRY_DSN` and `SENTRY_DEBUG` in sync across both files — SSR guards and the Worker read `.dev.vars`, while the client SDK reads `.env` via `astro:env`.
+
+**Production setup:**
+
+1. GitHub repository secret `SENTRY_AUTH_TOKEN` (CI source-map upload — see [.github/workflows/ci.yml](.github/workflows/ci.yml)).
+2. Cloudflare Builds build variables: `SENTRY_AUTH_TOKEN` and `SENTRY_DSN`.
+3. Worker encrypted secret: `npx wrangler secret put SENTRY_DSN`.
+
+**Verify locally:** with `SENTRY_DEBUG=1` and `SENTRY_DSN` set, open `http://localhost:4321/debug/sentry-test` and click the test button. Events should appear in the Sentry project `paint-ledger` (org `mraubo`) within a few minutes.
+
+**Playwright CI** ([.github/workflows/playwright.yml](.github/workflows/playwright.yml)) intentionally omits Sentry env vars so e2e runs do not flood the production Sentry project.
+
 ### Manual deploy
 
 1. Authenticate: `npx wrangler login` (once per machine).
-2. Build: `npm run build` (requires Supabase env vars locally).
+2. Build: `npm run build` (requires Supabase env vars locally; set `SENTRY_AUTH_TOKEN` for source-map upload).
 3. Set runtime secrets (first deploy or after rotation):
 
 ```bash
 npx wrangler secret put SUPABASE_URL
 npx wrangler secret put SUPABASE_KEY
+npx wrangler secret put SENTRY_DSN
 ```
 
 4. Deploy:
@@ -250,11 +273,11 @@ npx wrangler deploy
 
 ### Cloudflare Workers Builds (auto-deploy)
 
-Connect the [Cloudflare Workers & Pages GitHub app](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/), link this repo to the `paint-ledger` Worker, and set production branch to `main`. Build: `npm ci && npx astro sync && npm run build`; deploy: `npx wrangler deploy`. Set `SUPABASE_URL` and `SUPABASE_KEY` in both Builds build variables and Worker encrypted secrets. CI does not deploy — Builds owns production deploy.
+Connect the [Cloudflare Workers & Pages GitHub app](https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/), link this repo to the `paint-ledger` Worker, and set production branch to `main`. Build: `npm ci && npx astro sync && npm run build`; deploy: `npx wrangler deploy`. Set `SUPABASE_URL` and `SUPABASE_KEY` in both Builds build variables and Worker encrypted secrets. Also set `SENTRY_AUTH_TOKEN` and `SENTRY_DSN` in Builds build variables and `SENTRY_DSN` as a Worker encrypted secret. CI does not deploy — Builds owns production deploy.
 
 ## CI
 
-GitHub Actions runs lint + build on every push and PR to `main`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs lint + build on every push and PR to `main`. Configure `SUPABASE_URL`, `SUPABASE_KEY`, and `SENTRY_AUTH_TOKEN` as repository secrets in GitHub for the build step. Playwright e2e CI omits Sentry vars on purpose.
 
 ## License
 

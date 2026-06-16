@@ -344,7 +344,7 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 
 - [x] 2.3 Local `.env` and `.dev.vars` populated with Sentry vars — f511e1b
 - [x] 2.4 Cloudflare Builds and Worker secrets configured for Sentry — f511e1b
-- [ ] 2.5 Source maps appear in Sentry Releases after production build/deploy
+- [x] 2.5 Source maps appear in Sentry Releases after production build/deploy
 
 ### Phase 3: Dev Verify Route
 
@@ -356,16 +356,16 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 #### Manual
 
 - [x] 3.3 Local `SENTRY_DEBUG=1` test button sends event to Sentry — a484035
-- [ ] 3.4 Local without `SENTRY_DEBUG` sends no events from normal browsing
-- [ ] 3.5 Production `/dev/sentry-test` is not exposed
+- [x] 3.4 Local without `SENTRY_DEBUG` sends no events from normal browsing
+- [x] 3.5 Production `/dev/sentry-test` is not exposed
 
 ### Phase 4: Documentation
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` passes
+- [x] 4.1 `npm run lint` passes
 
 #### Manual
 
-- [ ] 4.2 README alone is sufficient for Sentry setup
-- [ ] 4.3 AGENTS.md rule matches implemented gating
+- [x] 4.2 README alone is sufficient for Sentry setup
+- [x] 4.3 AGENTS.md rule matches implemented gating
