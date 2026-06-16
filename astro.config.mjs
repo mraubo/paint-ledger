@@ -14,6 +14,7 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap(),
+    // When `site` is configured, exclude dev-only routes: sitemap({ filter: (page) => !page.includes("/dev/") })
     sentry({
       org: "mraubo",
       project: "paint-ledger",

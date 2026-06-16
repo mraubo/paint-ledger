@@ -15,13 +15,17 @@ export default function SentryTestButton() {
     let clientEventId: string | undefined;
 
     if (client) {
+      Sentry.logger.info(Sentry.logger.fmt`User ${"sentry-test"} triggered test error button`, {
+        action: "test_error_button_click",
+      });
+      Sentry.metrics.count("test_counter", 1);
       clientEventId = Sentry.captureException(new Error("This is a test error (client)"));
       await Sentry.flush(2000);
     }
 
     let serverEventId: string | undefined;
     try {
-      const response = await fetch("/api/debug/sentry-test", { method: "POST" });
+      const response = await fetch("/api/dev/sentry-test", { method: "POST" });
       if (response.ok) {
         const body = (await response.json()) as { eventId?: string };
         serverEventId = body.eventId;

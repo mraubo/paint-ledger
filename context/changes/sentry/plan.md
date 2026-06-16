@@ -315,6 +315,10 @@ Update contributor and ops docs so Sentry secrets are discoverable and maintaine
 - Existing adapter: `astro.config.mjs:16`, `wrangler.jsonc:4`
 - Secret surfaces pattern: `README.md:213-221`
 
+## Implementation addenda
+
+- **Sentry tunnel** (`src/pages/api/sentry-tunnel.ts`): client SDK sets `tunnel: "/api/sentry-tunnel"` to proxy browser envelopes through the Worker (CORS/ad-blocker bypass). Public POST; validates DSN host + project ID before forwarding. Not in original scope; retained as standard Sentry pattern.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles.

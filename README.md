@@ -234,15 +234,19 @@ Paint Ledger uses [@sentry/astro](https://docs.sentry.io/platforms/javascript/gu
 
 **Local setup:** copy placeholders from `.env.example` into both `.env` and `.dev.vars`. Keep `SENTRY_DSN` and `SENTRY_DEBUG` in sync across both files — SSR guards and the Worker read `.dev.vars`, while the client SDK reads `.env` via `astro:env`.
 
+**Troubleshooting local Sentry:** if `/dev/sentry-test` returns 404 but the client still sends events, `SENTRY_DEBUG=1` is likely set only in `.env` — add it to `.dev.vars` and restart `npm run dev`. If the page loads but the button says the client is not initialized, the reverse applies (set `SENTRY_DEBUG=1` in `.env` too).
+
 **Production setup:**
 
-1. GitHub repository secret `SENTRY_AUTH_TOKEN` (CI source-map upload — see [.github/workflows/ci.yml](.github/workflows/ci.yml)).
+1. GitHub repository secret `SENTRY_AUTH_TOKEN` (CI source-map upload — see [.github/workflows/ci.yml](.github/workflows/ci.yml)). The token must be scoped to Sentry org `mraubo`; a token for a different org logs a warning and skips source-map upload locally while the build still succeeds.
 2. Cloudflare Builds build variables: `SENTRY_AUTH_TOKEN` and `SENTRY_DSN`.
 3. Worker encrypted secret: `npx wrangler secret put SENTRY_DSN`.
 
-**Verify locally:** with `SENTRY_DEBUG=1` and `SENTRY_DSN` set, open `http://localhost:4321/debug/sentry-test` and click the test button. Events should appear in the Sentry project `paint-ledger` (org `mraubo`) within a few minutes.
+**Verify locally:** with `SENTRY_DEBUG=1` and `SENTRY_DSN` set, open `http://localhost:4321/dev/sentry-test` and click the test button. Events should appear in the Sentry project `paint-ledger` (org `mraubo`) within a few minutes.
 
 **Playwright CI** ([.github/workflows/playwright.yml](.github/workflows/playwright.yml)) intentionally omits Sentry env vars so e2e runs do not flood the production Sentry project.
+
+**Sentry tunnel:** the client SDK uses `tunnel: "/api/sentry-tunnel"` to proxy browser events through the Worker (bypasses CORS and ad-blockers). The tunnel validates DSN host and project ID before forwarding to Sentry ingest; it is a public POST endpoint by design.
 
 ### Manual deploy
 

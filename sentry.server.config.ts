@@ -6,6 +6,12 @@ interface SentryEnv {
   SENTRY_DEBUG?: string;
 }
 
+const UUID_PATH_SEGMENT = /\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+
+function sanitizeTransactionName(name: string): string {
+  return name.replace(UUID_PATH_SEGMENT, "/:id");
+}
+
 function sentryOptions(env: SentryEnv) {
   const dsn = env.SENTRY_DSN;
   const isProd = import.meta.env.PROD;
@@ -19,6 +25,12 @@ function sentryOptions(env: SentryEnv) {
     integrations: [Sentry.captureConsoleIntegration({ levels: ["warn", "error"] })],
     enableLogs: true,
     tracesSampleRate: isProd ? 0.1 : 1.0,
+    beforeSendTransaction(event: { transaction?: string }) {
+      if (event.transaction) {
+        event.transaction = sanitizeTransactionName(event.transaction);
+      }
+      return event;
+    },
   };
 }
 
