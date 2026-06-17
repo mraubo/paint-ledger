@@ -6,7 +6,18 @@ const PROTECTED_ROUTES = ["/entries", "/api/entries"];
 
 const AUTH_ONLY_GUEST_ROUTES = ["/auth/signin", "/auth/signup"];
 
+const DEV_ONLY_ROUTES = ["/dev/sentry-test", "/api/dev"];
+
+// Sentry tunnel is always public — used by browser SDK in all environments.
+const PUBLIC_API_ROUTES = ["/api/sentry-tunnel"];
+
 export const onRequest = defineMiddleware(async (context, next) => {
+  const { pathname } = context.url;
+
+  if (PUBLIC_API_ROUTES.some((route) => pathname === route)) {
+    return next();
+  }
+
   const supabase = createClient(context.request.headers, context.cookies);
 
   if (supabase) {
@@ -18,7 +29,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = null;
   }
 
-  const { pathname } = context.url;
+  if (
+    DEV_ONLY_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`)) &&
+    (import.meta.env.PROD || process.env.SENTRY_DEBUG !== "1")
+  ) {
+    return new Response("Not Found", { status: 404 });
+  }
 
   if (context.locals.user && AUTH_ONLY_GUEST_ROUTES.some((route) => pathname.startsWith(route))) {
     return context.redirect("/entries");

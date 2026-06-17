@@ -80,10 +80,10 @@ The team shipped Paint Ledger on Workers with Supabase and felt fast for three w
 ## Operational Story
 
 - **Preview deploys**: Not configured in repo today. Typical pattern: `wrangler deploy` per branch or GitHub Action with `wrangler versions upload` / environment aliases; protect preview URLs with Cloudflare Access if exposing fork PR builds. Confirm fork PR secret access in GitHub before enabling auto-preview.
-- **Secrets**: Production/runtime: Cloudflare Worker secrets via `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY` (or dashboard → Workers → Settings → Variables). Build-time: GitHub repository secrets `SUPABASE_URL` and `SUPABASE_KEY` for `npm run build` in CI. Server-only via `astro:env` (`access: "secret"` in `astro.config.mjs`)—never expose in client bundles. Rotation: update Supabase keys, then `wrangler secret put`, then GitHub secrets; redeploy Worker.
+- **Secrets**: Production/runtime: Cloudflare Worker secrets via `npx wrangler secret put SUPABASE_URL`, `SUPABASE_KEY`, and `SENTRY_DSN` (or dashboard → Workers → Settings → Variables). Build-time: GitHub repository secrets `SUPABASE_URL`, `SUPABASE_KEY`, and `SENTRY_AUTH_TOKEN` for `npm run build` in CI; Cloudflare Builds build variables for `SENTRY_AUTH_TOKEN` and `SENTRY_DSN` (client bundle + source maps). `SUPABASE_*` are server-only via `astro:env` (`access: "secret"` in `astro.config.mjs`) — never expose in client bundles. `SENTRY_DSN` is semi-public in the client bundle but loaded from env; `SENTRY_AUTH_TOKEN` is build-only. Local dev: keep `.env` and `.dev.vars` in sync for `SENTRY_DSN` and `SENTRY_DEBUG`; set `SENTRY_DEBUG=1` to send events locally. Playwright CI intentionally omits Sentry vars. Rotation: update Supabase keys, then `wrangler secret put`, then GitHub/Builds secrets; redeploy Worker.
 - **Rollback**: `npx wrangler rollback` (optional `[VERSION_ID]`; list versions in dashboard or `wrangler deployments list`). GA feature; reverts Worker + assets, not Supabase schema or Storage objects. Typical revert is minutes; plan DB forward-only migrations separately.
 - **Approval**: Human should approve production deploy, primary secret rotation, and any Supabase destructive migration. Agent may run `npm run build`, `wrangler tail`, read-only dashboard/MCP queries, and deploy to non-production aliases if credentials are scoped.
-- **Logs**: Runtime: `npx wrangler tail` (live logs). Observability enabled in `wrangler.jsonc`. Agents: Cloudflare MCP (`docs.mcp.cloudflare.com/mcp`, `mcp.cloudflare.com/mcp`) per [Cursor setup](https://developers.cloudflare.com/agent-setup/cursor/). CI: GitHub Actions logs for lint/build on `master` PRs.
+- **Logs**: Runtime: `npx wrangler tail` (live logs). Observability enabled in `wrangler.jsonc`. **Sentry** ([`@sentry/astro`](https://docs.sentry.io/platforms/javascript/guides/astro/) + Cloudflare Worker entry `sentry.server.config.ts`) complements `wrangler tail` with error grouping, stack traces (source maps via `SENTRY_AUTH_TOKEN` at build), performance traces (10% sample in production), and structured logs. Production captures when `SENTRY_DSN` is set; local dev requires `SENTRY_DEBUG=1`. Verify via `/dev/sentry-test` in dev. Agents: Cloudflare MCP (`docs.mcp.cloudflare.com/mcp`, `mcp.cloudflare.com/mcp`) per [Cursor setup](https://developers.cloudflare.com/agent-setup/cursor/). CI: GitHub Actions logs for lint/build on `master` PRs.
 
 ## Risk Register
 
@@ -92,6 +92,7 @@ The team shipped Paint Ledger on Workers with Supabase and felt fast for three w
 | SSR routes exceed Workers CPU limits | Devil's advocate | M | H | Prerender public/static pages; cache where safe; monitor CPU in dashboard; set `prerender` on read-heavy list routes when stable |
 | `nodejs_compat` breaks after dependency upgrade | Devil's advocate / Unknown unknowns | M | M | Keep `compatibility_flags: ["nodejs_compat"]` in `wrangler.jsonc`; smoke-test auth + Supabase after upgrades; use `npm run dev` (workerd) before deploy |
 | Secrets drift (Cloudflare vs GitHub vs local) | Pre-mortem | M | H | Document single source of truth; rotate with checklist; verify `wrangler secret list` matches GitHub secrets used in CI |
+| Sentry observability secret drift (`SENTRY_AUTH_TOKEN`, `SENTRY_DSN`) | Operational Story | M | M | Keep GitHub, Cloudflare Builds, Worker secrets, and local `.env`/`.dev.vars` in sync; confirm source maps in Sentry Releases after deploy; Playwright CI omits Sentry to avoid test noise |
 | Worker rollback leaves DB incompatible | Devil's advocate | L | H | Treat Supabase migrations as forward-only; test migrations on staging project; never assume `wrangler rollback` fixes data |
 | No preview gate before production | Pre-mortem / Unknown unknowns | M | M | Add branch preview deploy in GitHub Actions before auto-promote; or require manual `wrangler deploy` checklist until CI deploy exists |
 | Pages vs Workers doc confusion | Devil's advocate | M | L | Treat deployment target as **Workers**; update `tech-stack.md` hint when convenient; follow [Astro Cloudflare guide](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) v13+ only |
@@ -103,8 +104,8 @@ Stack versions in repo: `astro` ^6.3.1, `@astrojs/cloudflare` ^13.5.0, `wrangler
 1. **Local env** — Copy `.env.example` to `.env` and `.dev.vars` per `README.md` with Supabase URL and service/anon keys for local SSR.
 2. **Run locally** — `npm run dev` (Astro + Cloudflare adapter emulates Workers runtime).
 3. **Build** — `npm run build` (outputs to `dist/` for Static Assets + server entry).
-4. **First deploy** — `npx wrangler login` then `npx wrangler secret put SUPABASE_URL` and `SUPABASE_KEY`, then `npx wrangler deploy`.
-5. **Verify** — Hit the deployed URL; exercise `/auth/signin` and a `PROTECTED_ROUTES` path; tail logs with `npx wrangler tail` if errors occur.
+4. **First deploy** — `npx wrangler login` then `npx wrangler secret put SUPABASE_URL`, `SUPABASE_KEY`, and `SENTRY_DSN`, then `npx wrangler deploy`.
+5. **Verify** — Hit the deployed URL; exercise `/auth/signin` and a `PROTECTED_ROUTES` path; tail logs with `npx wrangler tail` if errors occur. Confirm Sentry events in project `paint-ledger` after deploy.
 
 ## Out of Scope
 

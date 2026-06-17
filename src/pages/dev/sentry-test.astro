@@ -1,0 +1,18 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SentryTestButton from "@/components/dev/SentryTestButton";
+---
+
+<Layout title="Sentry test (dev only)">
+  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+      <h1 class="mb-2 text-center text-xl font-bold">Sentry verify (dev only)</h1>
+      <p class="mb-6 text-center text-sm text-blue-100/70">
+        Requires <code class="text-purple-200">SENTRY_DEBUG=1</code> and <code class="text-purple-200">SENTRY_DSN</code> in
+        both <code class="text-purple-200">.env</code> (client SDK) and <code class="text-purple-200">.dev.vars</code> (SSR
+        guard).
+      </p>
+      <SentryTestButton client:load />
+    </div>
+  </div>
+</Layout>

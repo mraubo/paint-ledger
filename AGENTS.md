@@ -5,6 +5,7 @@ Paint Ledger logs hobby paint workflows (models, recipes, steps, photos). Astro 
 ## Hard rules
 
 - Keep `SUPABASE_URL` and `SUPABASE_KEY` server-only: they are declared in @astro.config.mjs via `astro:env` with `access: "secret"`. Do not import them into client components or expose them in the browser.
+- Sentry env boundaries: `SENTRY_AUTH_TOKEN` is build-time only (source maps via `@sentry/astro` integration) — never import it into client code or expose it in the browser. `SENTRY_DSN` is semi-public (embedded in the client bundle via `astro:env/client`) but must still come from env, not hardcoded. Local event sending requires `SENTRY_DEBUG=1` in both `.env` and `.dev.vars`; production sends when `SENTRY_DSN` is set. Do not commit real Sentry tokens.
 - Copy env from @.env.example to `.env` for Supabase and `.dev.vars` for Cloudflare local dev (see @README.md).
 - Register new authenticated pages by adding their path prefix to `PROTECTED_ROUTES` in @src/middleware.ts.
 - Do not delete or relocate the `context/` tree; it holds foundation docs and change logs for this project.
@@ -67,7 +68,7 @@ Recent history uses Conventional Commit prefixes (`feat:`, `chore:`). Target bra
 
 **After implementation:** When a plan, slice, phase, or other scoped unit of work is finished, propose a commit message that follows the conventions above (slice/change id in the subject when relevant). Do not commit unless the user explicitly asks.
 
-PRs should pass GitHub Actions lint, build, integration tests, and Playwright e2e. Set `SUPABASE_URL` and `SUPABASE_KEY` as repo secrets for CI builds.
+PRs should pass GitHub Actions lint, build, integration tests, and Playwright e2e. Set `SUPABASE_URL`, `SUPABASE_KEY`, and `SENTRY_AUTH_TOKEN` as repo secrets for CI builds.
 
 ## Mutation testing
 
