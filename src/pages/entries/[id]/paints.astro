@@ -1,5 +1,8 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
+import Alert from "@/components/ui/Alert.astro";
+import PageCard from "@/components/ui/PageCard.astro";
+import PageHeading from "@/components/ui/PageHeading.astro";
 import EntryPaintForm from "@/components/entries/EntryPaintForm";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
@@ -60,16 +63,11 @@ const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : ent
 ---
 
 <AppLayout title={pageTitle}>
-  <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+  <PageCard>
     {
       isEditView && editingPaint && editingPaintId ? (
         <>
-          <div class="mb-6">
-            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-              Edit paint
-            </h1>
-            <p class="mt-1 text-sm text-blue-100/60">{editingPaint.name}</p>
-          </div>
+          <PageHeading title="Edit paint" subtitle={editingPaint.name} />
 
           <EntryPaintForm
             mode="edit"
@@ -86,84 +84,63 @@ const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : ent
             client:load
           />
 
-          <p class="mt-6 text-center text-sm text-blue-100/60">
-            <a href={paintsBaseUrl} class="text-purple-300 hover:underline">
+          <p class="text-muted-foreground mt-6 text-center text-sm">
+            <a href={paintsBaseUrl} class="text-primary hover:underline">
               Back to paints
             </a>
-            <span class="mx-2 text-blue-100/30">·</span>
-            <a href={`/entries/${entryId}/edit`} class="text-purple-300 hover:underline">
+            <span class="text-muted-foreground/50 mx-2">·</span>
+            <a href={`/entries/${entryId}/edit`} class="text-primary hover:underline">
               Back to entry
             </a>
           </p>
         </>
       ) : (
         <>
-          <div class="mb-6">
-            <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-              Paint palette
-            </h1>
-            <p class="mt-1 text-sm text-blue-100/60">Entry-level paints for this recipe.</p>
-          </div>
+          <PageHeading title="Paint palette" subtitle="Entry-level paints for this recipe." />
 
-          {showAddedBanner && (
-            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
-              Paint added
-            </p>
-          )}
+          {showAddedBanner && <Alert variant="success" message="Paint added" class="mb-4" />}
 
-          {showUpdatedBanner && (
-            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
-              Paint updated
-            </p>
-          )}
+          {showUpdatedBanner && <Alert variant="success" message="Paint updated" class="mb-4" />}
 
-          {showDeletedBanner && (
-            <p class="mb-4 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
-              Paint deleted
-            </p>
-          )}
+          {showDeletedBanner && <Alert variant="success" message="Paint deleted" class="mb-4" />}
 
-          {listError && (
-            <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
-              Could not load paints. Please try again.
-            </p>
-          )}
+          {listError && <Alert variant="error" message="Could not load paints. Please try again." class="mb-4" />}
 
           {paintRows.length === 0 && !listError && (
-            <div class="mb-6 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-              <p class="text-blue-100/70">No paints yet. Add the first color to this entry&apos;s palette.</p>
+            <div class="border-border bg-muted mb-6 rounded-xl border p-6 text-center">
+              <p class="text-muted-foreground">No paints yet. Add the first color to this entry&apos;s palette.</p>
             </div>
           )}
 
           <div class="mb-8">
-            <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Add paint</h2>
+            <h2 class="text-foreground mb-4 font-serif text-lg font-semibold">Add paint</h2>
             <EntryPaintForm mode="add" entryId={entryId} serverError={addFormError} client:load />
           </div>
 
           {paintRows.length > 0 && (
             <div>
-              <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Paints</h2>
+              <h2 class="text-foreground mb-4 font-serif text-lg font-semibold">Paints</h2>
               <ul class="space-y-3">
                 {paintRows.map((paint) => {
                   const metaParts = [paint.brand, paint.color_description].filter((part) => part.trim().length > 0);
                   const swatchColor = isValidHexColor(paint.approximate_color) ? paint.approximate_color : "#000000";
 
                   return (
-                    <li class="rounded-lg border border-white/10 bg-white/5 p-4">
+                    <li class="border-border bg-card rounded-lg border p-4">
                       <div class="flex flex-wrap items-start gap-4">
                         <span
-                          class="mt-0.5 size-10 shrink-0 rounded-lg border border-white/20"
+                          class="border-border mt-0.5 size-10 shrink-0 rounded-lg border"
                           style={{ backgroundColor: swatchColor }}
                           aria-hidden="true"
                         />
                         <div class="min-w-0 flex-1">
-                          <p class="font-medium text-white">{paint.name}</p>
-                          {metaParts.length > 0 && <p class="text-sm text-blue-100/60">{metaParts.join(" · ")}</p>}
+                          <p class="text-foreground font-mono text-sm font-medium">{paint.name}</p>
+                          {metaParts.length > 0 && <p class="text-muted-foreground text-sm">{metaParts.join(" · ")}</p>}
                         </div>
                         <div class="flex shrink-0 gap-2">
                           <a
                             href={`${paintsBaseUrl}?edit=${paint.id}`}
-                            class="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+                            class="border-border text-foreground hover:bg-accent inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm transition-colors"
                           >
                             Edit
                           </a>
@@ -174,7 +151,7 @@ const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : ent
                           >
                             <button
                               type="submit"
-                              class="inline-flex items-center gap-1 rounded-lg border border-red-400/30 px-3 py-1.5 text-sm text-red-200/90 transition-colors hover:bg-red-900/20"
+                              class="border-destructive/30 text-destructive hover:bg-destructive/10 inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm transition-colors"
                             >
                               Delete
                             </button>
@@ -188,17 +165,17 @@ const pageTitle = isEditView && editingPaint ? `Edit ${editingPaint.name}` : ent
             </div>
           )}
 
-          <p class="mt-6 text-center text-sm text-blue-100/60">
-            <a href={`/entries/${entryId}/steps`} class="text-purple-300 hover:underline">
+          <p class="text-muted-foreground mt-6 text-center text-sm">
+            <a href={`/entries/${entryId}/steps`} class="text-primary hover:underline">
               Manage steps
             </a>
-            <span class="mx-2 text-blue-100/30">·</span>
-            <a href={`/entries/${entryId}/edit`} class="text-purple-300 hover:underline">
+            <span class="text-muted-foreground/50 mx-2">·</span>
+            <a href={`/entries/${entryId}/edit`} class="text-primary hover:underline">
               Back to entry
             </a>
           </p>
         </>
       )
     }
-  </div>
+  </PageCard>
 </AppLayout>

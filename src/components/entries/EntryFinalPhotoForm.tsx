@@ -29,17 +29,17 @@ export default function EntryFinalPhotoForm({ entryId, initialPhotoUrl, serverEr
           <img
             src={initialPhotoUrl}
             alt="Current final result"
-            className="max-h-56 max-w-full rounded-lg border border-white/20 object-cover"
+            className="border-border max-h-56 max-w-full rounded-lg border object-cover"
           />
         ) : (
-          <div className="flex items-center gap-2 text-sm text-blue-100/60">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <ImageIcon className="size-4 shrink-0" />
             No final result photo yet
           </div>
         )}
 
         <div>
-          <label htmlFor="final-photo" className="mb-1 block text-xs text-blue-100/60">
+          <label htmlFor="final-photo" className="text-muted-foreground mb-1 block text-xs">
             {hasExistingPhoto ? "Replace photo" : "Upload photo"}
           </label>
           <input
@@ -47,13 +47,13 @@ export default function EntryFinalPhotoForm({ entryId, initialPhotoUrl, serverEr
             type="file"
             name={FINAL_PHOTO_FIELD}
             accept="image/jpeg,image/png,image/webp"
-            className="block w-full text-sm text-blue-100/80 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-sm file:text-white hover:file:bg-white/20"
+            className="text-foreground file:bg-input file:text-foreground hover:file:bg-accent block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-2 file:text-sm"
           />
-          <p className="mt-1 text-xs text-blue-100/50">JPEG, PNG, or WebP up to 4 MB</p>
+          <p className="text-muted-foreground mt-1 text-xs">JPEG, PNG, or WebP up to 4 MB</p>
         </div>
 
         {hasExistingPhoto ? (
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-blue-100/80">
+          <label className="text-foreground flex cursor-pointer items-center gap-2 text-sm">
             <input
               type="checkbox"
               name={REMOVE_FINAL_PHOTO_FIELD}
@@ -62,7 +62,7 @@ export default function EntryFinalPhotoForm({ entryId, initialPhotoUrl, serverEr
               onChange={(e) => {
                 setRemoveChecked(e.target.checked);
               }}
-              className="size-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-400"
+              className="border-border bg-input text-primary focus:ring-ring size-4 rounded border"
             />
             Remove photo
           </label>

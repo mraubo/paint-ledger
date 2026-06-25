@@ -11,15 +11,15 @@ const metaParts = [paint.brand, paint.color_description].filter((part) => part.t
 const swatchColor = isValidHexColor(paint.approximate_color) ? paint.approximate_color : "#000000";
 ---
 
-<li class="h-full rounded-xl border border-white/10 bg-white/5 p-4">
+<li class="border-border bg-card h-full rounded-xl border p-4">
   <div class="flex items-center gap-4">
     <span
-      class="size-14 shrink-0 rounded-lg border border-white/20"
+      class="border-border size-14 shrink-0 rounded-lg border"
       style={{ backgroundColor: swatchColor }}
       aria-hidden="true"></span>
     <div class="min-w-0 flex-1">
-      <p class="font-medium text-white">{paint.name}</p>
-      {metaParts.length > 0 && <p class="mt-0.5 text-sm text-blue-100/60">{metaParts.join(" · ")}</p>}
+      <p class="text-foreground font-mono text-sm font-medium">{paint.name}</p>
+      {metaParts.length > 0 && <p class="text-muted-foreground mt-0.5 text-sm">{metaParts.join(" · ")}</p>}
     </div>
   </div>
 </li>

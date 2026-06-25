@@ -504,27 +504,27 @@ Sweep for residual cosmic styling in scope, delete dead code, run full CI, docum
 
 #### Automated
 
-- [x] 3.1 `npm run lint` passes
-- [x] 3.2 `npm run build` passes
-- [x] 3.3 No cosmic/purple classes in `src/pages/auth/` and `src/layouts/`
+- [x] 3.1 `npm run lint` passes — 74153aa
+- [x] 3.2 `npm run build` passes — 74153aa
+- [x] 3.3 No cosmic/purple classes in `src/pages/auth/` and `src/layouts/` — 74153aa
 
 #### Manual
 
-- [x] 3.4 Sign-in, sign-up, confirm-email pages on-brand and functional
-- [x] 3.5 Topbar navigable; sign-in flow works end-to-end
+- [x] 3.4 Sign-in, sign-up, confirm-email pages on-brand and functional — 74153aa
+- [x] 3.5 Topbar navigable; sign-in flow works end-to-end — 74153aa
 
 ### Phase 4: Entry Workflow Pages & Components
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` passes
-- [ ] 4.2 `npm run build` passes
-- [ ] 4.3 `npm run test:integration` passes
-- [ ] 4.4 No cosmic/purple/blue-100 classes in `src/pages/entries/` and `src/components/entries/`
+- [x] 4.1 `npm run lint` passes
+- [x] 4.2 `npm run build` passes
+- [x] 4.3 `npm run test:integration` passes
+- [x] 4.4 No cosmic/purple/blue-100 classes in `src/pages/entries/` and `src/components/entries/`
 
 #### Manual
 
-- [ ] 4.5 Full entry workflow walkthrough on-brand (list → create → paints → steps → detail → edit)
+- [x] 4.5 Full entry workflow walkthrough on-brand (list → create → paints → steps → detail → edit)
 
 ### Phase 5: Cleanup & Verification
 

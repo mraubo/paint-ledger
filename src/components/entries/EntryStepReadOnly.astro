@@ -9,15 +9,15 @@ interface Props {
 const { step } = Astro.props;
 ---
 
-<li class="flex h-full flex-col rounded-xl border border-white/10 bg-white/5 p-4">
-  <p class="mb-3 text-xs font-medium tracking-wide text-blue-100/50 uppercase">Step {step.position}</p>
+<li class="border-border bg-card flex h-full flex-col rounded-xl border p-4">
+  <p class="font-label text-muted-foreground mb-3 text-xs uppercase">Step {step.position}</p>
 
   {
     step.photo_url && (
       <img
         src={step.photo_url}
         alt={`Step ${step.position}`}
-        class="mb-3 size-[200px] rounded-lg border border-white/20 object-cover"
+        class="border-border mb-3 size-[200px] rounded-lg border object-cover"
       />
     )
   }
@@ -32,5 +32,5 @@ const { step } = Astro.props;
     )
   }
 
-  <p class="mt-auto text-sm whitespace-pre-wrap text-white">{step.description}</p>
+  <p class="text-foreground mt-auto text-sm whitespace-pre-wrap">{step.description}</p>
 </li>

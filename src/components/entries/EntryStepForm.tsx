@@ -54,11 +54,11 @@ interface PaintChecklistProps {
 function PaintChecklist({ entryId, entryPaints, selectedPaintIds, onTogglePaint }: PaintChecklistProps) {
   return (
     <fieldset className="space-y-3">
-      <legend className="mb-1 block text-sm text-blue-100/80">Assigned paints</legend>
+      <legend className="text-foreground mb-1 block text-sm">Assigned paints</legend>
       {entryPaints.length === 0 ? (
-        <p className="text-sm text-blue-100/60">
+        <p className="text-muted-foreground text-sm">
           No paints on this entry yet. Add one below or on the{" "}
-          <a href={`/entries/${entryId}/paints`} className="text-purple-300 hover:underline">
+          <a href={`/entries/${entryId}/paints`} className="text-primary hover:underline">
             paints page
           </a>
           .
@@ -72,7 +72,7 @@ function PaintChecklist({ entryId, entryPaints, selectedPaintIds, onTogglePaint 
 
             return (
               <li key={paint.id}>
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10">
+                <label className="border-border bg-card hover:bg-accent flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors">
                   <input
                     type="checkbox"
                     name="entry_paint_ids"
@@ -81,16 +81,16 @@ function PaintChecklist({ entryId, entryPaints, selectedPaintIds, onTogglePaint 
                     onChange={(e) => {
                       onTogglePaint(paint.id, e.target.checked);
                     }}
-                    className="mt-1 size-4 shrink-0 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-400"
+                    className="border-border bg-input text-primary focus:ring-ring mt-1 size-4 shrink-0 rounded border"
                   />
                   <span
-                    className="mt-0.5 size-8 shrink-0 rounded border border-white/20"
+                    className="border-border mt-0.5 size-8 shrink-0 rounded border"
                     style={{ backgroundColor: swatchColor }}
                     aria-hidden="true"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium text-white">{paint.name}</span>
-                    {meta ? <span className="block text-xs text-blue-100/60">{meta}</span> : null}
+                    <span className="text-foreground block text-sm font-medium">{paint.name}</span>
+                    {meta ? <span className="text-muted-foreground block text-xs">{meta}</span> : null}
                   </span>
                 </label>
               </li>
@@ -198,7 +198,7 @@ export default function EntryStepForm(props: Props) {
           {isEdit ? (
             <a
               href={props.cancelHref}
-              className="inline-flex items-center rounded-lg border border-white/20 px-4 py-2 text-sm text-blue-100/80 transition-colors hover:bg-white/10"
+              className="border-border text-foreground hover:bg-accent inline-flex items-center rounded-lg border px-4 py-2 text-sm transition-colors"
             >
               Cancel
             </a>
