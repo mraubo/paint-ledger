@@ -530,12 +530,12 @@ Sweep for residual cosmic styling in scope, delete dead code, run full CI, docum
 
 #### Automated
 
-- [x] 5.1 `npm run lint` passes
-- [x] 5.2 `npm run build` passes
-- [x] 5.3 `npm run test:integration` passes
-- [x] 5.4 `npx astro sync` succeeds
+- [x] 5.1 `npm run lint` passes — 23c9268
+- [x] 5.2 `npm run build` passes — 23c9268
+- [x] 5.3 `npm run test:integration` passes — 23c9268
+- [x] 5.4 `npx astro sync` succeeds — 23c9268
 
 #### Manual
 
-- [x] 5.5 Full auth + entry walkthrough including delete
-- [x] 5.6 No font 404 errors; contrast spot-check on primary button and body text
+- [x] 5.5 Full auth + entry walkthrough including delete — 23c9268
+- [x] 5.6 No font 404 errors; contrast spot-check on primary button and body text — 23c9268
