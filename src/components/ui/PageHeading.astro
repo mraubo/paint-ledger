@@ -2,12 +2,13 @@
 interface Props {
   title: string;
   subtitle?: string;
+  class?: string;
 }
 
-const { title, subtitle } = Astro.props;
+const { title, subtitle, class: className } = Astro.props;
 ---
 
-<div class="mb-6">
+<div class:list={["mb-6", className]}>
   <h1 class="text-foreground font-serif text-2xl font-semibold">{title}</h1>
   {subtitle && <p class="text-muted-foreground mt-1">{subtitle}</p>}
 </div>

@@ -490,28 +490,28 @@ Sweep for residual cosmic styling in scope, delete dead code, run full CI, docum
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run build` passes
-- [x] 2.3 No remaining `Banner` imports in `src/`
-- [x] 2.4 No `bg-purple-600` in `src/components/auth/`
+- [x] 2.1 `npm run lint` passes — 04f5075
+- [x] 2.2 `npm run build` passes — 04f5075
+- [x] 2.3 No remaining `Banner` imports in `src/` — 04f5075
+- [x] 2.4 No `bg-purple-600` in `src/components/auth/` — 04f5075
 
 #### Manual
 
-- [x] 2.5 Primitives preview: PageCard, PageHeading, Alert, StatusChip on-brand
-- [x] 2.6 FormField recessed input renders correctly on parchment
+- [x] 2.5 Primitives preview: PageCard, PageHeading, Alert, StatusChip on-brand — 04f5075
+- [x] 2.6 FormField recessed input renders correctly on parchment — 04f5075
 
 ### Phase 3: Shell & Auth Pages
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npm run build` passes
-- [ ] 3.3 No cosmic/purple classes in `src/pages/auth/` and `src/layouts/`
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npm run build` passes
+- [x] 3.3 No cosmic/purple classes in `src/pages/auth/` and `src/layouts/`
 
 #### Manual
 
-- [ ] 3.4 Sign-in, sign-up, confirm-email pages on-brand and functional
-- [ ] 3.5 Topbar navigable; sign-in flow works end-to-end
+- [x] 3.4 Sign-in, sign-up, confirm-email pages on-brand and functional
+- [x] 3.5 Topbar navigable; sign-in flow works end-to-end
 
 ### Phase 4: Entry Workflow Pages & Components
 
