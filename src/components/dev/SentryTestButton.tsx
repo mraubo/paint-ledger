@@ -4,7 +4,7 @@ function setStatus(message: string, isError = false) {
   const el = document.getElementById("sentry-test-status");
   if (!el) return;
   el.textContent = message;
-  el.className = `text-center text-sm ${isError ? "text-red-300" : "text-green-200"}`;
+  el.className = `text-center text-sm ${isError ? "text-destructive" : "text-success-foreground"}`;
 }
 
 export default function SentryTestButton() {
@@ -55,7 +55,7 @@ export default function SentryTestButton() {
       <button
         type="button"
         onClick={() => void handleClick()}
-        className="w-full rounded-lg bg-purple-600 px-4 py-2 font-medium hover:bg-purple-500"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-lg px-4 py-2 font-medium"
       >
         Send test errors to Sentry
       </button>

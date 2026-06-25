@@ -517,25 +517,25 @@ Sweep for residual cosmic styling in scope, delete dead code, run full CI, docum
 
 #### Automated
 
-- [x] 4.1 `npm run lint` passes
-- [x] 4.2 `npm run build` passes
-- [x] 4.3 `npm run test:integration` passes
-- [x] 4.4 No cosmic/purple/blue-100 classes in `src/pages/entries/` and `src/components/entries/`
+- [x] 4.1 `npm run lint` passes — cb067c9
+- [x] 4.2 `npm run build` passes — cb067c9
+- [x] 4.3 `npm run test:integration` passes — cb067c9
+- [x] 4.4 No cosmic/purple/blue-100 classes in `src/pages/entries/` and `src/components/entries/` — cb067c9
 
 #### Manual
 
-- [x] 4.5 Full entry workflow walkthrough on-brand (list → create → paints → steps → detail → edit)
+- [x] 4.5 Full entry workflow walkthrough on-brand (list → create → paints → steps → detail → edit) — cb067c9
 
 ### Phase 5: Cleanup & Verification
 
 #### Automated
 
-- [ ] 5.1 `npm run lint` passes
-- [ ] 5.2 `npm run build` passes
-- [ ] 5.3 `npm run test:integration` passes
-- [ ] 5.4 `npx astro sync` succeeds
+- [x] 5.1 `npm run lint` passes
+- [x] 5.2 `npm run build` passes
+- [x] 5.3 `npm run test:integration` passes
+- [x] 5.4 `npx astro sync` succeeds
 
 #### Manual
 
-- [ ] 5.5 Full auth + entry walkthrough including delete
-- [ ] 5.6 No font 404 errors; contrast spot-check on primary button and body text
+- [x] 5.5 Full auth + entry walkthrough including delete
+- [x] 5.6 No font 404 errors; contrast spot-check on primary button and body text
