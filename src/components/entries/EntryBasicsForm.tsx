@@ -7,7 +7,7 @@ import { ServerError } from "@/components/auth/ServerError";
 import type { EntryBasicsFields } from "@/lib/entries-api";
 
 const MODEL_ORIGIN_HINT = (
-  <p className="mt-1 text-xs text-blue-100/50">STL source, shop, producer, link, or where to find files on disk</p>
+  <p className="text-muted-foreground mt-1 text-xs">STL source, shop, producer, link, or where to find files on disk</p>
 );
 
 interface CreateProps {

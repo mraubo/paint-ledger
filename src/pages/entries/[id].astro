@@ -1,5 +1,9 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
+import Alert from "@/components/ui/Alert.astro";
+import PageCard from "@/components/ui/PageCard.astro";
+import PageHeading from "@/components/ui/PageHeading.astro";
+import StatusChip from "@/components/ui/StatusChip.astro";
 import EntryPaintReadOnlyRow from "@/components/entries/EntryPaintReadOnlyRow.astro";
 import EntryStepReadOnly from "@/components/entries/EntryStepReadOnly.astro";
 import { createClient } from "@/lib/supabase";
@@ -68,34 +72,14 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
 ---
 
 <AppLayout title={entry.title}>
-  <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+  <PageCard>
     <div class="mb-6 flex flex-wrap items-center gap-3">
-      <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-        {entry.title}
-      </h1>
-      {
-        entry.status === "draft" && (
-          <span class="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs text-blue-100/70">
-            Draft
-          </span>
-        )
-      }
-      {
-        entry.status === "ready" && (
-          <span class="rounded-full border border-green-500/30 bg-green-900/30 px-2.5 py-0.5 text-xs text-green-200/90">
-            Ready
-          </span>
-        )
-      }
+      <PageHeading title={entry.title} class="mb-0" />
+      {entry.status === "draft" && <StatusChip status="draft" />}
+      {entry.status === "ready" && <StatusChip status="ready" />}
     </div>
 
-    {
-      loaderError && (
-        <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
-          Could not load entry details. Please try again.
-        </p>
-      )
-    }
+    {loaderError && <Alert variant="error" message="Could not load entry details. Please try again." class="mb-4" />}
 
     {
       finalPhotoUrl && (
@@ -103,7 +87,7 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
           <img
             src={finalPhotoUrl}
             alt={`Final result for ${entry.title}`}
-            class="max-h-96 w-full rounded-xl border border-white/20 object-cover"
+            class="border-border max-h-96 w-full rounded-xl border object-cover"
           />
         </div>
       )
@@ -112,8 +96,8 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
     {
       hasDescription && (
         <section class="mb-8">
-          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Description</h2>
-          <p class="whitespace-pre-wrap text-blue-100/80">{entry.description}</p>
+          <h2 class="text-foreground mb-2 font-serif text-lg font-semibold">Description</h2>
+          <p class="text-foreground whitespace-pre-wrap">{entry.description}</p>
         </section>
       )
     }
@@ -121,8 +105,8 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
     {
       hasModelInfo && (
         <section class="mb-8">
-          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Model information</h2>
-          <p class="whitespace-pre-wrap text-blue-100/80">{entry.model_info}</p>
+          <h2 class="text-foreground mb-2 font-serif text-lg font-semibold">Model information</h2>
+          <p class="text-foreground whitespace-pre-wrap">{entry.model_info}</p>
         </section>
       )
     }
@@ -130,8 +114,8 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
     {
       hasModelOriginNote && (
         <section class="mb-8">
-          <h2 class="mb-2 text-lg font-semibold text-blue-100/90">Model origin</h2>
-          <p class="whitespace-pre-wrap text-blue-100/80">{entry.model_origin_note}</p>
+          <h2 class="text-foreground mb-2 font-serif text-lg font-semibold">Model origin</h2>
+          <p class="text-foreground whitespace-pre-wrap">{entry.model_origin_note}</p>
         </section>
       )
     }
@@ -139,7 +123,7 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
     {
       paintRows.length > 0 && (
         <section class="mb-8">
-          <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Paint palette</h2>
+          <h2 class="text-foreground mb-4 font-serif text-lg font-semibold">Paint palette</h2>
           <ul class="grid grid-cols-1 gap-4 md:grid-cols-2">
             {paintRows.map((paint) => (
               <EntryPaintReadOnlyRow paint={paint} />
@@ -152,7 +136,7 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
     {
       stepRows.length > 0 && (
         <section class="mb-8">
-          <h2 class="mb-4 text-lg font-semibold text-blue-100/90">Tutorial steps</h2>
+          <h2 class="text-foreground mb-4 font-serif text-lg font-semibold">Tutorial steps</h2>
           <ul class="grid grid-cols-1 gap-4 md:grid-cols-3">
             {stepRows.map((step) => (
               <EntryStepReadOnly step={step} />
@@ -162,17 +146,17 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
       )
     }
 
-    <div class="mt-8 border-t border-white/10 pt-8">
+    <div class="border-border mt-8 border-t pt-8">
       <a
         href={`/entries/${entry.id}/edit`}
-        class="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+        class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors"
       >
         Edit entry
       </a>
     </div>
 
-    <p class="mt-6 text-center text-sm text-blue-100/60">
-      <a href="/entries" class="text-purple-300 hover:underline">Back to entries</a>
+    <p class="text-muted-foreground mt-6 text-center text-sm">
+      <a href="/entries" class="text-primary hover:underline">Back to entries</a>
     </p>
-  </div>
+  </PageCard>
 </AppLayout>

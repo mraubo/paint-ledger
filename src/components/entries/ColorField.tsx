@@ -36,12 +36,12 @@ export function ColorField({ id, name, label, value, onChange, error }: ColorFie
 
   return (
     <div>
-      <label htmlFor={`${id}-hex`} className="mb-1 block text-sm text-blue-100/80">
+      <label htmlFor={`${id}-hex`} className="text-foreground mb-1 block text-sm">
         {label}
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <span
-          className="size-10 shrink-0 rounded-lg border border-white/20"
+          className="border-border size-10 shrink-0 rounded-lg border"
           style={{ backgroundColor: swatchValue(value) }}
           aria-hidden
         />
@@ -55,12 +55,12 @@ export function ColorField({ id, name, label, value, onChange, error }: ColorFie
           onChange={(e) => {
             handlePickerUpdate(e.currentTarget.value);
           }}
-          className="h-10 w-14 cursor-pointer rounded-lg border border-white/20 bg-transparent p-1"
+          className="border-border bg-input h-10 w-14 cursor-pointer rounded-lg border p-1"
           aria-label={`${label} picker`}
         />
         <div className="relative min-w-[8rem] flex-1">
           <span
-            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 rounded border border-white/20"
+            className="border-border absolute top-1/2 left-3 size-4 -translate-y-1/2 rounded border"
             style={{ backgroundColor: swatchValue(value) }}
             aria-hidden="true"
           />
@@ -77,19 +77,19 @@ export function ColorField({ id, name, label, value, onChange, error }: ColorFie
             }}
             placeholder="#000000"
             className={cn(
-              "w-full rounded-lg border bg-white/10 px-3 py-2 pl-10 text-white placeholder-white/40 focus:ring-2 focus:outline-none",
-              error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",
+              "border-border bg-input text-foreground placeholder:text-muted-foreground focus:ring-ring w-full rounded-lg border px-3 py-2 pl-10 focus:ring-2 focus:outline-none",
+              error && "border-destructive focus:ring-destructive/30",
             )}
           />
         </div>
       </div>
       {error ? (
-        <p className="mt-1 flex items-center gap-1 text-xs text-red-300">
+        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>
       ) : (
-        <p className="mt-1 text-xs text-blue-100/50">
+        <p className="text-muted-foreground mt-1 text-xs">
           Approximate swatch for this paint — not an exact match to the physical color.
         </p>
       )}

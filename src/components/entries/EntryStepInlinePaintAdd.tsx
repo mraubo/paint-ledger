@@ -48,24 +48,24 @@ export function EntryStepInlinePaintAdd({
 
   return (
     <details
-      className="group rounded-lg border border-white/10 bg-white/5"
+      className="border-border bg-card group rounded-lg border"
       open={open}
       onToggle={(e) => {
         setOpen(e.currentTarget.open);
       }}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-blue-100/90 transition-colors marker:content-none hover:bg-white/5 [&::-webkit-details-marker]:hidden">
+      <summary className="text-foreground hover:bg-accent flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium transition-colors marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex items-center gap-2">
-          <Plus className="size-4 text-purple-300" />
+          <Plus className="text-primary size-4" />
           Add paint to entry
         </span>
-        <ChevronDown className="size-4 text-blue-100/60 transition-transform group-open:rotate-180" />
+        <ChevronDown className="text-muted-foreground size-4 transition-transform group-open:rotate-180" />
       </summary>
 
       <form
         method="POST"
         action={action}
-        className="space-y-4 border-t border-white/10 px-4 py-4"
+        className="border-border space-y-4 border-t px-4 py-4"
         onSubmit={handleSubmit}
         noValidate
       >

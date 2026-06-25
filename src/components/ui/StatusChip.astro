@@ -1,0 +1,18 @@
+---
+interface Props {
+  status: "draft" | "ready";
+}
+
+const { status } = Astro.props;
+
+const statusClasses = {
+  draft: "bg-muted text-muted-foreground",
+  ready: "bg-success/20 text-success-foreground",
+} as const;
+
+const label = status === "draft" ? "Draft" : "Ready";
+---
+
+<span class:list={["font-label rounded-full px-2 py-0.5 text-xs", statusClasses[status]]}>
+  {label}
+</span>

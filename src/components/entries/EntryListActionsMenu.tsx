@@ -38,7 +38,7 @@ export default function EntryListActionsMenu({ entryId }: EntryListActionsMenuPr
         onClick={() => {
           setOpen((value) => !value);
         }}
-        className="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 text-blue-100/80 transition-colors hover:bg-white/10"
+        className="border-border text-muted-foreground hover:bg-accent inline-flex size-8 items-center justify-center rounded-lg border transition-colors"
       >
         <MoreVertical className="size-4" aria-hidden="true" />
       </button>
@@ -47,12 +47,12 @@ export default function EntryListActionsMenu({ entryId }: EntryListActionsMenuPr
         <div
           id={menuId}
           role="menu"
-          className="absolute right-0 z-10 mt-1 min-w-32 rounded-lg border border-white/10 bg-slate-900/95 py-1 shadow-lg backdrop-blur-xl"
+          className="border-border bg-card absolute right-0 z-10 mt-1 min-w-32 rounded-lg border py-1 shadow-sm"
         >
           <a
             role="menuitem"
             href={`/entries/${entryId}/edit`}
-            className="block px-3 py-2 text-sm text-blue-100/90 transition-colors hover:bg-white/10"
+            className="text-foreground hover:bg-accent block px-3 py-2 text-sm transition-colors"
             onClick={() => {
               setOpen(false);
             }}
@@ -63,7 +63,7 @@ export default function EntryListActionsMenu({ entryId }: EntryListActionsMenuPr
             <button
               type="submit"
               role="menuitem"
-              className="block w-full px-3 py-2 text-left text-sm text-red-200/90 transition-colors hover:bg-red-900/20"
+              className="text-destructive hover:bg-destructive/10 block w-full px-3 py-2 text-left text-sm transition-colors"
               onClick={(event) => {
                 if (!confirm("Delete this entry?")) {
                   event.preventDefault();
