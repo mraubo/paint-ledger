@@ -4,6 +4,7 @@
 @import "@fontsource/source-serif-4/latin-600.css";
 @import "@fontsource/source-serif-4/latin-700.css";
 @import "@fontsource/work-sans/latin-400.css";
+@import "@fontsource/work-sans/latin-500.css";
 @import "@fontsource/jetbrains-mono/latin-500.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -29,7 +30,7 @@
   --input: #f5f3ef;
   --ring: #934b19;
   --success: #35470f;
-  --success-foreground: #35470f;
+  --success-foreground: #c1d890;
   --chart-1: #6c2f00;
   --chart-2: #446464;
   --chart-3: #35470f;

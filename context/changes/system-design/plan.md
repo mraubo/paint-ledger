@@ -165,6 +165,8 @@ Create reusable Astro shell components and restyle React form primitives to use 
 
 **Contract**: Props: `variant` (`info` | `warning` | `error` | `success`), `message` (string). Uses token backgrounds: info → `secondary-container`, warning → custom amber tokens or `accent`, error → `destructive/10`, success → `success/10`. 1px border, no hardcoded hex.
 
+**Addendum (impl):** Also supports optional `class` prop and `<slot>` fallback when `message` is omitted — preserves `Banner` slot API for `Layout.astro` config warnings.
+
 #### 4. StatusChip
 
 **File**: `src/components/ui/StatusChip.astro` (new)

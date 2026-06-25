@@ -48,12 +48,18 @@ export function FormField({
             onChange(e.target.value);
           }}
           placeholder={placeholder}
-          className={cn(inputBase, error && "border-destructive focus:border-destructive focus:ring-destructive/30")}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={cn(
+            inputBase,
+            endContent && "pr-10",
+            error && "border-destructive focus:border-destructive focus:ring-destructive/30",
+          )}
         />
         {endContent}
       </div>
       {error ? (
-        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
+        <p id={`${id}-error`} className="text-destructive mt-1 flex items-center gap-1 text-xs">
           <CircleAlert className="size-3" />
           {error}
         </p>
