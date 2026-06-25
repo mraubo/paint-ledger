@@ -1,0 +1,33 @@
+---
+type Variant = "info" | "warning" | "error" | "success";
+
+interface Props {
+  variant?: Variant;
+  message?: string;
+  class?: string;
+}
+
+const { variant = "info", message, class: className } = Astro.props;
+
+const variantClasses: Record<Variant, string> = {
+  info: "bg-secondary text-secondary-foreground border-border",
+  warning: "bg-accent text-foreground border-border",
+  error: "bg-destructive/10 text-destructive border-destructive",
+  success: "bg-success/10 text-success-foreground border-success",
+};
+---
+
+<div
+  class:list={["rounded-lg border px-4 py-3 text-sm", variantClasses[variant], className]}
+  role={variant === "error" ? "alert" : "status"}
+>
+  {message ? <p>{message}</p> : <slot />}
+</div>
+
+<style>
+  div :global(a) {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+</style>

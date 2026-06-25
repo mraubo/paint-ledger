@@ -477,28 +477,28 @@ Sweep for residual cosmic styling in scope, delete dead code, run full CI, docum
 
 #### Automated
 
-- [x] 1.1 `npm install` completes without errors
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npm run build` passes
-- [x] 1.4 `bg-cosmic` no longer defined in `src/styles/global.css`
+- [x] 1.1 `npm install` completes without errors — ae73b82
+- [x] 1.2 `npm run lint` passes — ae73b82
+- [x] 1.3 `npm run build` passes — ae73b82
+- [x] 1.4 `bg-cosmic` no longer defined in `src/styles/global.css` — ae73b82
 
 #### Manual
 
-- [x] 1.5 `:root --primary` resolves to Burnt Sienna; `body` uses Work Sans in DevTools
+- [x] 1.5 `:root --primary` resolves to Burnt Sienna; `body` uses Work Sans in DevTools — ae73b82
 
 ### Phase 2: Shared Primitives & Form Restyle
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npm run build` passes
-- [ ] 2.3 No remaining `Banner` imports in `src/`
-- [ ] 2.4 No `bg-purple-600` in `src/components/auth/`
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npm run build` passes
+- [x] 2.3 No remaining `Banner` imports in `src/`
+- [x] 2.4 No `bg-purple-600` in `src/components/auth/`
 
 #### Manual
 
-- [ ] 2.5 Primitives preview: PageCard, PageHeading, Alert, StatusChip on-brand
-- [ ] 2.6 FormField recessed input renders correctly on parchment
+- [x] 2.5 Primitives preview: PageCard, PageHeading, Alert, StatusChip on-brand
+- [x] 2.6 FormField recessed input renders correctly on parchment
 
 ### Phase 3: Shell & Auth Pages
 

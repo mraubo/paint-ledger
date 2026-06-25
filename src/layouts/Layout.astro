@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import Banner from "@/components/Banner.astro";
+import Alert from "@/components/ui/Alert.astro";
 import { missingConfigs } from "@/lib/config-status";
 
 interface Props {
@@ -26,7 +26,7 @@ const { title = "Paint Ledger" } = Astro.props;
   <body>
     {
       missingConfigs.map((cfg) => (
-        <Banner variant="error">
+        <Alert variant="error" class="rounded-none border-x-0 border-t-0 text-center">
           <strong>Uwaga:</strong> {cfg.message}
           {cfg.docsUrl && (
             <>
@@ -37,7 +37,7 @@ const { title = "Paint Ledger" } = Astro.props;
               .
             </>
           )}
-        </Banner>
+        </Alert>
       ))
     }
     <slot />
