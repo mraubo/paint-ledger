@@ -1,0 +1,27 @@
+---
+import BrandLogo from "@/components/ui/BrandLogo.astro";
+import SiteHeader from "@/components/ui/SiteHeader.astro";
+
+interface Props {
+  ctaHref: string;
+  ctaLabel: string;
+}
+
+const { ctaHref, ctaLabel } = Astro.props;
+
+const navLinkClass = "font-label text-muted-foreground hover:text-primary-container text-sm transition-colors";
+---
+
+<SiteHeader contentClass="max-w-7xl">
+  <BrandLogo href="/" />
+  <nav class="hidden items-center gap-8 md:flex" aria-label="Marketing">
+    <a href="#features" class:list={navLinkClass}> Features </a>
+    <a href="#cta" class:list={navLinkClass}> Journal </a>
+  </nav>
+  <a
+    href={ctaHref}
+    class="bg-primary-container hover:bg-primary font-label rounded px-4 py-2 text-sm text-white transition-colors"
+  >
+    {ctaLabel}
+  </a>
+</SiteHeader>

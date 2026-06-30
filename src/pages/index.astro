@@ -1,8 +1,60 @@
 ---
-import Welcome from "@/components/Welcome.astro";
+import LandingCta from "@/components/landing/LandingCta.astro";
+import LandingFeatures from "@/components/landing/LandingFeatures.astro";
+import LandingFooter from "@/components/landing/LandingFooter.astro";
+import LandingHeader from "@/components/landing/LandingHeader.astro";
+import LandingHero from "@/components/landing/LandingHero.astro";
 import Layout from "@/layouts/Layout.astro";
+
+const { user } = Astro.locals;
+const isLoggedIn = Boolean(user);
+
+const headerCta = isLoggedIn
+  ? { href: "/entries/new", label: "New Entry" }
+  : { href: "/auth/signup", label: "Get Started" };
+
+const heroPrimary = isLoggedIn
+  ? { href: "/entries/new", label: "Start Your First Log" }
+  : { href: "/auth/signup", label: "Start Your First Log" };
+
+const heroSecondary = isLoggedIn
+  ? { href: "/entries", label: "View Your Entries" }
+  : { href: "#features", label: "Explore the Library" };
+
+const bottomCta = isLoggedIn
+  ? {
+      href: "/entries",
+      label: "Go to Your Entries",
+      heading: "Your field journal awaits",
+      description: "Pick up where you left off — add paints, document steps, and archive your latest miniature work.",
+    }
+  : {
+      href: "/auth/signup",
+      label: "Create Free Account",
+      heading: "Ready to organize your paints?",
+      description:
+        "Join the community of dedicated hobbyists treating their painting logs with the same care they apply to their miniatures.",
+    };
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="Paint Ledger - Master Your Palette">
+  <link
+    slot="head"
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap"
+  />
+  <div class="bg-background text-foreground selection:bg-primary-container flex min-h-screen flex-col antialiased">
+    <LandingHeader ctaHref={headerCta.href} ctaLabel={headerCta.label} />
+    <main class="flex-grow">
+      <LandingHero primaryCta={heroPrimary} secondaryCta={heroSecondary} />
+      <LandingFeatures />
+      <LandingCta
+        href={bottomCta.href}
+        label={bottomCta.label}
+        heading={bottomCta.heading}
+        description={bottomCta.description}
+      />
+    </main>
+    <LandingFooter />
+  </div>
 </Layout>

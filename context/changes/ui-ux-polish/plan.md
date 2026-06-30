@@ -456,23 +456,23 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [x] 3.1 `npm run lint`
-- [x] 3.2 `npm run build`
+- [x] 3.1 `npm run lint` — 447684c
+- [x] 3.2 `npm run build` — 447684c
 
 #### Manual
 
-- [x] 3.3 Logo in Topbar; email desktop-only; SVG renders without black rect
+- [x] 3.3 Logo in Topbar; email desktop-only; SVG renders without black rect — 447684c
 
 ### Phase 4: Homepage (Stitch)
 
 #### Automated
 
-- [ ] 4.1 `npm run lint`
-- [ ] 4.2 `npm run build`
+- [x] 4.1 `npm run lint`
+- [x] 4.2 `npm run build`
 
 #### Manual
 
-- [ ] 4.4 Landing matches Stitch; auth-aware CTAs; shared logo; responsive layout
+- [x] 4.4 Landing matches Stitch; auth-aware CTAs; shared logo; responsive layout
 
 ### Phase 5: E2E & Verification
 

@@ -1,0 +1,135 @@
+---
+import MaterialSymbol from "@/components/landing/MaterialSymbol.astro";
+
+interface CtaLink {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  primaryCta: CtaLink;
+  secondaryCta: CtaLink;
+}
+
+const { primaryCta, secondaryCta } = Astro.props;
+---
+
+<section
+  class="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 overflow-hidden px-4 py-10 md:grid-cols-2 md:gap-16 md:px-16 md:py-16"
+>
+  <div class="relative z-10">
+    <h1 class="text-primary mb-4 text-4xl leading-tight font-bold tracking-tight md:text-5xl">
+      Master Your Palette.<br />Archive Your Journey.
+    </h1>
+    <p class="text-muted-foreground mb-8 max-w-lg text-lg leading-relaxed">
+      Transform messy workshop notes and forgotten recipes into a beautifully organized field journal. Document every
+      step, from basecoat to final highlight, and build a lasting archive of your miniature painting progress.
+    </p>
+    <div class="flex flex-col gap-4 sm:flex-row">
+      <a
+        href={primaryCta.href}
+        class="bg-primary-container hover:bg-primary font-label inline-flex items-center justify-center gap-2 rounded px-6 py-3 text-sm text-white shadow-sm transition-colors"
+      >
+        <MaterialSymbol name="edit_document" filled />
+        {primaryCta.label}
+      </a>
+      <a
+        href={secondaryCta.href}
+        class="border-secondary-accent text-secondary-accent hover:bg-surface-container font-label inline-flex items-center justify-center gap-2 rounded border px-6 py-3 text-sm transition-colors"
+      >
+        <MaterialSymbol name="explore" />
+        {secondaryCta.label}
+      </a>
+    </div>
+  </div>
+
+  <div class="relative flex h-[480px] w-full items-center justify-center md:h-[600px]">
+    <div
+      class="bg-card ink-border mockup-card absolute inset-0 z-10 flex -rotate-1 flex-col overflow-hidden rounded-lg shadow-sm"
+    >
+      <div class="border-border bg-surface-container flex items-center justify-between border-b p-4">
+        <h3 class="text-primary text-xl font-semibold">British Paratrooper</h3>
+        <span class="font-label text-muted-foreground ink-border bg-background rounded px-2 py-1 text-xs">
+          Bolt Action
+        </span>
+      </div>
+      <div class="mockup-ruled flex min-h-0 flex-1 flex-col px-4 pt-1 pb-4">
+        <div class="mockup-row font-label text-sm">
+          <span class="mr-2 size-2 shrink-0 rounded-full" style="background-color: #7a7553"></span>
+          Karak Stone
+          <div class="dotted-leader"></div>
+          <span class="text-muted-foreground">Base</span>
+        </div>
+        <div class="mockup-row font-label text-sm">
+          <span class="mr-2 size-2 shrink-0 rounded-full" style="background-color: #4b3d33"></span>
+          Agrax Earthshade
+          <div class="dotted-leader"></div>
+          <span class="text-muted-foreground">Wash</span>
+        </div>
+        <div class="mockup-row font-label text-sm">
+          <span class="mr-2 size-2 shrink-0 rounded-full" style="background-color: #7b2e36"></span>
+          Wild Rider Red
+          <div class="dotted-leader"></div>
+          <span class="text-muted-foreground">Beret</span>
+        </div>
+        <div class="mockup-row">
+          <h4 class="text-primary font-serif text-base font-semibold">Process Notes</h4>
+        </div>
+        <div class="mockup-notes">
+          <p class="text-muted-foreground font-label text-sm italic">
+            Smock in khaki with brush-stroke camo in dark earth and olive. Maroon beret finished with a silver cap
+            badge; webbing left in natural tan canvas.
+          </p>
+        </div>
+        <div class="ink-border relative mt-auto h-60 overflow-hidden rounded">
+          <img
+            src="/paratrooper.jpg"
+            alt="Close-up of a painted British Paratrooper miniature in maroon beret and Denison smock"
+            class="relative top-[-30px] h-full w-full object-cover object-center"
+            width="640"
+            height="480"
+            loading="lazy"
+          />
+          <div
+            class="border-border bg-background/90 font-label absolute right-0 bottom-0 left-0 border-t p-2 text-center text-xs backdrop-blur-sm"
+          >
+            Final Result — Jun 24, 2026
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mockup-card {
+    --mockup-rule: 28px;
+  }
+
+  .mockup-ruled {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent calc(var(--mockup-rule) - 1px),
+      #dac2b6 calc(var(--mockup-rule) - 1px),
+      #dac2b6 var(--mockup-rule)
+    );
+    background-position: 0 0;
+  }
+
+  .mockup-row {
+    display: flex;
+    height: var(--mockup-rule);
+    align-items: center;
+  }
+
+  .mockup-row .dotted-leader {
+    top: 0;
+    align-self: center;
+  }
+
+  .mockup-notes p {
+    margin: 0;
+    line-height: var(--mockup-rule);
+  }
+</style>
