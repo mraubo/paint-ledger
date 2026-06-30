@@ -478,10 +478,10 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [ ] 5.1 `npm run lint`
-- [ ] 5.2 `npm run build`
-- [ ] 5.3 `npm run test:integration`
-- [ ] 5.4 `npm run test:e2e`
+- [x] 5.1 `npm run lint`
+- [x] 5.2 `npm run build`
+- [x] 5.3 `npm run test:integration`
+- [x] 5.4 `npm run test:e2e`
 
 #### Manual
 

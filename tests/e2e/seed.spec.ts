@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { signInAsUserA } from "./helpers/sign-in";
+import { parseEntryIdFromEditUrl } from "./helpers/entry-url";
 
 test("created entry persists after reload and can be deleted", async ({ page }) => {
   const entryTitle = `Test Entry ${Date.now()}`;
@@ -12,8 +13,16 @@ test("created entry persists after reload and can be deleted", async ({ page }) 
   await titleInput.pressSequentially(entryTitle);
   await page.getByRole("button", { name: "Create entry" }).click();
 
-  await expect(page).toHaveURL(/created=/);
+  await expect(page).toHaveURL(/\/entries\/[^/]+\/edit\?created=1/);
   await expect(page.getByText("Entry created")).toBeVisible();
+  await expect(titleInput).toHaveValue(entryTitle);
+
+  const entryId = parseEntryIdFromEditUrl(page.url());
+
+  await page.reload();
+  await expect(titleInput).toHaveValue(entryTitle);
+
+  await page.goto("/entries");
   await expect(page.getByRole("link", { name: entryTitle })).toBeVisible();
 
   await page.reload();
@@ -31,4 +40,7 @@ test("created entry persists after reload and can be deleted", async ({ page }) 
   await expect(page).toHaveURL(/deleted=/);
   await expect(page.getByText(`"${entryTitle}" deleted`)).toBeVisible();
   await expect(page.getByRole("link", { name: entryTitle })).not.toBeVisible();
+
+  // Sanity: entry id was valid UUID-shaped path segment
+  expect(entryId).toMatch(/^[0-9a-f-]{36}$/i);
 });
