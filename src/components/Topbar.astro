@@ -1,38 +1,58 @@
 ---
+import BrandLogo from "@/components/ui/BrandLogo.astro";
+import SiteHeader from "@/components/ui/SiteHeader.astro";
+
+interface Props {
+  class?: string;
+  logoHref?: string;
+}
+
+const { class: className, logoHref } = Astro.props;
 const { user } = Astro.locals;
+
+const navLinkClass = "font-label text-muted-foreground hover:text-primary-container text-sm transition-colors";
 ---
 
-<div class="border-border bg-muted mb-4 flex items-center justify-between rounded-xl border px-4 py-3 text-sm">
+<SiteHeader class:list={className} contentClass="max-w-7xl">
   {
     user ? (
       <>
-        <span class="text-muted-foreground">{user.email}</span>
-        <div class="flex items-center gap-3">
-          <a href="/entries" class="text-secondary-foreground hover:text-primary transition-colors hover:underline">
+        <div class="flex min-w-0 items-center gap-3">
+          <BrandLogo href={logoHref} />
+          <span class:list={[navLinkClass, "hidden truncate sm:inline"]}>{user.email}</span>
+        </div>
+        <nav class="flex items-center gap-4 md:gap-8" aria-label="App">
+          <a href="/entries" class:list={navLinkClass}>
             Entries
           </a>
-          <a href="/entries/new" class="text-secondary-foreground hover:text-primary transition-colors hover:underline">
+          <a
+            href="/entries/new"
+            class="bg-primary-container hover:bg-primary font-label hidden rounded px-4 py-2 text-sm text-white transition-colors md:inline-flex md:items-center"
+          >
             New entry
           </a>
           <form method="POST" action="/api/auth/signout">
-            <button type="submit" class="text-muted-foreground hover:text-foreground transition-colors hover:underline">
+            <button type="submit" class:list={[navLinkClass, "hover:underline"]}>
               Sign out
             </button>
           </form>
-        </div>
+        </nav>
       </>
     ) : (
       <>
-        <span class="text-muted-foreground">Not signed in</span>
-        <div class="flex gap-3">
-          <a href="/auth/signin" class="text-secondary-foreground hover:text-primary transition-colors hover:underline">
+        <BrandLogo />
+        <nav class="flex items-center gap-4 md:gap-8" aria-label="Account">
+          <a href="/auth/signin" class:list={navLinkClass}>
             Sign in
           </a>
-          <a href="/auth/signup" class="text-secondary-foreground hover:text-primary transition-colors hover:underline">
+          <a
+            href="/auth/signup"
+            class="bg-primary-container hover:bg-primary font-label rounded px-4 py-2 text-sm text-white transition-colors"
+          >
             Sign up
           </a>
-        </div>
+        </nav>
       </>
     )
   }
-</div>
+</SiteHeader>

@@ -11,7 +11,7 @@ const { title = "Paint Ledger" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -22,6 +22,7 @@ const { title = "Paint Ledger" } = Astro.props;
     <meta name="apple-mobile-web-app-title" content="Paint Ledger" />
     <link rel="manifest" href="/site.webmanifest" />
     <title>{title}</title>
+    <slot name="head" />
   </head>
   <body>
     {

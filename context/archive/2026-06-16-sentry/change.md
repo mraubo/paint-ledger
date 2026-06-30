@@ -1,10 +1,10 @@
 ---
 change_id: sentry
 title: Add and configure Sentry for Astro error monitoring
-status: impl_reviewed
+status: archived
 created: 2026-06-16
-updated: 2026-06-16
-archived_at: null
+updated: 2026-06-30
+archived_at: 2026-06-30T17:23:19Z
 ---
 
 ## Notes

@@ -1,0 +1,24 @@
+---
+import BrandLogo from "@/components/ui/BrandLogo.astro";
+
+interface Props {
+  class?: string;
+  logoHref?: string;
+}
+
+const { class: className, logoHref } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer
+  class:list={[
+    "bg-surface-container border-border mt-10 flex w-full flex-col items-center justify-between gap-4 border-t px-4 py-8 md:flex-row md:px-16 md:py-10",
+    className,
+  ]}
+>
+  <BrandLogo small href={logoHref} />
+  <p class="text-muted-foreground text-center text-sm">
+    © {year} Paint Ledger. Hand-ruled for the dedicated painter.
+  </p>
+  <p class="text-muted-foreground text-center text-sm md:text-right">Keep painting ;)</p>
+</footer>

@@ -15,7 +15,7 @@ export function PaintCard({ name, approximate_color, className }: PaintCardProps
       className={cn("border-border bg-card inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5", className)}
     >
       <span
-        className="border-border size-6 shrink-0 rounded border"
+        className="border-border size-6 shrink-0 rounded-full border"
         style={{ backgroundColor: swatchColor }}
         aria-hidden="true"
       />

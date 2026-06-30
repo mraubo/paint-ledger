@@ -1,0 +1,284 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Paint Ledger - Master Your Palette</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&amp;family=Source+Serif+4:wght@400;600;700&amp;family=Work+Sans:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#2c4c4c",
+                        "inverse-primary": "#ffb68c",
+                        "on-primary-fixed-variant": "#753401",
+                        "on-tertiary-fixed-variant": "#3b4d14",
+                        "secondary": "#446464",
+                        "surface-container": "#efeeea",
+                        "tertiary": "#35470f",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#b8cf88",
+                        "surface-container-highest": "#e4e2de",
+                        "primary-fixed": "#ffdbc9",
+                        "surface-variant": "#e4e2de",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#4c5f25",
+                        "inverse-surface": "#30312e",
+                        "inverse-on-surface": "#f2f0ed",
+                        "on-error-container": "#93000a",
+                        "surface": "#fbf9f5",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#c6e9e9",
+                        "on-primary-fixed": "#321200",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#ffb68c",
+                        "surface-dim": "#dbdad6",
+                        "on-primary-container": "#ffc29f",
+                        "outline-variant": "#dac2b6",
+                        "on-secondary-container": "#4a6a6a",
+                        "on-surface-variant": "#54433a",
+                        "on-tertiary-container": "#c1d890",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#d4eca2",
+                        "primary": "#6c2f00",
+                        "secondary-fixed-dim": "#abcdcd",
+                        "outline": "#877369",
+                        "on-secondary-fixed": "#002020",
+                        "primary-container": "#8b4513",
+                        "on-surface": "#1b1c1a",
+                        "background": "#fbf9f5",
+                        "secondary-fixed": "#c6e9e9",
+                        "surface-tint": "#934b19",
+                        "surface-container-high": "#eae8e4",
+                        "surface-bright": "#fbf9f5",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f5f3ef",
+                        "on-tertiary-fixed": "#141f00"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "lg": "24px",
+                        "margin-desktop": "64px",
+                        "gutter": "20px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xl": "40px"
+                    },
+                    fontFamily: {
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["\"Source Serif 4\""],
+                        "headline-md": ["\"Source Serif 4\""],
+                        "body-md": ["Work Sans"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["\"Source Serif 4\""],
+                        "display-lg": ["\"Source Serif 4\""],
+                        "body-lg": ["Work Sans"]
+                    },
+                    fontSize: {
+                        "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .ruled-bg {
+            background-image: linear-gradient(transparent 95%, #dac2b6 95%);
+            background-size: 100% 32px;
+            background-position: 0 8px;
+        }
+        .ink-border {
+            border: 1px solid #dac2b6;
+        }
+        .recessed-fill {
+            background-color: #efeeea;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .hover-lift {
+            transition: all 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.05);
+        }
+        .dotted-leader {
+            border-bottom: 2px dotted #dac2b6;
+            flex-grow: 1;
+            margin: 0 12px;
+            position: relative;
+            top: -6px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopNavBar Component -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-inverse-primary font-headline-md text-headline-md font-serif text-on-surface dark:text-on-surface text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary w-full top-0 sticky border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center px-margin-desktop py-md max-w-7xl mx-auto z-50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book</span>
+<span class="">Paint Ledger</span>
+</div>
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md hover:text-primary-container dark:hover:text-on-primary-container transition-colors scale-95 active:opacity-80 transition-transform" href="#">Features</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md hover:text-primary-container dark:hover:text-on-primary-container transition-colors scale-95 active:opacity-80 transition-transform" href="#">Palette</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md hover:text-primary-container dark:hover:text-on-primary-container transition-colors scale-95 active:opacity-80 transition-transform" href="#">Journal</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-md text-label-md hover:text-primary-container dark:hover:text-on-primary-container transition-colors scale-95 active:opacity-80 transition-transform" href="#">Community</a>
+</nav>
+<button class="bg-primary-container text-white px-md py-sm rounded font-label-md hover:opacity-90 transition-opacity">Get Started</button>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="py-xl px-margin-desktop max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-xl items-center relative overflow-hidden">
+<div class="z-10 relative">
+<h1 class="font-display-lg text-display-lg text-primary mb-md tracking-tight leading-tight">Master Your Palette.<br>Archive Your Journey.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg max-w-lg leading-relaxed">
+                    Transform messy workshop notes and forgotten recipes into a beautifully organized field journal. Document every step, from basecoat to final highlight, and build a lasting archive of your miniature painting progress.
+                </p>
+<div class="flex flex-col sm:flex-row gap-md">
+<button class="bg-primary-container text-white px-lg py-md rounded font-label-md text-label-md shadow-sm hover:bg-primary transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_document</span>
+                        Start Your First Log
+                    </button>
+<button class="border border-secondary text-secondary px-lg py-md rounded font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">explore</span>
+                        Explore the Library
+                    </button>
+</div>
+
+</div>
+<div class="relative w-full h-[600px] flex justify-center items-center">
+<!-- Decorative background elements -->
+<div class="absolute inset-0 bg-surface-container rounded-lg ink-border opacity-50 transform rotate-3 scale-95"></div>
+<div class="absolute inset-0 bg-surface-container-lowest rounded-lg ink-border shadow-sm transform -rotate-1 z-10 overflow-hidden flex flex-col">
+<!-- App Mockup: Ledger View -->
+<div class="border-b border-outline-variant p-md bg-surface-container flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-primary">British Paratrooper</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface px-sm py-xs rounded ink-border">Bolt Action</span>
+</div>
+<div class="p-md flex-grow flex flex-col gap-md ruled-bg">
+<div class="flex items-center text-label-md font-label-md text-on-surface">
+<span class="w-2 h-2 rounded-full bg-blue-700 mr-sm"></span>
+                            Macragge Blue
+                            <div class="dotted-leader"></div>
+<span class="text-on-surface-variant">Base</span>
+</div>
+<div class="flex items-center text-label-md font-label-md text-on-surface">
+<span class="w-2 h-2 rounded-full bg-black mr-sm"></span>
+                            Nuln Oil
+                            <div class="dotted-leader"></div>
+<span class="text-on-surface-variant">Wash</span>
+</div>
+<div class="flex items-center text-label-md font-label-md text-on-surface">
+<span class="w-2 h-2 rounded-full bg-blue-300 mr-sm"></span>
+                            Calgar Blue
+                            <div class="dotted-leader"></div>
+<span class="text-on-surface-variant">Highlight</span>
+</div>
+<div class="mt-md">
+<h4 class="font-headline-sm font-serif text-primary mb-sm">Process Notes</h4>
+<p class="font-body-md text-on-surface-variant italic leading-relaxed">
+                                "Applied the wash carefully into the recesses of the armor, avoiding flat panels to maintain the vibrant blue. Edge highlights were kept thin."
+                            </p>
+</div>
+<div class="mt-auto h-48 rounded ink-border overflow-hidden relative group">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500" data-alt="Close-up cinematic shot of a painted 28mm WWII British paratrooper miniature for Bolt Action, focus on head and torso, realistic military paint scheme, khaki uniform, maroon beret, detailed facial features, weathered appearance." src="https://lh3.googleusercontent.com/aida/AP1WRLthIs3QVhArBWrWqmct3xIOyXFtoX465ZkAO-hrNxuOYfaz0CBNU3-Gu1dsvGrNhCQHNWO5knT34YlQiqwEAMtDmH14qIQj44Cpg2mFf1DCc8hyjiOpIWpcGLf4AZVelbrHg78RMjQ7f93eLP7fqcaXXDCKUYtVdXlSB1fg-Ox40Yi-gRuTU2RafS3kE4TRsHgkgAnSmiyeY_Ct6T6swaXfIpeCuz-OiYzU1qJZrv55G76A0dWbZWVkUw">
+<div class="absolute bottom-0 left-0 right-0 bg-surface/90 p-sm text-center font-label-sm border-t border-outline-variant backdrop-blur-sm">
+                                Final Result - 10/24/2023
+                             </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Showcase -->
+<section class="py-xl px-margin-desktop max-w-7xl mx-auto bg-surface-container rounded-xl ink-border my-xl">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-sm">The Chronicler's Tools</h2>
+<p class="font-body-md text-on-surface-variant max-w-2xl mx-auto">Everything you need to document your hobby journey, designed with the careful structure of a hand-ruled ledger.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Feature 1 -->
+<div class="bg-surface p-lg rounded ink-border hover-lift flex flex-col h-full">
+<div class="w-12 h-12 bg-primary-container text-white rounded flex items-center justify-center mb-md">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">The Digital Ledger</h3>
+<p class="font-body-md text-on-surface-variant flex-grow">
+                        Unify your models, palettes, and step-by-step processes in one place. Never forget which colors you used for a specific army scheme again.
+                    </p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface p-lg rounded ink-border hover-lift flex flex-col h-full">
+<div class="w-12 h-12 bg-primary-container text-white rounded flex items-center justify-center mb-md">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">Recipe Management</h3>
+<p class="font-body-md text-on-surface-variant flex-grow">Manage your paints directly within your process. Track colors and mixes at every step of your painting workflow to ensure perfect consistency.</p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface p-lg rounded ink-border hover-lift flex flex-col h-full">
+<div class="w-12 h-12 bg-primary-container text-white rounded flex items-center justify-center mb-md">
+<span class="material-symbols-outlined">photo_library</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">Visual Archiving</h3>
+<p class="font-body-md text-on-surface-variant flex-grow">
+                        Build a beautiful, high-quality photo gallery of your finished results. Look back at your early work and celebrate your progression as a painter.
+                    </p>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-xl px-margin-desktop max-w-4xl mx-auto text-center border-t border-b border-outline-variant my-xl relative">
+<!-- Subtle background texture -->
+<div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #877369 25%, transparent 25%, transparent 75%, #877369 75%, #877369), repeating-linear-gradient(45deg, #877369 25%, #fbf9f5 25%, #fbf9f5 75%, #877369 75%, #877369); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+<div class="relative z-10 bg-surface/95 p-xl rounded-lg ink-border backdrop-blur-sm">
+<span class="material-symbols-outlined text-4xl text-primary mb-md block">ink_pen</span>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-md">Ready to organize your paints?</h2>
+<p class="font-body-md text-on-surface-variant mb-lg max-w-lg mx-auto">
+                    Join the community of dedicated hobbyists treating their painting logs with the same care they apply to their miniatures.
+                </p>
+<button class="bg-primary-container text-white px-xl py-md rounded font-label-md text-label-md shadow-sm hover:bg-primary transition-colors inline-flex items-center gap-sm">
+                    Create Free Account
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-surface-container dark:bg-surface-container-highest text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant font-headline-md text-headline-md text-primary dark:text-inverse-primary w-full mt-xl border-t border-outline-variant dark:border-outline flat no shadows flex flex-col md:flex-row justify-between items-center px-margin-desktop py-xl gap-md">
+<div class="flex items-center gap-sm font-headline-md text-headline-md text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">book</span>
+<span class="">Paint Ledger</span>
+</div>
+<p class="text-on-surface-variant">© 2024 Chronicler’s Archive. Hand-ruled for the dedicated painter.</p>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Support</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Archive Guidelines</a>
+</div>
+</footer>
+
+
+
+
+</body></html>

@@ -36,5 +36,5 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/entries/new?error=${encodeURIComponent(toUserFacingDbError(error))}`);
   }
 
-  return context.redirect(`/entries?created=${data.id}`);
+  return context.redirect(`/entries/${data.id}/edit?created=1`);
 };

@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
+import SiteFooter from "@/components/ui/SiteFooter.astro";
 
 interface Props {
   title?: string;
@@ -10,12 +11,13 @@ const { title = "Paint Ledger" } = Astro.props;
 ---
 
 <Layout title={title}>
-  <div class="bg-background text-foreground flex min-h-screen flex-col p-4 lg:px-16">
-    <div class="mx-auto w-full max-w-4xl">
-      <Topbar />
-      <main class="mt-4">
+  <div class="bg-background text-foreground flex min-h-screen flex-col">
+    <Topbar logoHref="/entries" />
+    <div class="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 lg:px-16">
+      <main class="mt-4 flex-1">
         <slot />
       </main>
     </div>
+    <SiteFooter />
   </div>
 </Layout>

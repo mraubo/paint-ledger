@@ -1,0 +1,19 @@
+---
+interface Props {
+  href?: string;
+  small?: boolean;
+  class?: string;
+}
+
+const { href = "/entries", class: className, small = false } = Astro.props;
+---
+
+<a href={href} class:list={["inline-flex shrink-0 items-center", className]}>
+  <img
+    src="/logo-paint-ledger.svg"
+    alt="Paint Ledger"
+    class:list={["h-5 w-auto", !small && "md:h-8"]}
+    width="187"
+    height="32"
+  />
+</a>

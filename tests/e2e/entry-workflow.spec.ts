@@ -5,6 +5,7 @@
  */
 import { test, expect } from "@playwright/test";
 import { signInAsUserA } from "./helpers/sign-in";
+import { parseEntryIdFromEditUrl } from "./helpers/entry-url";
 
 test("entry workflow green path: create entry, add paint, add step, remove step, delete entry", async ({ page }) => {
   const entryTitle = `E2E Workflow ${Date.now()}`;
@@ -20,12 +21,10 @@ test("entry workflow green path: create entry, add paint, add step, remove step,
   await titleInput.click();
   await titleInput.pressSequentially(entryTitle);
   await page.getByRole("button", { name: "Create entry" }).click();
-  await expect(page).toHaveURL(/created=/);
+  await expect(page).toHaveURL(/\/entries\/[^/]+\/edit\?created=1/);
   await expect(page.getByText("Entry created")).toBeVisible();
 
-  const createdUrl = new URL(page.url());
-  const entryId = createdUrl.searchParams.get("created");
-  expect(entryId).toBeTruthy();
+  const entryId = parseEntryIdFromEditUrl(page.url());
 
   // Navigate to paints page and add paint (wait for React island hydration)
   await page.goto(`/entries/${entryId}/paints`);
