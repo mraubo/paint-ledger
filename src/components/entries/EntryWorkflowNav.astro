@@ -1,0 +1,106 @@
+---
+import WorkflowNavIcon from "@/components/entries/WorkflowNavIcon.astro";
+
+type WorkflowPage = "view" | "edit" | "paints" | "paints-edit" | "steps" | "steps-edit" | "new";
+
+interface NavAction {
+  key: string;
+  label: string;
+  href: string;
+  icon: "eye" | "palette" | "list-ordered" | "pencil" | "arrow-left" | "layout-list";
+}
+
+interface Props {
+  entryId?: string;
+  current: WorkflowPage;
+}
+
+const { entryId, current } = Astro.props;
+
+const linkClass =
+  "border-border text-foreground hover:bg-accent inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors";
+const currentClass =
+  "border-border bg-muted text-muted-foreground inline-flex cursor-default items-center gap-2 rounded-lg border px-3 py-2 text-sm";
+
+function buildActions(page: WorkflowPage, id: string): NavAction[] {
+  const entryBase = `/entries/${id}`;
+
+  switch (page) {
+    case "edit":
+      return [
+        { key: "view", label: "View entry", href: entryBase, icon: "eye" },
+        { key: "paints", label: "Manage paints", href: `${entryBase}/paints`, icon: "palette" },
+        { key: "steps", label: "Manage steps", href: `${entryBase}/steps`, icon: "list-ordered" },
+        { key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" },
+      ];
+    case "view":
+      return [
+        { key: "edit", label: "Edit entry", href: `${entryBase}/edit`, icon: "pencil" },
+        { key: "paints", label: "Manage paints", href: `${entryBase}/paints`, icon: "palette" },
+        { key: "steps", label: "Manage steps", href: `${entryBase}/steps`, icon: "list-ordered" },
+        { key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" },
+      ];
+    case "paints":
+      return [
+        { key: "steps", label: "Manage steps", href: `${entryBase}/steps`, icon: "list-ordered" },
+        { key: "edit", label: "Back to entry", href: `${entryBase}/edit`, icon: "pencil" },
+        { key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" },
+      ];
+    case "paints-edit":
+      return [
+        { key: "paints", label: "Back to paints", href: `${entryBase}/paints`, icon: "arrow-left" },
+        { key: "edit", label: "Back to entry", href: `${entryBase}/edit`, icon: "pencil" },
+      ];
+    case "steps":
+      return [
+        { key: "paints", label: "Manage paints", href: `${entryBase}/paints`, icon: "palette" },
+        { key: "edit", label: "Back to entry", href: `${entryBase}/edit`, icon: "pencil" },
+        { key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" },
+      ];
+    case "steps-edit":
+      return [
+        { key: "steps", label: "Back to steps", href: `${entryBase}/steps`, icon: "arrow-left" },
+        { key: "paints", label: "Manage paints", href: `${entryBase}/paints`, icon: "palette" },
+        { key: "edit", label: "Back to entry", href: `${entryBase}/edit`, icon: "pencil" },
+        { key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" },
+      ];
+    case "new":
+      return [{ key: "entries", label: "Back to entries", href: "/entries", icon: "layout-list" }];
+  }
+}
+
+const currentPageAction: Record<WorkflowPage, { label: string; icon: NavAction["icon"] } | null> = {
+  view: { label: "View entry", icon: "eye" },
+  edit: { label: "Edit entry", icon: "pencil" },
+  paints: { label: "Manage paints", icon: "palette" },
+  "paints-edit": { label: "Edit paint", icon: "pencil" },
+  steps: { label: "Manage steps", icon: "list-ordered" },
+  "steps-edit": { label: "Edit step", icon: "pencil" },
+  new: { label: "New entry", icon: "pencil" },
+};
+
+const actions = buildActions(current, entryId ?? "");
+const here = currentPageAction[current];
+---
+
+<nav
+  class="border-border mt-6 flex flex-wrap justify-center gap-2 border-t pt-6 sm:justify-start"
+  aria-label="Entry workflow"
+>
+  {
+    here && (
+      <span class:list={currentClass} aria-current="page">
+        <WorkflowNavIcon name={here.icon} />
+        {here.label}
+      </span>
+    )
+  }
+  {
+    actions.map((action) => (
+      <a href={action.href} class:list={linkClass}>
+        <WorkflowNavIcon name={action.icon} />
+        {action.label}
+      </a>
+    ))
+  }
+</nav>

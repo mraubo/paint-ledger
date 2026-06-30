@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import PageCard from "@/components/ui/PageCard.astro";
 import PageHeading from "@/components/ui/PageHeading.astro";
 import EntryBasicsForm from "@/components/entries/EntryBasicsForm";
+import EntryWorkflowNav from "@/components/entries/EntryWorkflowNav.astro";
 
 const error = Astro.url.searchParams.get("error");
 ---
@@ -11,8 +12,6 @@ const error = Astro.url.searchParams.get("error");
   <PageCard>
     <PageHeading title="New entry" />
     <EntryBasicsForm mode="create" serverError={error} client:load />
-    <p class="text-muted-foreground mt-4 text-center text-sm">
-      <a href="/entries" class="text-primary hover:underline">Back to entries</a>
-    </p>
+    <EntryWorkflowNav current="new" />
   </PageCard>
 </AppLayout>

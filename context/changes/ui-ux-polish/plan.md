@@ -433,24 +433,24 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [x] 1.1 `npm run lint`
-- [x] 1.2 `npm run build`
-- [x] 1.3 `npm run test:integration`
+- [x] 1.1 `npm run lint` — 91fa484
+- [x] 1.2 `npm run build` — 91fa484
+- [x] 1.3 `npm run test:integration` — 91fa484
 
 #### Manual
 
-- [x] 1.4 Create entry lands on edit with banner; swatches circular; ColorField deduped; badge aligned
+- [x] 1.4 Create entry lands on edit with banner; swatches circular; ColorField deduped; badge aligned — 91fa484
 
 ### Phase 2: Entry Workflow Navigation
 
 #### Automated
 
-- [ ] 2.1 `npm run lint`
-- [ ] 2.2 `npm run build`
+- [x] 2.1 `npm run lint`
+- [x] 2.2 `npm run build`
 
 #### Manual
 
-- [ ] 2.3 Icon action bar on all workflow pages; links correct; danger zone below nav on edit
+- [x] 2.3 Icon action bar on all workflow pages; links correct; danger zone below nav on edit
 
 ### Phase 3: Header & Logo
 

@@ -6,6 +6,7 @@ import PageHeading from "@/components/ui/PageHeading.astro";
 import StatusChip from "@/components/ui/StatusChip.astro";
 import EntryPaintReadOnlyRow from "@/components/entries/EntryPaintReadOnlyRow.astro";
 import EntryStepReadOnly from "@/components/entries/EntryStepReadOnly.astro";
+import EntryWorkflowNav from "@/components/entries/EntryWorkflowNav.astro";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
 import { loadEntryForEdit, resolveEntryFinalPhotoUrl, type EntryDetailBasics } from "@/lib/entries-page";
@@ -146,17 +147,6 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
       )
     }
 
-    <div class="border-border mt-8 border-t pt-8">
-      <a
-        href={`/entries/${entry.id}/edit`}
-        class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-      >
-        Edit entry
-      </a>
-    </div>
-
-    <p class="text-muted-foreground mt-6 text-center text-sm">
-      <a href="/entries" class="text-primary hover:underline">Back to entries</a>
-    </p>
+    <EntryWorkflowNav entryId={entry.id} current="view" />
   </PageCard>
 </AppLayout>

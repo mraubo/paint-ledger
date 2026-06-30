@@ -4,6 +4,7 @@ import Alert from "@/components/ui/Alert.astro";
 import PageCard from "@/components/ui/PageCard.astro";
 import PageHeading from "@/components/ui/PageHeading.astro";
 import EntryStepForm from "@/components/entries/EntryStepForm";
+import EntryWorkflowNav from "@/components/entries/EntryWorkflowNav.astro";
 import { PaintCard } from "@/components/entries/PaintCard";
 import { createClient } from "@/lib/supabase";
 import { isValidEntryId } from "@/lib/entries-api";
@@ -106,23 +107,7 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
             client:load
           />
 
-          <p class="text-muted-foreground mt-6 text-center text-sm">
-            <a href={stepsBaseUrl} class="text-primary hover:underline">
-              Back to steps
-            </a>
-            <span class="text-muted-foreground/50 mx-2">·</span>
-            <a href={`/entries/${entryId}/paints`} class="text-primary hover:underline">
-              Manage paints
-            </a>
-            <span class="text-muted-foreground/50 mx-2">·</span>
-            <a href={`/entries/${entryId}/edit`} class="text-primary hover:underline">
-              Back to entry
-            </a>
-            <span class="text-muted-foreground/50 mx-2">·</span>
-            <a href="/entries" class="text-primary hover:underline">
-              Back to entries
-            </a>
-          </p>
+          <EntryWorkflowNav entryId={entryId} current="steps-edit" />
         </>
       ) : (
         <>
@@ -233,19 +218,7 @@ const pageTitle = isEditView && editingStep ? `Edit step ${editingStep.position}
             </div>
           )}
 
-          <p class="text-muted-foreground mt-6 text-center text-sm">
-            <a href={`/entries/${entryId}/paints`} class="text-primary hover:underline">
-              Manage paints
-            </a>
-            <span class="text-muted-foreground/50 mx-2">·</span>
-            <a href={`/entries/${entryId}/edit`} class="text-primary hover:underline">
-              Back to entry
-            </a>
-            <span class="text-muted-foreground/50 mx-2">·</span>
-            <a href="/entries" class="text-primary hover:underline">
-              Back to entries
-            </a>
-          </p>
+          <EntryWorkflowNav entryId={entryId} current="steps" />
         </>
       )
     }
