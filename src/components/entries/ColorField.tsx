@@ -40,11 +40,6 @@ export function ColorField({ id, name, label, value, onChange, error }: ColorFie
         {label}
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <span
-          className="border-border size-10 shrink-0 rounded-lg border"
-          style={{ backgroundColor: swatchValue(value) }}
-          aria-hidden
-        />
         <input
           id={`${id}-picker`}
           type="color"

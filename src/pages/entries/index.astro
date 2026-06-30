@@ -6,7 +6,6 @@ import PageHeading from "@/components/ui/PageHeading.astro";
 import StatusChip from "@/components/ui/StatusChip.astro";
 import EntryListActionsMenu from "@/components/entries/EntryListActionsMenu";
 import { createClient } from "@/lib/supabase";
-import { isValidEntryId } from "@/lib/entries-api";
 import { formatEntryDate, formatStepCount, loadEntryList } from "@/lib/entries-page";
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
@@ -14,8 +13,6 @@ const listResult = supabase ? await loadEntryList(supabase) : { ok: true as cons
 const entries = listResult.ok ? listResult.entries : [];
 const listError = listResult.ok ? null : listResult.error;
 
-const createdParam = Astro.url.searchParams.get("created");
-const showCreatedBanner = Boolean(createdParam && isValidEntryId(createdParam));
 const error = Astro.url.searchParams.get("error");
 
 const MAX_DELETED_TITLE_LENGTH = 200;
@@ -42,8 +39,6 @@ const showDeletedBanner = Boolean(deletedTitle);
         Create entry
       </a>
     </div>
-
-    {showCreatedBanner && <Alert variant="success" message="Entry created" class="mb-4" />}
 
     {
       showDeletedBanner && deletedTitle && (

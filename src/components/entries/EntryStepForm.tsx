@@ -84,7 +84,7 @@ function PaintChecklist({ entryId, entryPaints, selectedPaintIds, onTogglePaint 
                     className="border-border bg-input text-primary focus:ring-ring mt-1 size-4 shrink-0 rounded border"
                   />
                   <span
-                    className="border-border mt-0.5 size-8 shrink-0 rounded border"
+                    className="border-border mt-0.5 size-8 shrink-0 rounded-full border"
                     style={{ backgroundColor: swatchColor }}
                     aria-hidden="true"
                   />

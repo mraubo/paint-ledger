@@ -73,7 +73,7 @@ const hasModelOriginNote = entry.model_origin_note.trim().length > 0;
 
 <AppLayout title={entry.title}>
   <PageCard>
-    <div class="mb-6 flex flex-wrap items-center gap-3">
+    <div class="mb-6 flex flex-wrap items-baseline gap-3">
       <PageHeading title={entry.title} class="mb-0" />
       {entry.status === "draft" && <StatusChip status="draft" />}
       {entry.status === "ready" && <StatusChip status="ready" />}

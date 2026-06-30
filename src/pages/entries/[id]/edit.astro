@@ -43,6 +43,7 @@ if (!entry) {
 
 const error = Astro.url.searchParams.get("error");
 const statusError = Astro.url.searchParams.get("status_error");
+const showCreatedBanner = Astro.url.searchParams.get("created") === "1";
 const showSavedBanner = Astro.url.searchParams.get("saved") === "1";
 const showFinalPhotoSavedBanner = Astro.url.searchParams.get("final_photo_saved") === "1";
 const statusChanged = Astro.url.searchParams.get("status_changed");
@@ -60,11 +61,13 @@ const initialValues = {
 
 <AppLayout title={entry.title}>
   <PageCard>
-    <div class="mb-6 flex flex-wrap items-center gap-3">
+    <div class="mb-6 flex flex-wrap items-baseline gap-3">
       <PageHeading title={entry.title} class="mb-0" />
       {entry.status === "draft" && <StatusChip status="draft" />}
       {entry.status === "ready" && <StatusChip status="ready" />}
     </div>
+
+    {showCreatedBanner && <Alert variant="success" message="Entry created" class="mb-4" />}
 
     {showSavedBanner && <Alert variant="success" message="Changes saved" class="mb-4" />}
 

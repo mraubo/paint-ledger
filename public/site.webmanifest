@@ -1,6 +1,6 @@
 {
-  "name": "Paint Ledger",
-  "short_name": "Paint Ledger",
+  "name": "PaintLegder",
+  "short_name": "PaintLegder",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
