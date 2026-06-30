@@ -3,9 +3,10 @@ import BrandLogo from "@/components/ui/BrandLogo.astro";
 
 interface Props {
   class?: string;
+  logoHref?: string;
 }
 
-const { class: className } = Astro.props;
+const { class: className, logoHref } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
@@ -15,7 +16,7 @@ const year = new Date().getFullYear();
     className,
   ]}
 >
-  <BrandLogo small />
+  <BrandLogo small href={logoHref} />
   <p class="text-muted-foreground text-center text-sm">
     © {year} Paint Ledger. Hand-ruled for the dedicated painter.
   </p>

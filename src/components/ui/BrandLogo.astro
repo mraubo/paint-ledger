@@ -5,7 +5,7 @@ interface Props {
   class?: string;
 }
 
-const { href = "/", class: className, small = false } = Astro.props;
+const { href = "/entries", class: className, small = false } = Astro.props;
 ---
 
 <a href={href} class:list={["inline-flex shrink-0 items-center", className]}>

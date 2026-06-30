@@ -425,6 +425,18 @@ Update Playwright specs for new create redirect; run full verification suite.
 - Logo asset: `public/logo-paint-ledger.svg`
 - Prior deferral: `context/changes/system-design/plan.md` (homepage out of scope)
 
+## Addendum (impl-review 2026-06-30)
+
+Discovered scope shipped alongside planned work:
+
+- **`SiteHeader.astro`** — shared sticky header shell for `Topbar` and `LandingHeader` (DRY extraction).
+- **`SiteFooter.astro`** — shared footer for landing and authenticated `AppLayout` (app pages now include footer; plan originally scoped footer to landing only).
+- **`WorkflowNavIcon.astro`** — inline Lucide-style SVGs extracted from `EntryWorkflowNav`.
+- **Favicon/PWA bundle** — `favicon.svg`, `.ico`, `.png`, `apple-touch-icon`, `site.webmanifest`, `sygnet-paint-ledger.svg`; `Layout.astro` head links updated.
+- **`wrangler.jsonc`** — `run_worker_first` exclusions for image static assets (`*.jpg`, `*.png`, etc.) so logos/favicons serve from CDN on Cloudflare.
+- **`@fontsource/material-symbols-outlined`** — self-hosted Material Symbols (replaces Google Fonts CDN on landing; triage fix F2).
+- **`tests/e2e/helpers/entry-url.ts`** — `parseEntryIdFromEditUrl` helper for post-create edit redirect specs.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands.
