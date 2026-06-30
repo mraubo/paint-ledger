@@ -478,11 +478,11 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [x] 5.1 `npm run lint`
-- [x] 5.2 `npm run build`
-- [x] 5.3 `npm run test:integration`
-- [x] 5.4 `npm run test:e2e`
+- [x] 5.1 `npm run lint` — 01d7945
+- [x] 5.2 `npm run build` — 01d7945
+- [x] 5.3 `npm run test:integration` — 01d7945
+- [x] 5.4 `npm run test:e2e` — 01d7945
 
 #### Manual
 
-- [ ] 5.5 Full workflow + landing smoke (logged in/out)
+- [x] 5.5 Full workflow + landing smoke (logged in/out) — 01d7945

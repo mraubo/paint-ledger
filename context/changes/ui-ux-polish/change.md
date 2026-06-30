@@ -1,7 +1,7 @@
 ---
 change_id: ui-ux-polish
 title: UI/UX polish for entries, paints, and homepage
-status: implementing
+status: implemented
 created: 2026-06-30
 updated: 2026-06-30
 archived_at: null
