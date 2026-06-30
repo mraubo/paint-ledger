@@ -1,13 +1,20 @@
 ---
+import BrandLogo from "@/components/ui/BrandLogo.astro";
+
 const { user } = Astro.locals;
 ---
 
-<div class="border-border bg-muted mb-4 flex items-center justify-between rounded-xl border px-4 py-3 text-sm">
+<div
+  class="border-border bg-muted mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm"
+>
   {
     user ? (
       <>
-        <span class="text-muted-foreground">{user.email}</span>
-        <div class="flex items-center gap-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <BrandLogo href="/entries" />
+          <span class="text-muted-foreground hidden truncate sm:inline">{user.email}</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
           <a href="/entries" class="text-secondary-foreground hover:text-primary transition-colors hover:underline">
             Entries
           </a>

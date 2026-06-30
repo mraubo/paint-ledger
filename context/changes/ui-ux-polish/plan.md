@@ -445,23 +445,23 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [x] 2.1 `npm run lint`
-- [x] 2.2 `npm run build`
+- [x] 2.1 `npm run lint` — 9b705d5
+- [x] 2.2 `npm run build` — 9b705d5
 
 #### Manual
 
-- [x] 2.3 Icon action bar on all workflow pages; links correct; danger zone below nav on edit
+- [x] 2.3 Icon action bar on all workflow pages; links correct; danger zone below nav on edit — 9b705d5
 
 ### Phase 3: Header & Logo
 
 #### Automated
 
-- [ ] 3.1 `npm run lint`
-- [ ] 3.2 `npm run build`
+- [x] 3.1 `npm run lint`
+- [x] 3.2 `npm run build`
 
 #### Manual
 
-- [ ] 3.3 Logo in Topbar; email desktop-only; SVG renders without black rect
+- [x] 3.3 Logo in Topbar; email desktop-only; SVG renders without black rect
 
 ### Phase 4: Homepage (Stitch)
 
