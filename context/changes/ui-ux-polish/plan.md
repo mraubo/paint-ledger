@@ -467,12 +467,12 @@ Update Playwright specs for new create redirect; run full verification suite.
 
 #### Automated
 
-- [x] 4.1 `npm run lint`
-- [x] 4.2 `npm run build`
+- [x] 4.1 `npm run lint` — eafa523
+- [x] 4.2 `npm run build` — eafa523
 
 #### Manual
 
-- [x] 4.4 Landing matches Stitch; auth-aware CTAs; shared logo; responsive layout
+- [x] 4.4 Landing matches Stitch; auth-aware CTAs; shared logo; responsive layout — eafa523
 
 ### Phase 5: E2E & Verification
 
