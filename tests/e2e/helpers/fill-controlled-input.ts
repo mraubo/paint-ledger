@@ -6,7 +6,7 @@ export async function fillControlledInput(input: Locator, value: string): Promis
 }
 
 /** Fill multiple React controlled inputs in one retry loop (avoids hydration wiping earlier fields). */
-export async function fillControlledInputs(fields: Array<{ input: Locator; value: string }>): Promise<void> {
+export async function fillControlledInputs(fields: { input: Locator; value: string }[]): Promise<void> {
   await expect(async () => {
     for (const { input, value } of fields) {
       await input.click();
