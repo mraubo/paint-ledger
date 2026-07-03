@@ -6,6 +6,7 @@
 import { test, expect } from "@playwright/test";
 import { signInAsUserA } from "./helpers/sign-in";
 import { parseEntryIdFromEditUrl } from "./helpers/entry-url";
+import { fillControlledInput } from "./helpers/fill-controlled-input";
 
 test("entry workflow green path: create entry, add paint, add step, remove step, delete entry", async ({ page }) => {
   const entryTitle = `E2E Workflow ${Date.now()}`;
@@ -18,8 +19,7 @@ test("entry workflow green path: create entry, add paint, add step, remove step,
   // Create entry with unique title
   await page.getByRole("link", { name: "Create entry" }).click();
   const titleInput = page.getByRole("textbox", { name: "Title" });
-  await titleInput.click();
-  await titleInput.pressSequentially(entryTitle);
+  await fillControlledInput(titleInput, entryTitle);
   await page.getByRole("button", { name: "Create entry" }).click();
   await expect(page).toHaveURL(/\/entries\/[^/]+\/edit\?created=1/);
   await expect(page.getByText("Entry created")).toBeVisible();
@@ -30,8 +30,7 @@ test("entry workflow green path: create entry, add paint, add step, remove step,
   await page.goto(`/entries/${entryId}/paints`);
   const paintNameInput = page.getByRole("textbox", { name: "Paint name" });
   await expect(paintNameInput).toBeEditable();
-  await paintNameInput.click();
-  await paintNameInput.pressSequentially(paintName);
+  await fillControlledInput(paintNameInput, paintName);
   await page.getByRole("button", { name: "Add paint" }).click();
   await expect(page).toHaveURL(/added=1/);
   await expect(page.getByText("Paint added")).toBeVisible();
@@ -42,9 +41,7 @@ test("entry workflow green path: create entry, add paint, add step, remove step,
 
   const stepDescriptionInput = page.getByRole("textbox", { name: "Step description" });
   await expect(stepDescriptionInput).toBeEditable();
-  await stepDescriptionInput.click();
-  await stepDescriptionInput.pressSequentially(stepDescription);
-  await expect(stepDescriptionInput).toHaveValue(stepDescription);
+  await fillControlledInput(stepDescriptionInput, stepDescription);
   await expect(page.getByRole("checkbox", { name: paintName })).toBeVisible();
   await page.getByRole("checkbox", { name: paintName }).check();
   await page.getByRole("button", { name: "Add step" }).click();
