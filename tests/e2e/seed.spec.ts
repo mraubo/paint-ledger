@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { signInAsUserA } from "./helpers/sign-in";
 import { parseEntryIdFromEditUrl } from "./helpers/entry-url";
+import { fillControlledInput } from "./helpers/fill-controlled-input";
 
 test("created entry persists after reload and can be deleted", async ({ page }) => {
   const entryTitle = `Test Entry ${Date.now()}`;
@@ -9,8 +10,7 @@ test("created entry persists after reload and can be deleted", async ({ page }) 
 
   await page.getByRole("link", { name: "Create entry" }).click();
   const titleInput = page.getByRole("textbox", { name: "Title" });
-  await titleInput.click();
-  await titleInput.pressSequentially(entryTitle);
+  await fillControlledInput(titleInput, entryTitle);
   await page.getByRole("button", { name: "Create entry" }).click();
 
   await expect(page).toHaveURL(/\/entries\/[^/]+\/edit\?created=1/);
